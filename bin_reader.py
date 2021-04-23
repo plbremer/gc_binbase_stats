@@ -7,9 +7,9 @@ import re
 def receive_url_return_dict(url_beginning,bin_id):
 
     temp_response=requests.get(url_beginning+bin_id)
-    print(temp_response)
+    #print(temp_response)
     json_object=temp_response.json()
-    print(json_object)
+    #print(json_object)
     return json_object
 
 
@@ -56,7 +56,7 @@ class BinReader():
         self.assign_dict(annotation_dict)
         #self.make_key_list
         self.reformat_spectrum_attribute('spectra')
-        self.dict_to_panda()
+        #self.dict_to_panda()
 
 if __name__ == '__main__':
 
