@@ -173,8 +173,8 @@ if __name__ == '__main__':
 
     #for i in range(1,1000000,10000):
     this_min=1
-    this_max=1000
-    this_gap=10
+    this_max=1000000
+    this_gap=10000
 
     
     for i in range(this_min,this_max,this_gap):
@@ -192,7 +192,7 @@ if __name__ == '__main__':
         
         my_BinvestigateWriter.do_everything('/home/rictuar/coding_projects_database/gc_binbase_results_')        
 
-
+        temp_logfile.close()
 
         #print(i)
 
