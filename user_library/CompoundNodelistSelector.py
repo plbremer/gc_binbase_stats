@@ -17,15 +17,15 @@ class CompoundNodelistSelector:
             #self.compound_nodelist=nx.algorithms.dag.ancestors(self.compound_nx,compound_topnode)
             self.compound_nodelist=nx.algorithms.dag.descendants(self.compound_nx,compound_topnode)
             self.compound_nodelist.add(compound_topnode)
-            print(self.compound_nodelist)
-            color_list=list()
-            for temp_node in self.compound_nx.nodes:
-                if temp_node in self.compound_nodelist:
-                    color_list.append('#00ff00')
-                else:
-                    color_list.append('#ff0000')
-            nx.draw(self.compound_nx,color)
-            hold=input('compound_nodelist')
+            ##print(self.compound_nodelist)
+            ##color_list=list()
+            ##for temp_node in self.compound_nx.nodes:
+            ##    if temp_node in self.compound_nodelist:
+            ##        color_list.append('#00ff00')
+            ##    else:
+            ##        color_list.append('#ff0000')
+            ##nx.draw(self.compound_nx,color)
+            ##hold=input('compound_nodelist')
 
         if (compound_minlevel is not None) and (compound_maxlevel is not None):
             self.set_nodelist_by_level('compound',compound_minlevel,compound_maxlevel)

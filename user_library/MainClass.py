@@ -113,6 +113,23 @@ class MainClass():
             temp_disease_nodelist_from,
             temp_disease_nodelist_to,
         )
+
+    def check_from_to_equal(self):
+        '''
+        check whether the from and to dicts are exactly equal and set a variable that retains that information
+        If they are exactly equal, then we can take a shortcut of starting "to" species at the curent "from" species
+        '''
+
+        if (
+            (self.NodelistSelector_from.species_nodelist == self.NodelistSelector_to.species_nodelist) and
+            (self.NodelistSelector_from.organ_nodelist == self.NodelistSelector_to.organ_nodelist) and
+            (self.NodelistSelector_from.disease_nodelist == self.NodelistSelector_to.disease_nodelist)
+        ):
+            self.from_nodes_to_nodes_equal=True
+        else:
+            self.from_nodes_to_nodes_equal=False
+
+
 if __name__ == "__main__":
 
     compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
@@ -132,16 +149,17 @@ if __name__ == "__main__":
     print('---------')
     
     print('---------')
+    #get the complete nodeset based on a particular headnode
     my_MainClass.assign_hierarchical_nodes_from(
         my_MainClass.species_nx,
         my_MainClass.organ_nx,
         my_MainClass.disease_nx,
         species_topnode='1',
         organ_topnode='organ',
-        disease_topnode='disease'     
+        disease_topnode='disease'
     )
     my_MainClass.NodelistSelector_from.node_selection_visualizer('species')
-
+    #get the complete nodeset based on a particular headnode
     my_MainClass.assign_hierarchical_nodes_to(
         my_MainClass.species_nx,
         my_MainClass.organ_nx,
@@ -152,10 +170,13 @@ if __name__ == "__main__":
     )
     my_MainClass.NodelistSelector_to.node_selection_visualizer('species')
 
+
+    my_MainClass.check_from_to_equal()
+
     #comparison request should probably be rewritten to take a NodelistSelector (but not necessary)
     #here we enter the "main loop" of the proceedings, whereas we make a comparison selector
     #for every compound.
-    #                                 '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/all_fold_matrices/2.bin
+
     one_compound_fold_matrix_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
     fold_matrix=pandas.read_pickle(one_compound_fold_matrix_address)
     print(fold_matrix)
@@ -237,7 +258,8 @@ if __name__ == "__main__":
         my_MainClass.organ_nx,
         my_MainClass.disease_nx,
         my_MainClass.ComparisonRequest.valid_node_triplets_dict['from'],
-        my_MainClass.ComparisonRequest.valid_node_triplets_dict['to']      
+        my_MainClass.ComparisonRequest.valid_node_triplets_dict['to'],
+        my_MainClass.from_nodes_to_nodes_equal
     )
 
     my_AllCompoundEvaluator.evaluate_all_compounds()
@@ -306,3 +328,7 @@ if __name__ == "__main__":
     #come up with actionable end-user interface
 
     #put on pypy
+
+    #i think the plan should be to make a simple version with very little data and have oliver and crew
+    #test it out
+    #just make it with a csv

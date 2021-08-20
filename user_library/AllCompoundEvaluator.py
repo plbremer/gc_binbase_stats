@@ -7,7 +7,7 @@ class AllCompoundEvaluator:
     basically a wrapper for SingleCompoundEvaluator
     '''
 
-    def __init__(self, temp_compound_nodelist, temp_use_multiprocessing, temp_fold_matrix_base_address, temp_base_output_address, temp_species_nx,temp_organ_nx,temp_disease_nx,temp_node_triplets_from,temp_node_triplets_to):
+    def __init__(self, temp_compound_nodelist, temp_use_multiprocessing, temp_fold_matrix_base_address, temp_base_output_address, temp_species_nx,temp_organ_nx,temp_disease_nx,temp_node_triplets_from,temp_node_triplets_to,temp_from_nodes_to_nodes_equal):
         '''
         '''
         self.compound_nodelist=temp_compound_nodelist
@@ -19,6 +19,7 @@ class AllCompoundEvaluator:
         self.disease_nx=temp_disease_nx
         self.node_triplets_from=temp_node_triplets_from
         self.node_triplets_to=temp_node_triplets_to
+        self.from_nodes_to_nodes_equal=temp_from_nodes_to_nodes_equal
 
     def evaluate_all_compounds(self):
         '''
@@ -48,7 +49,8 @@ class AllCompoundEvaluator:
                     #self.base_output_address,
                     self.base_output_address,
                     #temp_compound
-                    temp_compound
+                    temp_compound,
+                    self.from_nodes_to_nodes_equal
                 )
 
                 temp_SingleCompoundEvaluator.evaluate_from()

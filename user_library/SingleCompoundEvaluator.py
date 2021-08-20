@@ -16,7 +16,8 @@ class SingleCompoundEvaluator:
         temp_from_dict,
         temp_to_dict,
         temp_base_address,
-        temp_compound
+        temp_compound,
+        temp_from_nodes_to_nodes_equal
     ):
         '''
         '''
@@ -28,6 +29,7 @@ class SingleCompoundEvaluator:
         self.to_dict=temp_to_dict        
         self.base_address=temp_base_address
         self.compound=temp_compound
+        self.from_nodes_to_nodes_equal=temp_from_nodes_to_nodes_equal
         #print(self)
         #print(temp_species_nx)
         #print(self.species_nx)
@@ -123,7 +125,10 @@ class SingleCompoundEvaluator:
 
                     #=False
                     #print(temp_species+' '+temp_organ+' '+temp_disease)
+                    #if self.from_nodes_to_nodes_equal==True:
                     found_at_least_one_result_for_current_disease=self.evaluate_to(temp_species,temp_organ,temp_disease)
+                    #elif from_nodes_to_nodes_equal==False:
+                    #found_at_least_one_result_for_current_disease=self.evaluate_to(temp_species,temp_organ,temp_disease)
                     #found_at_least_one_result_for_current_disease=False
 
                     if found_at_least_one_result_for_current_disease==True:
@@ -154,6 +159,18 @@ class SingleCompoundEvaluator:
         #print(species_traversal_list)
         #remove species that are not referenced by the user subset selection
         species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.to_dict.keys())
+        print(temp_species_from)
+        print(species_traversal_sublist)
+        print(species_traversal_sublist.index(temp_species_from))
+        if self.from_nodes_to_nodes_equal==True:
+            #if the from and to lists are the same, then, from the species nx traversal list, remove all nodes upto and including
+            #the current from species
+            species_traversal_sublist=species_traversal_sublist[species_traversal_sublist.index(temp_species_from):]
+        
+        print(species_traversal_sublist)
+        hold=input('check proper removal on species traversal sublist')
+
+        
         #print(species_traversal_sublist)
         #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
         species_traversal_skips=list()
