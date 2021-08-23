@@ -9,23 +9,18 @@ class CompoundNodelistSelector:
 
     def __init__(self,temp_compound_nx,compound_topnode=None,compound_maxlevel=None,compound_minlevel=None):
         '''
+        Creates an instance of CompoundNodelistSelector
+
+        At current, there are two ways to indicate your nodechoices.
+        1) specify a headnode from which all descdendants are nodes
+        2) specify a minimum/maximum depth from the headnode. Note that this does not currently work because of problems later down the line
+            such as a need to reconnect all specified nodes to the headnode
         '''
         self.compound_nx=temp_compound_nx
 
         if compound_topnode is not None:
-            #the ont reader or the ont itself is insane and the ancestor/descedant relationship is backwards
-            #self.compound_nodelist=nx.algorithms.dag.ancestors(self.compound_nx,compound_topnode)
             self.compound_nodelist=nx.algorithms.dag.descendants(self.compound_nx,compound_topnode)
             self.compound_nodelist.add(compound_topnode)
-            ##print(self.compound_nodelist)
-            ##color_list=list()
-            ##for temp_node in self.compound_nx.nodes:
-            ##    if temp_node in self.compound_nodelist:
-            ##        color_list.append('#00ff00')
-            ##    else:
-            ##        color_list.append('#ff0000')
-            ##nx.draw(self.compound_nx,color)
-            ##hold=input('compound_nodelist')
 
         if (compound_minlevel is not None) and (compound_maxlevel is not None):
             self.set_nodelist_by_level('compound',compound_minlevel,compound_maxlevel)
@@ -33,11 +28,9 @@ class CompoundNodelistSelector:
 
     def set_nodelist_by_level(self,temp_type,temp_min,temp_max):
         '''
-        this code is borrowed from NodelistSelector  therefore it goes about things in a a seemingly roundabout fashion
+        this code is borrowed from NodelistSelector (for species, organs, diseases) therefore it goes about things in a a seemingly roundabout fashion
         '''
         setattr(self,temp_type+'_nodelist',list())
-        print(self.compound_nodelist)
-        hold=input('self.compound_nodelist')
 
         if temp_type=='compound':
             temp_headnode='CHEMONTID:9999999'
@@ -50,18 +43,13 @@ class CompoundNodelistSelector:
         pprint(shortest_path_length_dict)
 
         for temp_key in shortest_path_length_dict.keys():
-            print(temp_key)
             if (shortest_path_length_dict[temp_key]>temp_min) and (shortest_path_length_dict[temp_key]<temp_max):
-                print('met conditions')
                 getattr(self,temp_type+'_nodelist').append(temp_key)
-                print(getattr(self,temp_type+'_nodelist'))
-            #hold=input('hold')
 
     def node_selection_visualizer(self,temp_type):
         '''
+        A visualization tool for debugging.
         '''
-        print(self.compound_nx)
-        print(self.compound_nodelist)
         color_list=list()
         for temp_node in getattr(self,temp_type+'_nx'):
             if temp_node in getattr(self,temp_type+'_nodelist'):
@@ -70,17 +58,7 @@ class CompoundNodelistSelector:
                 color_list.append('#ff0000')
             else:
                 color_list.append('#0000dd')
-        
-        #H = nx.convert_node_labels_to_integers(self.compound_nx, label_attribute='node_label')
-        #H_layout = nx.nx_pydot.pydot_layout(self.compound_nx, prog='dot')
-        #G_layout = {H.nodes[n]['node_label']: p for n, p in H_layout.items()}
-        #nx.draw(getattr(self,temp_type+'_nx'), G_layout,with_labels=True,node_color=color_list)
-        #pos = nx.drawing.nx_pydot.graphviz_layout(self.compound_nx, prog="twopi")
-        #pos = nx.nx_agraph.pygraphviz_layout(getattr(self,temp_type+'_nx'), prog='dot')
-        #pos = nx.nx_agraph.pygraphviz_layout(self.compound_nx, prog='dot')
-        #nx.draw(getattr(self,temp_type+'_nx'), pos,with_labels=True,node_color=color_list)
         nx.draw(self.compound_nx,with_labels=True,node_color=color_list)
-        #nx.draw(self.compound_nx,node_color=color_list)
         plt.show()
 
 '''

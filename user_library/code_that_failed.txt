@@ -1,0 +1,246 @@
+
+    def check_for_organ_disease_from_symmetry(self, temp_organ_traversal_sublist,temp_temp_species):
+        print('$$$$$$$$$$$$$$$$$$$$$$$$')
+        print(temp_organ_traversal_sublist)
+        #get the path from the first element to the node 'organ
+        #if every element in the organ traversal sublist is in that 
+        temp_path=nx.algorithms.shortest_paths.generic.shortest_path(self.organ_nx,source='organ',target=temp_organ_traversal_sublist[0])
+        print(temp_path)
+        all_organ_sublist_elements_in_path=all([True if element in temp_path else False for element in temp_organ_traversal_sublist])
+        print(all_organ_sublist_elements_in_path)
+        #the second thing to check is that they all have the same disease elements
+        #to do this, we can look at the dictionary entry for
+
+        disease_list_of_first_organ_sublist_element=self.from_dict[temp_temp_species][temp_organ_traversal_sublist[0]]
+        print(disease_list_of_first_organ_sublist_element)
+        print([self.from_dict[temp_temp_species][temp_organ_traversal_sublist[i]] for i in range(len(disease_list_of_first_organ_sublist_element))])
+        print([True if self.from_dict[temp_temp_species][temp_organ_traversal_sublist[i]] == disease_list_of_first_organ_sublist_element else False for i in range(len(disease_list_of_first_organ_sublist_element))])
+        all_organ_sublist_elements_in_path_have_same_disease=all([True if self.from_dict[temp_temp_species][temp_organ_traversal_sublist[i]] == disease_list_of_first_organ_sublist_element else False for i in range(len(disease_list_of_first_organ_sublist_element))])
+        print(all_organ_sublist_elements_in_path_have_same_disease)
+        #basically what we are coding here is the case where a species has one organ and that one organ has one disease
+        #in this case, you dont need to go up the whole path
+
+        #there is another case where just for each organ there is only one disease
+        #pointless to search "no" and "disease"
+
+        hold=input('$$$$$$$$$ check path $$$$$$$$$$$$')
+
+        if all_organ_sublist_elements_in_path==True and all_organ_sublist_elements_in_path_have_same_disease==True:
+            return True
+        else:
+            return False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            #check if the particular species node that we are on has an organ path with no branching and each organ has exactly the 
+            #same disease
+            organ_disease_symmetry_from=self.check_for_organ_disease_from_symmetry(organ_traversal_sublist,temp_species)
+            print(organ_disease_symmetry_from)
+            hold=input('hold organ_disease_symmetry_from')
+
+
+
+
+
+
+
+
+
+
+                #if we successfully found path symmetries, then we can check to see if its the first organ
+                #if it is, then we proceed as normal
+                #else, we pass the loop and duplicate the results after the organ portion
+                if organ_disease_symmetry_from==True:
+                    if organ_traversal_sublist.index(temp_organ) != 0:
+                        continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+the following was an attempt to implement something that "duplicated" results if the list was simple
+for example, if "disease and no" were the only diseases, then i originally thought that one could 
+simply duplicate the result of teh more specific disease to that of the more general (aka duplicate no to disease)
+what i realized after several hours was taht in fact the "from" makes  ahuge difference about the things that get "except for"'d
+so this whole thing is not legit logic
+
+                
+                child_same,single_child=self.check_if_node_skippable_via_single_child(temp_organ,organ_traversal_sublist,temp_species)
+                if (child_same):
+                    #call "special writer" that copies everything
+                    #continue
+                    hold=input('headed to alternative writing function where organ is the same')
+                    self.alternate_writing_function(temp_organ,single_child,temp_species)
+                    #hold
+
+
+                for temp_disease in disease_traversal_sublist:
+                    print(temp_disease)
+                    print(disease_traversal_sublist)
+                    hold=input('disease list from')
+                    
+    def check_if_node_skippable_via_single_child(self,temp_temp_organ,temp_organ_traversal_sublist,temp_temp_species):
+        '''
+        There is a special type of symmetry where a particular node in the traversal_sublist has exactlyone child 
+        that is in the traversal sublist. it always has more if we chose to use the minimized tree, but it there might actually
+        only be one child in the traveral list
+        '''
+        #self.organ_nx
+        #temp_organ
+
+        #get the children of the current node
+        temp_children=set(self.organ_nx.successors(temp_temp_organ))
+        #if there is exactly one child node in the traveral sublist (and the diseases match), then the current node is just a copy
+        #of the child node
+        #we test the first condition by seeing if the union of their sets has size one
+        print([self.organ_nx.nodes[temp_node]['mesh_label'] for temp_node in self.organ_nx.nodes])
+        nx.draw(self.organ_nx,with_labels=True)
+        plt.show()
+        print('temp_temp_organ '+temp_temp_organ)
+        #print(set(temp_children))
+        print(set(temp_organ_traversal_sublist))
+        
+        temp_union=temp_children.intersection(set(temp_organ_traversal_sublist))
+        print(temp_union)
+        print(len(temp_union))
+
+        #if there is more than one child, then we are at a branch node and we cant copy results
+        if len(temp_union)!=1:
+            return False,None
+        else:
+            #if we are at a branch node, confirm that the child and the current node have the same set of diseases
+            temp_single_child=temp_union.pop()
+            disease_list_from_current_node=self.from_dict[temp_temp_species][temp_temp_organ]
+            disease_list_from_child_node=self.from_dict[temp_temp_species][temp_single_child]
+            print(disease_list_from_current_node)
+            print(disease_list_from_child_node)
+            if disease_list_from_child_node==disease_list_from_current_node:
+                hold=input('found a direct copy')
+                return True,temp_single_child
+            else:
+                return False,None
+
+        hold=input('inside check_if_node_skippable_via_single_child')
+
+
+    def alternate_writing_function(self,temp_temp_organ,temp_single_child,temp_temp_species):
+        '''
+        we call this function if when the disease or organ group is "monopathic", that is
+        every element in the organ sublist or disease sublist is in a single path from the lowest node
+        to the highest
+        in that case, we can, for each non-zeroth element in the sublist, copy the items from the previous sublist
+        
+        we should only do it if the organs *and* diseases are the same for every element
+        '''
+        #print(self.recording_dict[temp_key].append(temp_SingleResultCalculator.current_result[temp_key][0]))
+        print(self.recording_dict)            
+        print('hi')
+        
+        temp_species_organ_pairs=list(zip(self.recording_dict['species_node_from'],self.recording_dict['organ_node_from']))
+        print(temp_species_organ_pairs)
+        #indices_to_copy=
+
+        first_index=temp_species_organ_pairs.index((temp_temp_species,temp_single_child))
+        print(first_index)
+        #last_index=temp_species_organ_pairs.rindex((temp_temp_species,temp_single_child))
+        last_index=rindex(temp_species_organ_pairs,(temp_temp_species,temp_single_child),None)
+        print(last_index)
+
+
+
+        for temp_key in self.recording_dict.keys():
+            self.recording_dict[temp_key]
+
+        hold=input('inside alternate_writing_function')
+
+
+
+

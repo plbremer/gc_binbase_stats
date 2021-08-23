@@ -11,10 +11,12 @@ import itertools
 class ComparisonRequest():
     '''
     The purpose of this class is to receive a "complete" set of nodes from something else
-    (so, after the various networkx trees have been selected from)
+    (so, after the species, organ, disease networkx trees have been selected)
     There is an implied combination set for any "three way list of nodes"
     Thus, the goal of this class is to reduce the "complete combination" space to a smaller combination
     Space where each combination has at least 1 valid entry
+
+    that is, it removes things like ('human','leaf','lung cancer')
 
     The results of this analysis can be complete from any fold matrix, but apply to all compounds
     '''
@@ -59,8 +61,6 @@ class ComparisonRequest():
             'from':{},
             'to':{}            
         }
-        ##print(self.species_nx.nodes)
-        ##hold=input('self.species_nx inside comparison request')
 
     def assign_binvestigate_triplet_list(self):
         '''
@@ -71,8 +71,6 @@ class ComparisonRequest():
         self.binvestigate_triplet_panda=pandas.DataFrame(self.fold_matrix.index.values)
         self.binvestigate_triplet_panda=self.binvestigate_triplet_panda[0].apply(pandas.Series)
         self.binvestigate_triplet_panda.columns=['organ','species','disease']        
-        ##print(self.binvestigate_triplet_panda)
-        ##hold=input('self.binvestigate_triplet_panda')
 
     def create_full_node_triplet_list(self,temp_species_list,temp_source):
         '''
@@ -107,14 +105,9 @@ class ComparisonRequest():
                 species_nodelist_iterable.append(self.species_nodelist[temp_source][i*chunk_size:(i+1)*chunk_size])
             elif i==(num_processes-1):
                 species_nodelist_iterable.append(self.species_nodelist[temp_source][i*chunk_size:])
-        print(len(species_nodelist_iterable[0]))
-        #hold=input('species_nodelist_iterable, wait until the numbers reach above')
         transformed_chunks=pool.starmap(self.fill_combination_list,zip(species_nodelist_iterable,itertools.repeat(temp_source)))
         pool.close()
         pool.join()
-        
-        ##print(transformed_chunks)
-        #hold=input('transformed_chunks')
 
         #recombine chunks
         for i in range(len(transformed_chunks)):
@@ -135,17 +128,10 @@ class ComparisonRequest():
 
         for i, temp_species in enumerate(temp_species_list):
             print(i)
-            ##print(temp_species)
-            ##print(self.species_nx)
-            #print(self.binvestigate_triplet_panda)
 
             temp_species_nodeset=nx.algorithms.dag.descendants(self.species_nx,temp_species)
             temp_species_nodeset.add(temp_species)
             temp_triplet_view_after_species_filter=self.binvestigate_triplet_panda.loc[self.binvestigate_triplet_panda['species'].isin(temp_species_nodeset)]
-            ##print(temp_species_nodeset)
-            ##print(temp_triplet_view_after_species_filter)
-            ##print('--------------------------------')
-            #hold=input('temp_triplet_view_after_species_filter')
 
             for temp_organ in self.organ_nodelist[temp_source]:
                 temp_organ_nodeset=nx.algorithms.dag.descendants(self.organ_nx,temp_organ)
@@ -182,8 +168,8 @@ class ComparisonRequest():
             self.valid_node_triplets_dict[temp_source][element[0]][element[1]].append(element[2])
 
         pprint(self.valid_node_triplets_dict[temp_source])
-    
-    
+
+'''
 if __name__ == "__main__":
 
     one_compound_fold_matrix_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/all_fold_matrices/2.bin'
@@ -221,3 +207,4 @@ if __name__ == "__main__":
 
     my_ComparisonRequest.fill_combination_dict_wrapper('to')
     my_ComparisonRequest.convert_combination_list_to_dict('to')
+'''

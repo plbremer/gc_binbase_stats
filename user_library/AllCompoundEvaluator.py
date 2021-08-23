@@ -23,6 +23,10 @@ class AllCompoundEvaluator:
 
     def evaluate_all_compounds(self):
         '''
+        If someone wanted to do this on their own computer, then they would probably choose a swatch of compounds
+        and evaluate all of them, where each compound is evaulated on an individual processor
+
+        For now, since we might just precompute everything, we keep multiprocessing false
         '''
         print(self.use_multiprocessing)
         if self.use_multiprocessing==False:
@@ -30,31 +34,18 @@ class AllCompoundEvaluator:
             for temp_compound in self.compound_nodelist:
 
                 temp_fold_matrix=pandas.read_pickle(self.fold_matrix_base_address+str(temp_compound)+'.bin')
-                print(temp_compound)
-                ##print(self.fold_matrix_base_address+str(temp_compound)+'.bin')
-                #hold=input('hold')
                 temp_SingleCompoundEvaluator=SingleCompoundEvaluator(
-                    #fold_matrix,
                     temp_fold_matrix,
-                    #species_nx,
                     self.species_nx,
-                    #organ_nx,
                     self.organ_nx,
-                    #disease_nx,
                     self.disease_nx,
-                    #my_MainClass.ComparisonRequest.valid_node_triplets_dict['from'],
                     self.node_triplets_from,
-                    #my_MainClass.ComparisonRequest.valid_node_triplets_dict['to'],
                     self.node_triplets_to,
-                    #self.base_output_address,
                     self.base_output_address,
-                    #temp_compound
                     temp_compound,
                     self.from_nodes_to_nodes_equal
                 )
 
                 temp_SingleCompoundEvaluator.evaluate_from()
 
-                #temp_SingleCompoundEvaluator.save_result(self.base_output_address,temp_compound)
                 temp_SingleCompoundEvaluator.save_result()
-

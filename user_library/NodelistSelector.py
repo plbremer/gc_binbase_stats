@@ -26,8 +26,6 @@ class NodelistSelector():
         disease_maxlevel=None,
         organ_maxlevel=None
     ):
-        '''
-        '''
 
         self.species_nx=temp_species_nx
         self.organ_nx=temp_organ_nx
@@ -56,19 +54,15 @@ class NodelistSelector():
             self.set_nodelist_by_level('disease',disease_minlevel,disease_maxlevel)            
 
     def set_nodelist_by_level(self,temp_type,temp_min,temp_max):
-        
-        setattr(self,temp_type+'_nodelist',list())
-        #print(self.species_nodelist)
-        #hold=input('self.species_nodelist')
-        #print(self.species_nx)
-        #print(vars(self)[temp_type+'_nx'])
-        #print(getattr(self,temp_type+'_nx'))
+        '''
+        An alternative method to check nodes. Note, may not work
+        '''
 
+        setattr(self,temp_type+'_nodelist',list())
         if temp_type=='species':
             temp_headnode='1'
         else:
             temp_headnode=temp_type
-
 
         shortest_path_node_dict=nx.algorithms.shortest_paths.generic.shortest_path(getattr(self,temp_type+'_nx'),source=temp_headnode)
         pprint(shortest_path_node_dict)
@@ -76,15 +70,13 @@ class NodelistSelector():
         pprint(shortest_path_length_dict)
 
         for temp_key in shortest_path_length_dict.keys():
-            ##print(temp_key)
             if (shortest_path_length_dict[temp_key]>temp_min) and (shortest_path_length_dict[temp_key]<temp_max):
-                ##print('met conditions')
                 getattr(self,temp_type+'_nodelist').append(temp_key)
-                ##print(getattr(self,temp_type+'_nodelist'))
-            #hold=input('hold')
 
     def node_selection_visualizer(self,temp_type):
-        
+        '''
+        A debugging tool.
+        '''
         color_list=list()
         for temp_node in getattr(self,temp_type+'_nx'):
             if temp_node in getattr(self,temp_type+'_nodelist'):

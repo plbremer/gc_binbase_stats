@@ -6,6 +6,10 @@ import pandas
 class SingleCompoundEvaluator:
     '''
     Basically a wrapper for SingleResultCalculator
+    But a sophisticated wrapper, where we traverse the species, organ, and disease trees for both "from" and to"
+    we go through the entire "species, organ disease" to treeset for every single node on the "species, organ, disease" from treeset
+
+    every time we are at a node, it corresponds to a set of rows/columns in the fold matrix
     '''
     def __init__ (
         self,
@@ -20,6 +24,14 @@ class SingleCompoundEvaluator:
         temp_from_nodes_to_nodes_equal
     ):
         '''
+        In the initialization we have the things that you would expect (perhaps)
+        -species hierarchy
+        -organ hierarchy
+        -disease hierarchy
+        -fold matrix
+        -dict of node combinations that are non-zero for "from" and "to"
+
+        we declare a dict, whose form matches the "individual result" form
         '''
         self.fold_matrix=temp_fold_matrix
         self.species_nx=temp_species_nx
@@ -30,14 +42,6 @@ class SingleCompoundEvaluator:
         self.base_address=temp_base_address
         self.compound=temp_compound
         self.from_nodes_to_nodes_equal=temp_from_nodes_to_nodes_equal
-        #print(self)
-        #print(temp_species_nx)
-        #print(self.species_nx)
-        #hold=input('hold')
-        #for temp_node in self.species_nx.nodes:
-        #    print(self.species_nx.nodes[temp_node])
-
-        #print(self.species_nx.nodes)
 
         self.declare_global_recording_dict()
     
@@ -57,12 +61,12 @@ class SingleCompoundEvaluator:
         'species_node_from': list(),
         'species_node_to': list(),  
         }
-    
-    #def visualize
+
 
     def remove_nodes_not_chosen_by_user(self,temp_long_list,temp_list_to_keep):
         '''
-        the reason that we do this fancy removal is that we want to preserve the special traversal order
+        This funciton takes the ordered traversal of a complete nx and removes nodes that are not involved, preserving the
+        traversal order
         '''
         temp_shortened_list=list()
         for element in temp_long_list:
@@ -73,6 +77,22 @@ class SingleCompoundEvaluator:
         
     def evaluate_from(self):
         '''
+        The outer loop in the from/to loop pair
+
+        The general idea is as follows:
+        in a nested fashion, iterate over the species_nx, the organ_nx, and the disease_nx via the DFS postorder tree traversal order
+
+        every time you change a node on this, you call the evaluate_to, and do the entire triple tree traversal
+
+        in this way, you compare every single node with every single node.
+
+        We do three main things to make this faster than it could otherwise be:
+        1) Every iteration, we create a complete traversal, but then reduce the traversal to only those nodes that have non-null
+        row column references given the location we are in other trees (given nothing for species, given species for organ, given species and organ for disease)
+        2) because we do a DFS postorder traversal, we start at the bottom of the tree. if we dont find anything for those leaf (or close to bottom) nodes
+        then we skip nodes that are parents thereof 
+        3) if the from and to dicts are equal, then we start the to species traversal at the from species start point. in this way, we dont
+        see redundant comparisons
         '''
         
         #create ordered traversal through species, organ disease (these are always the same so we put outside loop)
@@ -80,38 +100,26 @@ class SingleCompoundEvaluator:
         organ_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.organ_nx,source='organ'))
         disease_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.disease_nx,source='disease'))
 
-        ##print(species_traversal_list)
         #remove species that are not referenced by the user subset selection
         species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.from_dict.keys())
-        ##print(species_traversal_sublist)
+
         #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
         species_traversal_skips=list()
 
         #iterate through specices
         for temp_species in species_traversal_sublist:
-            print('-------------------------')
-            print('to')
-            print('species_traversal_sublist')
-            print(species_traversal_sublist)
-            print('temp_species')
-            print(temp_species)
-            print('species_traversal_skips')
-            print(species_traversal_skips)
             if temp_species in species_traversal_skips:
                 continue
             
-            #print(temp_species)
             found_at_least_one_result_for_current_species=False
-            #print(organ_traversal_list)
+
             #create the organ traversal sublist that is referred to by temp_species
             organ_traversal_sublist=self.remove_nodes_not_chosen_by_user(organ_traversal_list,self.from_dict[temp_species].keys())
-            #print(organ_traversal_sublist)
+
             #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
             organ_traversal_skips=list()
 
             for temp_organ in organ_traversal_sublist:
-                print(organ_traversal_sublist)
-                print(temp_organ)
                 if temp_organ in organ_traversal_skips:
                     continue
 
@@ -123,13 +131,7 @@ class SingleCompoundEvaluator:
                     if temp_disease in disease_traversal_skips:
                         continue
 
-                    #=False
-                    #print(temp_species+' '+temp_organ+' '+temp_disease)
-                    #if self.from_nodes_to_nodes_equal==True:
                     found_at_least_one_result_for_current_disease=self.evaluate_to(temp_species,temp_organ,temp_disease)
-                    #elif from_nodes_to_nodes_equal==False:
-                    #found_at_least_one_result_for_current_disease=self.evaluate_to(temp_species,temp_organ,temp_disease)
-                    #found_at_least_one_result_for_current_disease=False
 
                     if found_at_least_one_result_for_current_disease==True:
                         #add ancestors of temp_disease to disease_traversal_skips
@@ -146,55 +148,39 @@ class SingleCompoundEvaluator:
 
             if found_at_least_one_result_for_current_species==False:
                 species_traversal_skips+=list(nx.algorithms.dag.ancestors(self.species_nx,temp_species))
-            #hold=input('hold')
+
 
     def evaluate_to(self,temp_species_from,temp_organ_from,temp_disease_from):
         '''
+        A lot of the same logic as from
         '''
         #create ordered traversal through species, organ disease (these are always the same so we put outside loop)
         species_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.species_nx,source='1'))
         organ_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.organ_nx,source='organ'))
         disease_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.disease_nx,source='disease'))
 
-        #print(species_traversal_list)
         #remove species that are not referenced by the user subset selection
         species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.to_dict.keys())
-        print(temp_species_from)
-        print(species_traversal_sublist)
-        print(species_traversal_sublist.index(temp_species_from))
+
         if self.from_nodes_to_nodes_equal==True:
             #if the from and to lists are the same, then, from the species nx traversal list, remove all nodes upto and including
             #the current from species
             species_traversal_sublist=species_traversal_sublist[species_traversal_sublist.index(temp_species_from):]
         
-        print(species_traversal_sublist)
-        hold=input('check proper removal on species traversal sublist')
-
-        
-        #print(species_traversal_sublist)
         #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
         species_traversal_skips=list()
 
         found_at_least_one_finding_for_entire_to_nxs=False
         #iterate through specices
         for temp_species in species_traversal_sublist:
-            #print('-------------------------')
-            #print('to')
-            #print('species_traversal_sublist')
-            #print(species_traversal_sublist)
-            #print('temp_species')
-            #print(temp_species)
-            #print('species_traversal_skips')
-            #print(species_traversal_skips)
             if temp_species in species_traversal_skips:
                 continue
             
-            #print(temp_species)
             found_at_least_one_result_for_current_species=False
-            #print(organ_traversal_list)
+
             #create the organ traversal sublist that is referred to by temp_species
             organ_traversal_sublist=self.remove_nodes_not_chosen_by_user(organ_traversal_list,self.to_dict[temp_species].keys())
-            #print(organ_traversal_sublist)
+
             #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
             organ_traversal_skips=list()
 
@@ -210,11 +196,9 @@ class SingleCompoundEvaluator:
                     if temp_disease in disease_traversal_skips:
                         continue
 
-                    #print('from '+temp_species_from+' '+temp_organ_from+' '+temp_disease_from)                    
-                    #print('to '+temp_species+' '+temp_organ+' '+temp_disease)
-                    
+
                     temp_SingleResultCalculator=SingleResultCalculator(self.fold_matrix,self.species_nx,self.organ_nx,self.disease_nx,True)
-                    #SHOULD BE A GLOBAL VARIABLE THAT WE PUT THE RESULT ONTO
+
                     temp_SingleResultCalculator.calculate_one_result(
                         {
                             'species':temp_species_from,
@@ -227,9 +211,6 @@ class SingleCompoundEvaluator:
                             'disease':temp_disease
                         }
                     )
-                    #current_to_from_combination=
-                    #pprint(temp_SingleResultCalculator.current_result)
-                    #hold=input('hold')
                     
                     ######## NEED TO MAKE 5 A HYPERPARAMETER #########
                     if (
@@ -261,20 +242,19 @@ class SingleCompoundEvaluator:
             if found_at_least_one_result_for_current_species==False:
                 species_traversal_skips+=list(nx.algorithms.dag.ancestors(self.species_nx,temp_species))
 
-        #hold=input('finished to')
         return found_at_least_one_finding_for_entire_to_nxs
 
     def save_result(self):
         '''
+        convert the result dict to a panda
         '''
         self.recording_dataframe=pandas.DataFrame.from_dict(self.recording_dict)
         self.recording_dataframe.to_pickle(self.base_address+str(self.compound)+'.bin')
 
-
+'''
 if __name__ == "__main__":
 
     species_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_11_prepare_species_networkx/species_networkx.bin'
-    '''
     organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
     disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
 
@@ -292,4 +272,4 @@ if __name__ == "__main__":
         temp_from_dict,
         temp_to_dict
     )
-    '''
+'''
