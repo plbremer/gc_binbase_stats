@@ -102,7 +102,7 @@ class SingleCompoundEvaluator:
 
         #remove species that are not referenced by the user subset selection
         species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.from_dict.keys())
-
+        #print(species_traversal_sublist)
         #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
         species_traversal_skips=list()
 
@@ -166,7 +166,7 @@ class SingleCompoundEvaluator:
             #if the from and to lists are the same, then, from the species nx traversal list, remove all nodes upto and including
             #the current from species
             species_traversal_sublist=species_traversal_sublist[species_traversal_sublist.index(temp_species_from):]
-        
+        #print(species_traversal_sublist)        
         #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
         species_traversal_skips=list()
 
@@ -211,7 +211,9 @@ class SingleCompoundEvaluator:
                             'disease':temp_disease
                         }
                     )
-                    
+                    #pprint(temp_SingleResultCalculator.current_result)
+                    #hold=input('calculated one result\n')
+
                     ######## NEED TO MAKE 5 A HYPERPARAMETER #########
                     if (
                         temp_SingleResultCalculator.current_result==None or
@@ -248,6 +250,10 @@ class SingleCompoundEvaluator:
         '''
         convert the result dict to a panda
         '''
+
+        #add a "column" that records what the compound is
+        self.recording_dict['compound']=[self.compound for i in range(len(self.recording_dict['fold_change']))]
+
         self.recording_dataframe=pandas.DataFrame.from_dict(self.recording_dict)
         self.recording_dataframe.to_pickle(self.base_address+str(self.compound)+'.bin')
 

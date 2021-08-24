@@ -163,8 +163,8 @@ if __name__ == "__main__":
     print(len(parsed_obo.nodes))
     original_classyfire_node_count=len(parsed_obo.nodes)
     #draw classyfire with no adjustments or anything
-    nx.draw(parsed_obo,node_color=['#1f78b4' for i in range(0,len(parsed_obo.nodes))],node_size=50)
-    plt.show()
+    #nx.draw(parsed_obo,node_color=['#1f78b4' for i in range(0,len(parsed_obo.nodes))],node_size=50)
+    #plt.show()
 
     '''
     add_one_node_to_classyfire_network(parsed_obo,binvestigate_panda.loc[0],class_to_node_dict)
@@ -177,5 +177,5 @@ if __name__ == "__main__":
     add_all_bins_to_network(parsed_obo,binvestigate_panda,class_to_node_dict)
     #for each bin assign as a child node of the deepest node that is possible
 
-    visualize_added_classes(parsed_obo,original_classyfire_node_count)
+    #visualize_added_classes(parsed_obo,original_classyfire_node_count)
     nx.readwrite.gpickle.write_gpickle(parsed_obo,output_file_address)

@@ -91,8 +91,9 @@ class ComparisonRequest():
         '''
         
         #prepare multiprocessing
-        num_processes = multiprocessing.cpu_count()
-        pool = multiprocessing.Pool(processes=4)
+        #num_processes = multiprocessing.cpu_count()
+        num_processes=4
+        pool = multiprocessing.Pool(processes=num_processes)
         
         #split the species list into equally sized chunks
         #since the results are going into a dict (intrinsically unordered)

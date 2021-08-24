@@ -24,5 +24,5 @@ if __name__=="__main__":
     for temp_node in binvestigate_taxonomy_networkx.nodes:
 
 
-    nx.draw(binvestigate_taxonomy_networkx,with_labels=True)
-    plt.show()
+    #nx.draw(binvestigate_taxonomy_networkx,with_labels=True)
+    #plt.show()

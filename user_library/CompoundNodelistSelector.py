@@ -1,3 +1,4 @@
+import os
 import networkx as nx
 import matplotlib.pyplot as plt
 #plt.switch_backend('agg')
@@ -7,14 +8,16 @@ from pprint import pprint
 
 class CompoundNodelistSelector:
 
-    def __init__(self,temp_compound_nx,compound_topnode=None,compound_maxlevel=None,compound_minlevel=None):
+    def __init__(self,temp_compound_nx,compound_topnode=None,compound_maxlevel=None,compound_minlevel=None,fold_matrix_base_address=None):
         '''
         Creates an instance of CompoundNodelistSelector
 
-        At current, there are two ways to indicate your nodechoices.
+        At current, only 1) works, but there is sort of two ways to indicate your nodechoices.
         1) specify a headnode from which all descdendants are nodes
         2) specify a minimum/maximum depth from the headnode. Note that this does not currently work because of problems later down the line
             such as a need to reconnect all specified nodes to the headnode
+
+        if we get a fold matrix base address, then we shorten the list of thing to try by those that actually exist
         '''
         self.compound_nx=temp_compound_nx
 
@@ -24,6 +27,9 @@ class CompoundNodelistSelector:
 
         if (compound_minlevel is not None) and (compound_maxlevel is not None):
             self.set_nodelist_by_level('compound',compound_minlevel,compound_maxlevel)
+
+        if fold_matrix_base_address is not None:
+            self.reduce_nodelist_by_existing_fold_matrices(fold_matrix_base_address)
 
 
     def set_nodelist_by_level(self,temp_type,temp_min,temp_max):
@@ -60,6 +66,23 @@ class CompoundNodelistSelector:
                 color_list.append('#0000dd')
         nx.draw(self.compound_nx,with_labels=True,node_color=color_list)
         plt.show()
+
+
+    def reduce_nodelist_by_existing_fold_matrices(self,temp_fold_matrix_base_address):
+        '''
+        If we just use the compound_nx, then we will get compounds that we dont actually have data for
+        '''
+
+        compound_to_keep_list=[temp.split('.')[0] for temp in os.listdir(temp_fold_matrix_base_address)]
+
+        #print(self.compound_nodelist)
+        nodes_to_keep={temp for temp in self.compound_nodelist if (str(temp) in compound_to_keep_list)}
+        #print(nodes_to_keep)
+        self.compound_nodelist=nodes_to_keep
+        #print(self.compound_nodelist)
+        #print([temp.split('.')[0] for temp in os.listdir(temp_fold_matrix_base_address)])
+        #hold=input('hold')
+
 
 '''
 if __name__ == "__main__":

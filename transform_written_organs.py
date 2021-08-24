@@ -110,6 +110,7 @@ def transform_organ_column(temp_bin_panda):
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
         print(mapping_index)
+#        print(mapping_series)
 
         #declare mapping rule
         #you have to iterate as (n^2) i believe. all rules over all binvestigate rows or vice versa
@@ -117,8 +118,18 @@ def transform_organ_column(temp_bin_panda):
         #because i think it means that we have to access memory spots more often. 
         #drop rules work differently. must get all indices and then drop from mapping as well as organs
         if (mapping_series['organ_final'] == 'drop') or (mapping_series['organ_final'] == 'Drop'):
-            
+#            #print('in drop')
+#            if mapping_series['species']=='Sus scrofa domesticus':
+#                
+#                hold=input('hold')
             for bin_index, bin_series in temp_bin_panda.iterrows():
+                
+#                if mapping_series['species']=='Sus scrofa domesticus' and mapping_series['organ_final']=='Drop':
+#                    #print(bin_series['organ'])
+#                    print(mapping_series)
+#                    print(temp_bin_panda.at[bin_index,'species'])
+                #print(temp_bin_panda.at[bin_index,'species'].index(mapping_series['species']))
+#                    hold=input('hold in drop with sus')
                 #the way that organs map is a function of the species, so we include a second condition in the if statement
                 indices_to_drop=[i for i in range(0,len(bin_series['organ'])) if (bin_series['organ'][i] == mapping_series['organ_initial']) and (bin_series['species'][i] == mapping_series['species'])]
                 organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
@@ -132,13 +143,19 @@ def transform_organ_column(temp_bin_panda):
                 temp_bin_panda.at[bin_index,'intensity']=intensity_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'count']=count_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'special_property_list']=special_property_list_with_indices_removed
-
+#                if mapping_series['species']=='Sus scrofa domesticus' and mapping_series['organ_final']=='Drop':
+#                    #print(bin_series['organ'])
+#                    print(indices_to_drop)
+#                    print(temp_bin_panda.at[bin_index,'species'].index(mapping_series['species']))
+#                    print(species_list_with_indices_removed.index(mapping_series['species']))
+#                    print(temp_bin_panda.at[bin_index,'species'])
+#                    hold=input('hold in drop post drop')
 
         elif (mapping_series['organ_final'] != 'drop') and (mapping_series['organ_final'] != 'Drop'):
 
             for bin_index, bin_series in temp_bin_panda.iterrows():
                 for i in range(0,len(bin_series['organ'])):
-                    if (bin_series['organ'][i] == mapping_series['organ_initial']):
+                    if (bin_series['organ'][i] == mapping_series['organ_initial']) and (bin_series['species'][i] == mapping_series['species']):
                         bin_series['organ'][i] = mapping_series['organ_final']
 
                 temp_bin_panda.at[bin_index,'organ']=bin_series['organ']
@@ -202,7 +219,8 @@ if __name__ == "__main__":
     add_special_property_column(post_species_transform_panda,organ_mapping_address)
     
     #according to the file that we create using the previous output, we transform the panda's organ lists
-    num_processes = multiprocessing.cpu_count()
+    #num_processes = multiprocessing.cpu_count()
+    num_processes=4
     chunk_size = len(post_species_transform_panda.index)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):
@@ -221,6 +239,7 @@ if __name__ == "__main__":
         post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
     post_species_transform_panda=pandas.concat(transformed_chunks)
     
+    #transform_organ_column(post_species_transform_panda)
 
     #show all organs map to anatomy networkx
     organ_networkx=nx.readwrite.gpickle.read_gpickle(organ_networkx_input_address)

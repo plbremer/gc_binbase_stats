@@ -17,13 +17,13 @@ class MainClass():
         self.organ_nx=temp_organ_nx
         self.disease_nx=temp_disease_nx
 
-    def assign_compound_nodes(self,temp_compound_nx,compound_topnode=None,compound_maxlevel=None,compound_minlevel=None):
+    def assign_compound_nodes(self,temp_compound_nx,compound_topnode=None,compound_maxlevel=None,compound_minlevel=None,fold_matrix_base_address=None):
         '''
         Assigns a CompoundNodelistSelector.
 
         See class .py file for more information
         '''
-        self.CompoundNodelistSelector=CompoundNodelistSelector(temp_compound_nx,compound_topnode,compound_maxlevel,compound_minlevel)
+        self.CompoundNodelistSelector=CompoundNodelistSelector(temp_compound_nx,compound_topnode,compound_maxlevel,compound_minlevel,fold_matrix_base_address)
 
     def assign_hierarchical_nodes_from(
         self,
@@ -137,7 +137,7 @@ class MainClass():
             temp_disease_nodelist_to,
         )
 
-    def prepare_all_compound_evaluator(
+    def prepare_AllCompoundEvaluator(
         self,
         temp_compound_nodelist,
         temp_use_multiprocessing,
@@ -186,7 +186,13 @@ if __name__ == "__main__":
     my_MainClass=MainClass(species_nx,organ_nx,disease_nx)
 
     #create a set of compounds that we want to evalulate
-    my_MainClass.assign_compound_nodes(compound_nx,compound_topnode=4545)
+    my_MainClass.assign_compound_nodes(
+        compound_nx,
+        compound_topnode='CHEMONTID:9999999',
+        compound_maxlevel=None,
+        compound_minlevel=None,
+        fold_matrix_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
+    )
 
     #get the complete species, organ, disease nodeset based on a particular headnode for each hierarchy
     my_MainClass.assign_hierarchical_nodes_from(
@@ -199,7 +205,9 @@ if __name__ == "__main__":
     )
     
     #example of a debugger visualization call
-    my_MainClass.NodelistSelector_from.node_selection_visualizer('species')
+    #my_MainClass.NodelistSelector_from.node_selection_visualizer('species')
+    #my_MainClass.NodelistSelector_from.node_selection_visualizer('organ')
+    #my_MainClass.NodelistSelector_from.node_selection_visualizer('disease')
     
     #get the complete species, organ, disease nodeset based on a particular headnode for each hierarchy. the to instance.
     my_MainClass.assign_hierarchical_nodes_to(
@@ -214,8 +222,6 @@ if __name__ == "__main__":
     #see if the from and to requests are the exact same. if so, we can invoke symmetry to shorten calculations
     my_MainClass.check_from_to_equal()
 
-    #here we enter the "main loop" of the proceedings, whereas we make a comparison selector
-    #for every compound.
     #we choose an arbitrary fold matrix as we are only interested in the row/column headings
     one_compound_fold_matrix_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
     fold_matrix=pandas.read_pickle(one_compound_fold_matrix_address)
@@ -236,9 +242,15 @@ if __name__ == "__main__":
     my_MainClass.ComparisonRequest.fill_combination_dict_wrapper('to')
     my_MainClass.ComparisonRequest.convert_combination_list_to_dict('to')
 
+
+    pprint(my_MainClass.ComparisonRequest.valid_node_triplets_dict['from'])
+    hold=input('hold')
+
+    #here we enter the "main loop" of the proceedings, whereas we make a comparison selector
+    #for every compound.
     my_MainClass.prepare_AllCompoundEvaluator(
         my_MainClass.CompoundNodelistSelector.compound_nodelist,
-        False,
+        True,
         '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/',
         '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/user_library_output/',
         my_MainClass.species_nx,
@@ -249,4 +261,4 @@ if __name__ == "__main__":
         my_MainClass.from_nodes_to_nodes_equal
     )
 
-    my_MainClass.AllCompoundEvaluator.evaluate_all_compounds()
+    my_MainClass.AllCompoundEvaluator.evaluate_all_compounds_wrapper()

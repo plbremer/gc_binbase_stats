@@ -114,20 +114,16 @@ def transform_species_column(temp_bin_panda):
 
 if __name__ == "__main__":
 
-    #if snakemake in globals():
-    #    hold=input('here')
+
     count_cutoff=snakemake.params.count_cutoff
-    binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/binvestigate_pickle_protocol_0.bin'
+    binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/shortened_file_for_test.bin'
+    #binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/binvestigate_pickle_protocol_0.bin'
     species_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/species_map.txt'
     output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
     os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/')
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/dummy.txt')
     
-    #else:
-    #    binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/binvestigate_pickle_protocol_0.bin'
-    #    species_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/species_map.txt'
-    #    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_species_transformed.bin'
-    
+
     binvestigate_panda=pandas.read_pickle(binvestigate_pickle_address)
     
     #identify species names that do not map to the NCBI database
@@ -150,7 +146,8 @@ if __name__ == "__main__":
     #later, after doing a curatin of this list, we put the transform file in the 
     #'species_mapping_address' location
     #translate species names according to some transform list and drop things that either have no translation or are identified with a translation 'drop'
-    num_processes = multiprocessing.cpu_count()
+    #num_processes = multiprocessing.cpu_count()
+    num_processes= 4
     chunk_size = len(binvestigate_panda.index)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):

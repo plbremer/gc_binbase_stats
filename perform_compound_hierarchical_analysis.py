@@ -410,8 +410,8 @@ if __name__ == "__main__":
 
 
     recursively_calculate_fold_matrices(compound_network,'CHEMONTID:9999999')
-    visualize_added_classes(compound_network)
-
+    #visualize_added_classes(compound_network)
+    '''
     print(compound_network.nodes[4]['fold_change_matrix'])
     #print(compound_network.nodes[4]['name'])
     hold=input('4')
@@ -430,7 +430,7 @@ if __name__ == "__main__":
     print(compound_network.nodes[2]['fold_change_matrix'])
     #print(compound_network.nodes[2]['name'])
     hold=input('2')
-
+    '''
 
     nx.readwrite.gpickle.write_gpickle(compound_network,output_graph_address)
 

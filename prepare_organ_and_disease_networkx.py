@@ -174,7 +174,8 @@ if __name__ == "__main__":
     prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     #add custom connection from each head node to a master headnode
     #for custom subset
-    organ_headnodes_list=['A01','A08','A11','A15','A12','A05','A04','A18']
+    organ_headnodes_list=['A11','A15','A12','A04']
+    #organ_headnodes_list=['A01','A08','A11','A15','A12','A05','A04','A18']
     #for real entire dataset
     #organ_headnodes_list=['J01','A01','A02','A08','A13','D27','G07','E07','B01','A11','A15','J02','A12','D20','A07','A10','A03','A16','B05','A17','A14','A06','A05','A04','A09','A18','A19']
     #organ_headnode='organ'
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     disease_networkx.add_node('No', mesh_label='No')
     prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     #disease_headnodes_list=['C06','C04','C14','C19','C08','C15','C13','C18','C16','C20','C17','C12','C10','No']
-    disease_headnodes_list=['C04','C08','C17','No']
+    disease_headnodes_list=['C04','C08','No']
     disease_networkx.add_node('disease',mesh_label='disease')
     temp_disease_edges=[('disease',temp_node) for temp_node in disease_headnodes_list]
     disease_networkx.add_edges_from(temp_disease_edges)
