@@ -149,7 +149,6 @@ class SingleCompoundEvaluator:
             if found_at_least_one_result_for_current_species==False:
                 species_traversal_skips+=list(nx.algorithms.dag.ancestors(self.species_nx,temp_species))
 
-
     def evaluate_to(self,temp_species_from,temp_organ_from,temp_disease_from):
         '''
         A lot of the same logic as from
@@ -163,7 +162,7 @@ class SingleCompoundEvaluator:
         species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.to_dict.keys())
 
         if self.from_nodes_to_nodes_equal==True:
-            #if the from and to lists are the same, then, from the species nx traversal list, remove all nodes upto and including
+            #if the from and to lists are the same, then, from the species nx traversal list, remove all nodes up BUT NOT including
             #the current from species
             species_traversal_sublist=species_traversal_sublist[species_traversal_sublist.index(temp_species_from):]
         #print(species_traversal_sublist)        
@@ -245,6 +244,171 @@ class SingleCompoundEvaluator:
                 species_traversal_skips+=list(nx.algorithms.dag.ancestors(self.species_nx,temp_species))
 
         return found_at_least_one_finding_for_entire_to_nxs
+
+    def evaluate_from_no_shortcuts(self):
+        '''
+        This is a "more brute force" approach to "evaulate_from", created to ensure that all of the shortcuts
+        That I wrote work.
+
+        The idea is that the results from this should
+        1) be symmetric (ie, have the from->to finding and then the corresponding to->from finding as the negative thereof
+        2) match the result when the result is produced by using shortcuts then just making the symmetric version of the 
+        shortcut created results
+        '''
+        print('made it here')
+        #create ordered traversal through species, organ disease (these are always the same so we put outside loop)
+        species_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.species_nx,source='1'))
+        organ_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.organ_nx,source='organ'))
+        disease_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.disease_nx,source='disease'))
+
+        #remove species that are not referenced by the user subset selection
+        species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.from_dict.keys())
+        #print(species_traversal_sublist)
+        #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
+        ##species_traversal_skips=list()
+
+        #iterate through specices
+        for temp_species in species_traversal_sublist:
+            ##if temp_species in species_traversal_skips:
+            ##    continue
+            
+            ##found_at_least_one_result_for_current_species=False
+
+            #create the organ traversal sublist that is referred to by temp_species
+            organ_traversal_sublist=self.remove_nodes_not_chosen_by_user(organ_traversal_list,self.from_dict[temp_species].keys())
+
+            #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
+            organ_traversal_skips=list()
+
+            for temp_organ in organ_traversal_sublist:
+                ##if temp_organ in organ_traversal_skips:
+                ##   continue
+
+                ##found_at_least_one_result_for_current_organ=False
+                disease_traversal_sublist=self.remove_nodes_not_chosen_by_user(disease_traversal_list,self.from_dict[temp_species][temp_organ])
+                ##disease_traversal_skips=list()
+
+                for temp_disease in disease_traversal_sublist:
+                    ##if temp_disease in disease_traversal_skips:
+                    ##    continue
+
+                    ##found_at_least_one_result_for_current_disease=self.evaluate_to(temp_species,temp_organ,temp_disease)
+                    nonsense_variable=self.evaluate_to_no_shortcuts(temp_species,temp_organ,temp_disease)
+                    ##if found_at_least_one_result_for_current_disease==True:
+                        #add ancestors of temp_disease to disease_traversal_skips
+                    ##    found_at_least_one_result_for_current_organ=True
+                    ##elif found_at_least_one_result_for_current_disease==False:
+                    ##   disease_traversal_skips+=list(nx.algorithms.dag.ancestors(self.disease_nx,temp_disease))
+
+
+                ##if found_at_least_one_result_for_current_organ==True:
+                ##    found_at_least_one_result_for_current_species=True
+                    #add ancestors of temp_organ to organ traversal skips
+                ##elif found_at_least_one_result_for_current_organ==False:
+                ##    organ_traversal_skips+=list(nx.algorithms.dag.ancestors(self.organ_nx,temp_organ))
+
+            ##if found_at_least_one_result_for_current_species==False:
+            ##    species_traversal_skips+=list(nx.algorithms.dag.ancestors(self.species_nx,temp_species))
+
+    def evaluate_to_no_shortcuts(self,temp_species_from,temp_organ_from,temp_disease_from):
+        '''
+        The partner to evalure_from_no_shortcuts
+        '''
+        #create ordered traversal through species, organ disease (these are always the same so we put outside loop)
+        species_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.species_nx,source='1'))
+        organ_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.organ_nx,source='organ'))
+        disease_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(self.disease_nx,source='disease'))
+
+        #remove species that are not referenced by the user subset selection
+        species_traversal_sublist=self.remove_nodes_not_chosen_by_user(species_traversal_list,self.to_dict.keys())
+
+        ##if self.from_nodes_to_nodes_equal==True:
+            #if the from and to lists are the same, then, from the species nx traversal list, remove all nodes upto and including
+            #the current from species
+        ##    species_traversal_sublist=species_traversal_sublist[species_traversal_sublist.index(temp_species_from):]
+        #print(species_traversal_sublist)        
+        #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
+        ##species_traversal_skips=list()
+
+        ##found_at_least_one_finding_for_entire_to_nxs=False
+        #iterate through specices
+        for temp_species in species_traversal_sublist:
+            ##if temp_species in species_traversal_skips:
+            ##    continue
+            
+            ##found_at_least_one_result_for_current_species=False
+
+            #create the organ traversal sublist that is referred to by temp_species
+            organ_traversal_sublist=self.remove_nodes_not_chosen_by_user(organ_traversal_list,self.to_dict[temp_species].keys())
+
+            #create a list of skippables that will be updated as necessary, since we shoudl not update teh list tha we are traversing over
+            ##organ_traversal_skips=list()
+
+            for temp_organ in organ_traversal_sublist:
+                ##if temp_organ in organ_traversal_skips:
+                ##    continue
+
+                ##found_at_least_one_result_for_current_organ=False
+                disease_traversal_sublist=self.remove_nodes_not_chosen_by_user(disease_traversal_list,self.to_dict[temp_species][temp_organ])
+                ##disease_traversal_skips=list()
+
+                for temp_disease in disease_traversal_sublist:
+                    ##if temp_disease in disease_traversal_skips:
+                    ##    continue
+
+
+                    temp_SingleResultCalculator=SingleResultCalculator(self.fold_matrix,self.species_nx,self.organ_nx,self.disease_nx,True)
+
+                    temp_SingleResultCalculator.calculate_one_result(
+                        {
+                            'species':temp_species_from,
+                            'organ':temp_organ_from,
+                            'disease':temp_disease_from
+                        },
+                        {
+                            'species':temp_species,
+                            'organ':temp_organ,
+                            'disease':temp_disease
+                        }
+                    )
+                    #pprint(temp_SingleResultCalculator.current_result)
+                    #hold=input('calculated one result\n')
+
+                    ######## NEED TO MAKE 5 A HYPERPARAMETER #########
+                    if (
+                        temp_SingleResultCalculator.current_result==None or
+                        np.isnan(temp_SingleResultCalculator.current_result['fold_change'][0]) or
+                        abs(temp_SingleResultCalculator.current_result['fold_change'][0]) < 10
+                    ):
+                        found_at_least_one_result_for_current_disease=False
+                    else:
+                        found_at_least_one_result_for_current_disease=True
+                        for temp_key in self.recording_dict.keys():
+                            self.recording_dict[temp_key].append(temp_SingleResultCalculator.current_result[temp_key][0])
+                    
+
+                    ##if found_at_least_one_result_for_current_disease==True:
+                    ##    found_at_least_one_result_for_current_organ=True
+                        #differs compared to from. this is the thing that we ultimately return
+                    ##    found_at_least_one_finding_for_entire_to_nxs=True
+                    ##elif found_at_least_one_result_for_current_disease==False:
+                        #add ancestors of temp_disease to disease_traversal_skips
+                    ##    disease_traversal_skips+=list(nx.algorithms.dag.ancestors(self.disease_nx,temp_disease))
+
+                ##if found_at_least_one_result_for_current_organ==True:
+                ##    found_at_least_one_result_for_current_species=True
+                ##elif found_at_least_one_result_for_current_organ==False:
+                    #add ancestors of temp_organ to organ traversal skips
+                ##    organ_traversal_skips+=list(nx.algorithms.dag.ancestors(self.organ_nx,temp_organ))
+
+            ##if found_at_least_one_result_for_current_species==False:
+            ##    species_traversal_skips+=list(nx.algorithms.dag.ancestors(self.species_nx,temp_species))
+
+        return None
+
+
+
+
 
     def save_result(self):
         '''

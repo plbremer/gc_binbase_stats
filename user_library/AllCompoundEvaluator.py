@@ -7,7 +7,7 @@ class AllCompoundEvaluator:
     basically a wrapper for SingleCompoundEvaluator
     '''
 
-    def __init__(self, temp_compound_nodelist, temp_use_multiprocessing, temp_fold_matrix_base_address, temp_base_output_address, temp_species_nx,temp_organ_nx,temp_disease_nx,temp_node_triplets_from,temp_node_triplets_to,temp_from_nodes_to_nodes_equal):
+    def __init__(self, temp_compound_nodelist, temp_use_multiprocessing, temp_fold_matrix_base_address, temp_base_output_address, temp_species_nx,temp_organ_nx,temp_disease_nx,temp_node_triplets_from,temp_node_triplets_to,temp_from_nodes_to_nodes_equal,temp_use_shortcuts):
         '''
         '''
         self.compound_nodelist=list(temp_compound_nodelist)
@@ -19,7 +19,8 @@ class AllCompoundEvaluator:
         self.disease_nx=temp_disease_nx
         self.node_triplets_from=temp_node_triplets_from
         self.node_triplets_to=temp_node_triplets_to
-        self.from_nodes_to_nodes_equal=temp_from_nodes_to_nodes_equal
+        self.from_nodes_to_nodes_equal=temp_from_nodes_to_nodes_equal,
+        self.use_shortcuts=temp_use_shortcuts
 
     def evaluate_all_compounds_wrapper(self):
         '''
@@ -103,8 +104,10 @@ class AllCompoundEvaluator:
                 temp_compound,
                 self.from_nodes_to_nodes_equal
             )
-
-            temp_SingleCompoundEvaluator.evaluate_from()
+            if self.use_shortcuts==True:
+                temp_SingleCompoundEvaluator.evaluate_from()
+            elif self.use_shortcuts==False:
+                temp_SingleCompoundEvaluator.evaluate_from_no_shortcuts()
 
             temp_SingleCompoundEvaluator.save_result()
 

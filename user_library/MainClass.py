@@ -148,7 +148,8 @@ class MainClass():
         temp_disease_nx,
         temp_comparison_request_dict_from,
         temp_comparison_request_dict_to,
-        temp_comparison_requests_are_equal
+        temp_comparison_requests_are_equal,
+        temp_use_shortcuts
     ):
         '''
         '''
@@ -162,7 +163,8 @@ class MainClass():
             temp_disease_nx,
             temp_comparison_request_dict_from,
             temp_comparison_request_dict_to,
-            temp_comparison_requests_are_equal
+            temp_comparison_requests_are_equal,
+            temp_use_shortcuts
         )
 
 
@@ -258,7 +260,8 @@ if __name__ == "__main__":
         my_MainClass.disease_nx,
         my_MainClass.ComparisonRequest.valid_node_triplets_dict['from'],
         my_MainClass.ComparisonRequest.valid_node_triplets_dict['to'],
-        my_MainClass.from_nodes_to_nodes_equal
+        my_MainClass.from_nodes_to_nodes_equal,
+        False
     )
 
     my_MainClass.AllCompoundEvaluator.evaluate_all_compounds_wrapper()
