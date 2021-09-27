@@ -96,7 +96,8 @@ def visualize_nodes_on_a_list(temp_nx,temp_list,temp_attribute_name):
 
 if __name__ == "__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
+    count_cutoff=10
+    #count_cutoff=snakemake.params.count_cutoff
     #the input panda here is the taxid<->species mapping.
     #we do not need to get a taxonomy mapping because metagenompy prepares that automatically
     #from a local database
@@ -127,6 +128,9 @@ if __name__ == "__main__":
     #create a copy that we work with
     binvestigate_species_networkx_view=metagenompy.highlight_nodes(total_ncbi_networkx,taxid_for_this_binvestigate_panda_list)
     binvestigate_species_networkx=binvestigate_species_networkx_view.copy()
+
+
+
 
     #back when we thought that the classic King Philliip Went To Greece etc set would work
     #now we must include instraclasses and chordates and blah blah
@@ -165,6 +169,16 @@ if __name__ == "__main__":
 
     #cut the networkx to branches and meaningful inputs
     contract_irrelevant_nodes(binvestigate_species_networkx,taxid_for_this_binvestigate_panda_list)
+
+    print('check that the ncbi number was added')
+    for temp_node in binvestigate_species_networkx.nodes:
+        print(binvestigate_species_networkx.nodes[temp_node])
+        #print(temp_node)
+        #hold=input('hold')
+        binvestigate_species_networkx.nodes[temp_node]['ncbi_number']=temp_node
+        print(binvestigate_species_networkx.nodes[temp_node])
+        #print(temp_node)
+        hold=input('hold')
 
     #render the network after node contraction
     node_labels = {
