@@ -165,3 +165,14 @@ rule step_14_reduce_hierarchy_complexity:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/reduce_hierarchy_complexity.py"
+
+
+rule step_15_prepare_count_matrix:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_15_prepare_count_matrix/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/prepare_count_matrix.py"
