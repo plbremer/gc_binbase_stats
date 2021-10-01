@@ -174,7 +174,7 @@ if __name__ == "__main__":
     prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     #add custom connection from each head node to a master headnode
     #for custom subset
-    organ_headnodes_list=['A11','A15','A12','A04']
+    organ_headnodes_list=['A15','A12','A04','A18']
     #organ_headnodes_list=['A01','A08','A11','A15','A12','A05','A04','A18']
     #for real entire dataset
     #organ_headnodes_list=['J01','A01','A02','A08','A13','D27','G07','E07','B01','A11','A15','J02','A12','D20','A07','A10','A03','A16','B05','A17','A14','A06','A05','A04','A09','A18','A19']

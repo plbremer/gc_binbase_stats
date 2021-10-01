@@ -104,8 +104,12 @@ def visualize_added_classes(temp_nx):
             elif temp_nx.nodes[temp_node]['type_of_node']=='from_binvestigate':
                 total_color_list.append('#32cd32')
 
-    nx.draw(temp_nx,with_labels=True,node_color=total_color_list)
-    plt.show() 
+
+    pos = graphviz_layout(temp_nx, prog="dot")
+    nx.draw(temp_nx, pos,with_labels=True)
+    plt.show()
+    #nx.draw(temp_nx,with_labels=True,node_color=total_color_list)
+    #plt.show() 
 
 if __name__ == "__main__":
     

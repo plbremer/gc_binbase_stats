@@ -113,7 +113,8 @@ def add_one_node_to_classyfire_network(temp_nx,temp_bin,temp_class_to_node_dict)
         int(temp_bin['id']),
         inchikey=temp_bin['inchikey'],
         fold_change_matrix=temp_bin['fold_change_matrix'],
-        type_of_node='from_binvestigate'
+        type_of_node='from_binvestigate',
+        common_name=temp_bin['name']
     )
 
     #add a connection between the added node and the class that it is most specifically
@@ -136,7 +137,8 @@ def visualize_added_classes(temp_nx,temp_original_classyfire_nodecount):
 
 
 if __name__ == "__main__":
-    count_cutoff=snakemake.params.count_cutoff
+    count_cutoff=10
+    #count_cutoff=snakemake.params.count_cutoff
     obo_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/classyfire_files/ChemOnt_2_1.obo'
     binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
     output_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'

@@ -155,3 +155,13 @@ rule step_13_swap_fold_matrix_multiindex:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/swap_fold_matrix_multiindex.py"
+
+rule step_14_reduce_hierarchy_complexity:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_13_swap_fold_matrix_multiindex/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/reduce_hierarchy_complexity.py"

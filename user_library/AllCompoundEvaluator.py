@@ -54,7 +54,7 @@ class AllCompoundEvaluator:
 
         elif self.use_multiprocessing==True:
             #num_processes = multiprocessing.cpu_count()
-            num_processes=4
+            num_processes=5
             pool = multiprocessing.Pool(processes=num_processes)
             chunk_size = len(self.compound_nodelist)//num_processes
 

@@ -42,7 +42,7 @@ if __name__ == "__main__":
     #temp_swap_panda=pandas.read_pickle(swap_panda_address)
     #rewrite_one_fold_matrix_multiindex(test,temp_swap_panda)
 
-    count_cutoff=10
+    count_cutoff=snakemake.params.count_cutoff
     input_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/all_fold_matrices/'
     #input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     #input_complete_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
