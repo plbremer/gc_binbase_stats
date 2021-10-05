@@ -186,3 +186,13 @@ rule step_16_calculate_fraction_triplets:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/calculate_fraction_triplets.py"
+
+rule step_17_invoke_user_library:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_16_calculate_fraction_triplets/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_17_invoke_user_library/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/user_library/invoke_user_library.py"
