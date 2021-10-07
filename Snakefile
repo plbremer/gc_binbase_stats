@@ -196,3 +196,23 @@ rule step_17_invoke_user_library:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/user_library/invoke_user_library.py"
+
+rule step_18_post_user_library_make_conglomerate_panda:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_17_invoke_user_library/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_18_post_user_library_make_conglomerate_panda/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/post_user_library_make_conglomerate_panda.py"
+
+rule step_19_add_triplet_count_column:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_18_post_user_library_make_conglomerate_panda/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_19_add_triplet_count_column/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/add_triplet_count_column.py"

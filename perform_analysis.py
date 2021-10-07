@@ -593,8 +593,8 @@ def perform_single_assesment(temp_species_from,temp_species_to,temp_organ_from,t
         all(fold_matrix_disease_view==-np.inf),
         any(fold_matrix_disease_view<0) and any(fold_matrix_disease_view>0),
         any(fold_matrix_disease_view==0),
-        all(fold_matrix_disease_view>=10),
-        all(fold_matrix_disease_view<=-10)
+        all(fold_matrix_disease_view>=1),
+        all(fold_matrix_disease_view<=-1)
     ]
 
     choices=[

@@ -43,7 +43,7 @@ if __name__ == "__main__":
     #rewrite_one_fold_matrix_multiindex(test,temp_swap_panda)
 
     count_cutoff=snakemake.params.count_cutoff
-    input_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/all_fold_matrices/'
+    input_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/all_fold_matrices/'
     #input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     #input_complete_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
     #input_complete_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_13_swap_fold_matrix_multiindex/dummy.txt')
 
     
-    translation_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
+    translation_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
     translation_panda=pandas.read_pickle(translation_panda_address)
 
     for i,temp_file in enumerate(os.listdir(input_base_address)):

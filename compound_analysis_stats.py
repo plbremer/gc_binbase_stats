@@ -4,6 +4,7 @@ import networkx as nx
 import pandas
 import numpy as np
 import os
+from networkx.drawing.nx_pydot import graphviz_layout
 
 def check_fold_matrix_maintains_combinations(temp_panda,temp_fold_number,temp_count_meeting_fold_number):
     '''
@@ -104,8 +105,8 @@ def visualize_added_classes(temp_nx):
             elif temp_nx.nodes[temp_node]['type_of_node']=='from_binvestigate':
                 total_color_list.append('#32cd32')
 
-
-    pos = graphviz_layout(temp_nx, prog="dot")
+    pos = nx.nx_agraph.pygraphviz_layout(temp_nx, prog='dot')
+    #pos = graphviz_layout(temp_nx, prog="dot")
     nx.draw(temp_nx, pos,with_labels=True)
     plt.show()
     #nx.draw(temp_nx,with_labels=True,node_color=total_color_list)

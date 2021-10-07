@@ -137,8 +137,8 @@ def visualize_added_classes(temp_nx,temp_original_classyfire_nodecount):
 
 
 if __name__ == "__main__":
-    count_cutoff=10
-    #count_cutoff=snakemake.params.count_cutoff
+    #count_cutoff=10
+    count_cutoff=snakemake.params.count_cutoff
     obo_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/classyfire_files/ChemOnt_2_1.obo'
     binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
     output_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'

@@ -7,14 +7,14 @@ from MainClass import *
 if __name__=="__main__":
 
     count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_invoke_user_library/')
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_invoke_user_library/output/')
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_invoke_user_library/dummy.txt')
 
 
-    compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/compounds_networkx.bin'
-    species_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/species_networkx.bin'
-    organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
-    disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
+    compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/compounds_networkx.bin'
+    species_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
+    organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
+    disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
     
     compound_nx=nx.readwrite.gpickle.read_gpickle(compound_nx_address)
     species_nx=nx.readwrite.gpickle.read_gpickle(species_networkx_address)
@@ -30,7 +30,7 @@ if __name__=="__main__":
         compound_topnode='CHEMONTID:9999999',
         compound_maxlevel=None,
         compound_minlevel=None,
-        fold_matrix_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
+        fold_matrix_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
     )
 
     #get the complete species, organ, disease nodeset based on a particular headnode for each hierarchy
@@ -62,7 +62,7 @@ if __name__=="__main__":
     my_MainClass.check_from_to_equal()
 
     #we choose an arbitrary fold matrix as we are only interested in the row/column headings
-    one_compound_fold_matrix_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
+    one_compound_fold_matrix_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
     fold_matrix=pandas.read_pickle(one_compound_fold_matrix_address)
     my_MainClass.prepare_comparison_request(
         fold_matrix,
@@ -90,8 +90,8 @@ if __name__=="__main__":
     my_MainClass.prepare_AllCompoundEvaluator(
         my_MainClass.CompoundNodelistSelector.compound_nodelist,
         True,
-        '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/',
-        '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/user_library_output/',
+        '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/',
+        '/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_invoke_user_library/output/',
         my_MainClass.species_nx,
         my_MainClass.organ_nx,
         my_MainClass.disease_nx,

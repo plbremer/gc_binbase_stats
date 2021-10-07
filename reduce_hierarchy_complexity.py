@@ -84,14 +84,20 @@ def get_labels_for_drawing(temp_nx,temp_hierarchy_type):
 
     elif temp_hierarchy_type=='species':
         for temp_node in temp_nx.nodes:
+            pprint(temp_nx.nodes[temp_node])
             try:
                 temp_sci_name=temp_nx.nodes[temp_node]['scientific_name']
             except KeyError:
                 temp_sci_name='no scientific name found'
+
             try:
-                temp_common_name=temp_nx.nodes[temp_node]['common_name']
+                if type(temp_nx.nodes[temp_node]['common_name']) == list:
+                    temp_common_name=temp_nx.nodes[temp_node]['common_name'][0]
+                else:
+                    temp_common_name=temp_nx.nodes[temp_node]['common_name']
             except KeyError:
-                temp_common_name='no common name found'            
+                temp_common_name='no common name found' 
+
             label_dict[temp_node]=(temp_node+'\n'+temp_sci_name+'\n'+temp_common_name)
 
     elif temp_hierarchy_type=='organ' or temp_hierarchy_type=='disease':
@@ -180,25 +186,25 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
 if __name__=="__main__":
     
 
-    count_cutoff=snakemake.params.count_cutoff
+    count_cutoff=int(snakemake.params.count_cutoff)
     os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/')
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/dummy.txt')
     
-    compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
     compound_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_compound.txt'
-    compound_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/compounds_networkx.bin'
+    compound_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/compounds_networkx.bin'
     do_everything(compound_nx_address,compound_node_keep_address,compound_nx_output_address,'compound')
 
     #required for species, organ, and disease
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
     organ_species_disease_triplet_list=show_all_organ_species_disease_triplets(binvestigate_panda)
     #pprint(organ_species_disease_triplet_list)
 
     #begin species
-    species_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_11_prepare_species_networkx/species_networkx.bin'
+    species_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/species_networkx.bin'
     species_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_species.txt'
-    species_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/species_networkx.bin'
+    species_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
     do_everything(species_nx_address,species_node_keep_address,species_nx_output_address,'species')
 
     #get the set of organs in this networkx
@@ -207,13 +213,13 @@ if __name__=="__main__":
     ##organ_species_disease_triplet_list=show_all_organ_species_disease_triplets(binvestigate_panda)
     ##organ_set={i[0] for i in organ_species_disease_triplet_list}
 
-    organ_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
+    organ_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
     organ_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_organ.txt'
-    organ_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
+    organ_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
     do_everything(organ_nx_address,organ_node_keep_address,organ_nx_output_address,'organ')
     
 
-    disease_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
+    disease_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
     disease_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_disease.txt'
-    disease_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
+    disease_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
     do_everything(disease_nx_address,disease_node_keep_address,disease_nx_output_address,'disease')    

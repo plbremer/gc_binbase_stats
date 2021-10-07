@@ -139,13 +139,15 @@ def contract_irrelevant_nodes(temp_nx,temp_binvestigate_entries_set):
 
 
 if __name__ == "__main__":
-    count_cutoff=10
+    count_cutoff=snakemake.params.count_cutoff
+    #count_cutoff=10
+    #'+str(count_cutoff)+'
     #probably could use the step_5 one if the "with fold matrices" version gets too massive for ram
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    input_complete_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    input_complete_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    output_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
-    output_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/10/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
+    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    input_complete_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    input_complete_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    output_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
+    output_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
     os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/')
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/dummy.txt')
 
