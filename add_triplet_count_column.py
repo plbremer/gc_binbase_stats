@@ -41,20 +41,28 @@ if __name__ == "__main__":
     triplet_panda_non_zero_view=triplet_panda.loc[triplet_panda['actual_triplets'] != 0]
 
     #make three mapping dicts to apply to our results panda
-    actual_triplet_mapping_dict=dict(zip(triplet_panda_non_zero_view['triplet_tuple'],triplet_panda_non_zero_view['actual_triplets']))
     possible_triplet_mapping_dict=dict(zip(triplet_panda_non_zero_view['triplet_tuple'],triplet_panda_non_zero_view['possible_triplets']))
-    ratio_triplet_mapping_dict=dict(zip(triplet_panda_non_zero_view['triplet_tuple'],triplet_panda_non_zero_view['ratio']))
+    ##actual_triplet_mapping_dict=dict(zip(triplet_panda_non_zero_view['triplet_tuple'],triplet_panda_non_zero_view['actual_triplets']))
+    ##ratio_triplet_mapping_dict=dict(zip(triplet_panda_non_zero_view['triplet_tuple'],triplet_panda_non_zero_view['ratio']))
 
+    
     
     #apply the three mappinng dicts to both "from" and "to"
     #from
     fold_change_panda['possible_triplets_from']=fold_change_panda['triplet_tuple_from'].map(possible_triplet_mapping_dict)
-    fold_change_panda['actual_triplets_from']=fold_change_panda['triplet_tuple_from'].map(actual_triplet_mapping_dict)
-    fold_change_panda['ratio_from']=fold_change_panda['triplet_tuple_from'].map(ratio_triplet_mapping_dict)
+    ##fold_change_panda['actual_triplets_from']=fold_change_panda['triplet_tuple_from'].map(actual_triplet_mapping_dict)
+    ##fold_change_panda['ratio_from']=fold_change_panda['triplet_tuple_from'].map(ratio_triplet_mapping_dict)
     #to
     fold_change_panda['possible_triplets_to']=fold_change_panda['triplet_tuple_to'].map(possible_triplet_mapping_dict)
-    fold_change_panda['actual_triplets_to']=fold_change_panda['triplet_tuple_to'].map(actual_triplet_mapping_dict)
-    fold_change_panda['ratio_to']=fold_change_panda['triplet_tuple_to'].map(ratio_triplet_mapping_dict)
+    ##fold_change_panda['actual_triplets_to']=fold_change_panda['triplet_tuple_to'].map(actual_triplet_mapping_dict)
+    ##fold_change_panda['ratio_to']=fold_change_panda['triplet_tuple_to'].map(ratio_triplet_mapping_dict)
+
+
+    fold_change_panda['actual_triplets_from']=fold_change_panda['included_triplets_from'].apply(len)
+    fold_change_panda['ratio_from']=fold_change_panda['actual_triplets_from'].div(fold_change_panda['possible_triplets_from'])
+    fold_change_panda['actual_triplets_to']=fold_change_panda['included_triplets_to'].apply(len)
+    fold_change_panda['ratio_to']=fold_change_panda['actual_triplets_to'].div(fold_change_panda['possible_triplets_to'])
+
 
     print(fold_change_panda)
     #print(fold_change_panda['possible_triplets'].value_counts())
