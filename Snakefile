@@ -226,3 +226,13 @@ rule step_20_add_sample_count_column:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/add_sample_count_column.py"
+
+rule step_21_convert_networkx_to_cyto_format:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_20_add_sample_count_column/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_21_convert_networkx_to_cyto_format/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/convert_networkx_to_cyto_format.py"
