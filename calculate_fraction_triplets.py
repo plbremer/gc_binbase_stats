@@ -25,6 +25,7 @@
 
 # then we divide the columns to get the ratio
 
+import numpy as np
 import os
 import networkx as nx
 import pandas
@@ -82,12 +83,21 @@ def identify_triplets_we_have_data_for(temp_species_we_map_to,temp_organ_we_map_
     #print(organ_species_disease_triplet_panda['species'])
     #print(organ_species_disease_triplet_panda['species'].isin(temp_species_we_map_to))
     
-    triplet_length=len(organ_species_disease_triplet_panda.loc[
+    #print(organ_species_disease_triplet_panda)
+    #hold=input('hold')
+
+    triplet_indices=organ_species_disease_triplet_panda.loc[
         organ_species_disease_triplet_panda['species'].isin(temp_species_we_map_to) &
         organ_species_disease_triplet_panda['organ'].isin(temp_organ_we_map_to) &
         organ_species_disease_triplet_panda['disease'].isin(temp_disease_we_map_to)
-    ].index)
-    return triplet_length
+    ].index.to_list()
+
+    mask= np.zeros((len(organ_species_disease_triplet_list)), dtype=np.bool)
+    mask[triplet_indices] = True
+
+    triplets=np.array(organ_species_disease_triplet_list)[mask]
+    triplet_length=len(triplets)
+    return triplets, triplet_length
 
 #traverses species organ and disease nodeslist
 def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx):
@@ -99,7 +109,8 @@ def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx
         'organ_headnode':[],
         'disease_headnode':[],
         'possible_triplets':[],
-        'actual_triplets':[]
+        'actual_triplets':[],
+        'triplet_list':[]
     }
     #print(result_panda_dict_list)
 
@@ -157,7 +168,7 @@ def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx
                 #print(temp_possibility_length)    
                 
                 
-                temp_actual_triplet_length=identify_triplets_we_have_data_for(
+                temp_triplets,temp_actual_triplet_length=identify_triplets_we_have_data_for(
                     temp_species_we_map_to,
                     temp_organ_we_map_to,
                     temp_disease_we_map_to
@@ -174,6 +185,7 @@ def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx
                 result_panda_dict_list['disease_headnode'].append(temp_disease_headnode)
                 result_panda_dict_list['possible_triplets'].append(temp_possibility_length)
                 result_panda_dict_list['actual_triplets'].append(temp_actual_triplet_length)
+                result_panda_dict_list['triplet_list'].append(temp_triplets)
     
     
     print(result_panda_dict_list)
@@ -214,18 +226,18 @@ if __name__ == "__main__":
     
 
     input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    species_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
-    organ_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
-    disease_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
+    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
+    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
+    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
     output_triplet_count_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
 
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
     organ_species_disease_triplet_list=list(show_all_organ_species_disease_triplets(binvestigate_panda))
     organ_species_disease_triplet_panda=pandas.DataFrame(organ_species_disease_triplet_list,columns=['organ','species','disease'])
 
-    species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_output_address)
-    organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_output_address)
-    disease_nx=nx.readwrite.gpickle.read_gpickle(disease_nx_output_address)
+    species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
+    organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
+    disease_nx=nx.readwrite.gpickle.read_gpickle(disease_nx_input_address)
 
 
     #temp_nx,temp_hierarchy_type,set_of_binvestigate_nodes=None

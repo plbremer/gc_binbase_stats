@@ -13,7 +13,7 @@ def convert_networkx(temp_input_address,temp_output_address,temp_is_compound_nx)
     temp_networkx=nx.readwrite.gpickle.read_gpickle(temp_input_address)
 
     if temp_is_compound_nx:
-        temp_networkx=nx.DiGraph.reverse(temp_networkx)
+        #temp_networkx=nx.DiGraph.reverse(temp_networkx)
         for temp_node in temp_networkx.nodes:
             del temp_networkx.nodes[temp_node]['fold_change_matrix']
 

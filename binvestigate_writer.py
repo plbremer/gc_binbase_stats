@@ -172,14 +172,15 @@ if __name__ == '__main__':
 
 
     #for i in range(1,1000000,10000):
-    this_min=1
-    this_max=1000000
-    this_gap=10000
+    this_min=26754
+    this_max=26755
+    this_gap=1
 
     
     for i in range(this_min,this_max,this_gap):
         
-        temp_logfile_location='/home/rictuar/coding_projects_database/logfiles/log_'+str(i)+'.log'
+        temp_logfile_location='/home/rictuar/delete_temp_log.bin'
+        #temp_logfile_location='/home/rictuar/coding_projects_database/logfiles/log_'+str(i)+'.log'
         #print='./log_'+str(i)+'.log'
         temp_logfile=open(temp_logfile_location,'w')
         sys.stdout=temp_logfile
