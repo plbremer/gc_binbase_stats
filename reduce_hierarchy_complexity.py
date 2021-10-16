@@ -139,8 +139,17 @@ def remove_unwanted_nodes(temp_nx,temp_nodes_to_keep,temp_hierarchy_type):
 def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,temp_hierarchy_type):
     
     if temp_hierarchy_type=='compound':
+        
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         temp_nx=nx.DiGraph.reverse(temp_nx)
+        
+        #reveal_node_attributes(temp_nx)
+
+        temp_panda=create_text_for_keep_files(temp_nx,'compound')
+        temp_panda.to_csv(output_base_address+'compound_list.csv',sep='¬')
+        #print(temp_panda)
+        hold=input('letting you put nodes to keep text file in directory')
+
         draw_nx_for_analysis(temp_nx,'compound')
         compounds_to_keep_panda=pandas.read_csv(temp_node_keep_address)
         keep_list=compounds_to_keep_panda['nodes_to_keep'].to_list()    
@@ -152,6 +161,12 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         #reveal_node_attributes(temp_nx)
         species_set={i[1] for i in organ_species_disease_triplet_list}
+        
+        temp_panda=create_text_for_keep_files(temp_nx,temp_hierarchy_type,species_set)
+        #print(temp_panda)
+        temp_panda.to_csv(output_base_address+'species_list.csv',sep='¬')
+        hold=input('letting you put nodes to keep text file in directory')
+
         draw_nx_for_analysis(temp_nx,temp_hierarchy_type,species_set)
         species_to_keep_panda=pandas.read_csv(temp_node_keep_address,)
         keep_list=species_to_keep_panda['nodes_to_keep'].astype(str).to_list()
@@ -163,6 +178,12 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         #reveal_node_attributes(temp_nx)
         organ_set={i[0] for i in organ_species_disease_triplet_list}
+        
+        temp_panda=create_text_for_keep_files(temp_nx,temp_hierarchy_type,organ_set)
+        #print(temp_panda)
+        temp_panda.to_csv(output_base_address+'organ_list.csv',sep='¬')
+        hold=input('letting you put nodes to keep text file in directory')
+
         draw_nx_for_analysis(temp_nx,temp_hierarchy_type,organ_set)
         organs_to_keep_panda=pandas.read_csv(temp_node_keep_address)
         keep_list=organs_to_keep_panda['nodes_to_keep'].to_list()
@@ -174,6 +195,12 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         #reveal_node_attributes(temp_nx)
         disease_set={i[2] for i in organ_species_disease_triplet_list}
+        
+        temp_panda=create_text_for_keep_files(temp_nx,temp_hierarchy_type,disease_set)
+        #print(temp_panda)
+        temp_panda.to_csv(output_base_address+'disease_list.csv',sep='¬')
+        hold=input('letting you put nodes to keep text file in directory')
+       
         draw_nx_for_analysis(temp_nx,temp_hierarchy_type,disease_set)
         diseases_to_keep_panda=pandas.read_csv(temp_node_keep_address)
         keep_list=diseases_to_keep_panda['nodes_to_keep'].to_list()
@@ -183,6 +210,67 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         nx.readwrite.gpickle.write_gpickle(temp_nx,temp_output_address)
 
 
+def create_text_for_keep_files(temp_nx,temp_hierarchy_type,set_of_binvestigate_nodes=None):
+    text_dict={
+        'node_id':[],
+        'english_name':[],
+        'we_map_to':[]
+    }
+    
+
+    if temp_hierarchy_type=='compound':
+        for temp_node in temp_nx.nodes:
+            text_dict['node_id'].append(temp_node)
+            #english name
+            try:
+                text_dict['english_name'].append(temp_node+' | '+temp_nx.nodes[temp_node]['name'])
+            except TypeError:
+                text_dict['english_name'].append(str(temp_node))
+            #we map to
+            if temp_nx.nodes[temp_node]['type_of_node']=='from_binvestigate':
+                text_dict['we_map_to'].append('Yes')
+            elif temp_nx.nodes[temp_node]['type_of_node']=='combination':
+                text_dict['we_map_to'].append('No')            
+
+
+    elif temp_hierarchy_type=='species':
+        for temp_node in temp_nx.nodes:
+            text_dict['node_id'].append(temp_node)
+            
+            #english name
+            try:
+                temp_sci_name=temp_nx.nodes[temp_node]['scientific_name']
+            except KeyError:
+                temp_sci_name='no scientific name found'
+            try:
+                if type(temp_nx.nodes[temp_node]['common_name']) == list:
+                    temp_common_name=temp_nx.nodes[temp_node]['common_name'][0]
+                else:
+                    temp_common_name=temp_nx.nodes[temp_node]['common_name']
+            except KeyError:
+                temp_common_name='no common name found' 
+            text_dict['english_name'].append(temp_sci_name+' | '+temp_common_name)
+            #we map to
+            if temp_node in set_of_binvestigate_nodes:
+                text_dict['we_map_to'].append('Yes')
+            else:
+                text_dict['we_map_to'].append('No')
+
+    elif temp_hierarchy_type=='organ' or temp_hierarchy_type=='disease':
+
+        for temp_node in temp_nx.nodes:
+            text_dict['node_id'].append(temp_node)
+            #english name
+            text_dict['english_name'].append(temp_nx.nodes[temp_node]['mesh_label'])
+            #we map to
+            if temp_nx.nodes[temp_node]['mesh_label'] in set_of_binvestigate_nodes:
+                text_dict['we_map_to'].append('Yes')
+            else:
+                text_dict['we_map_to'].append('No')
+
+    text_panda=pandas.DataFrame.from_dict(text_dict)
+    return text_panda
+
 if __name__=="__main__":
     
 
@@ -190,10 +278,15 @@ if __name__=="__main__":
     os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/')
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/dummy.txt')
     
+
+    output_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/'
+
+
     compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
     compound_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_compound.txt'
     compound_nx_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/compounds_networkx.bin'
     do_everything(compound_nx_address,compound_node_keep_address,compound_nx_output_address,'compound')
+    
 
     #required for species, organ, and disease
     input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'

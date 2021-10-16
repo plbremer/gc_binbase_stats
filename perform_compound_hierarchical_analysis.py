@@ -432,7 +432,7 @@ if __name__ == "__main__":
     hold=input('2')
     '''
 
-    nx.readwrite.gpickle.write_gpickle(compound_network,output_graph_address)
+    nx.readwrite.gpickle.write_gpickle(compound_network,output_graph_address,protocol=0)
 
     #write each compound fold matrix panda to file
     write_each_compound_fold_change_matrix_to_file(compound_network,individual_fold_matrix_directory_base)

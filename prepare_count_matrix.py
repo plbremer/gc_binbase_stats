@@ -21,7 +21,7 @@ def prepare_empty_count_panda(temp_triplet_set,temp_nx):
     print(ordered_nodelist)
 
     pandas_dict={temp_column:[ [] for i in range(len(temp_triplet_set)) ] for temp_column in ordered_nodelist}
-    pprint(pandas_dict)
+    #pprint(pandas_dict)
 
     empty_dataframe=pandas.DataFrame(data=None,index=temp_triplet_set,columns=ordered_nodelist)
     #empty_dataframe=pandas.DataFrame.from_dict(pandas_dict)
