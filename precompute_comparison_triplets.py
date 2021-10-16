@@ -309,12 +309,20 @@ if __name__ == "__main__":
     #print(len(total_panda['to_triplets_inter_removed_if_nec'].unique()))
     #print(len(total_panda['from_triplets_inter_removed_if_nec'].unique()))
     
-    print(total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list())
+    #print(total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list())
     output_dict={
         'triplets': (total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list() + total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()),
         'from_to': (['from' for element in total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list()] + ['to' for element in total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()])
     }
 
-    output_panda=pd.DataFrame.from_dict(output_dict)
+    empty_set_indices=[i for i,value in enumerate(output_dict['triplets']) if len(value)==0]
+    print(empty_set_indices)
+    #empty_set_indices
 
+    output_dict_cleaned={}
+    output_dict_cleaned['triplets']=[element for i,element in enumerate(output_dict['triplets']) if i not in empty_set_indices]
+    output_dict_cleaned['from_to']=[element for i,element in enumerate(output_dict['from_to']) if i not in empty_set_indices]
+
+    output_panda=pd.DataFrame.from_dict(output_dict_cleaned)
+    print(output_panda)
     output_panda.to_pickle(output_address)
