@@ -1,7 +1,44 @@
+'''
+At some point i realized that many of the results of hiearchical headnodes depended only on whether or not
+one or more triplets existed depending on the headnode choice
+
+this script accepts the panda that describes the triplets that are implied by each possible headnode combination
+many of these headnode combinations imply zero triplets
+
+this script takes the aforementiond panda
+it drops all rows where zero triplets are implied by the headnode combination
+
+we recognize that every headnode combination can be tested against every headnode combination (from vs to)
+
+
+we start with a list of headnode combinations
+for every headnode combination (from), we append append a list of that headnode combination's index to the end of the list of headnode combinations (to)
+(we start at the current index for the from because the fold matrix is "anti symmetric" (lower diagonal is negative of upper diagonal))
+
+then, for every single from vs to combinations (# of headnode triplets * ((1/2)*# of headnode triplets)) we do a triplet combination reduction operation
+
+this is motivated by the "except for" clause, which is , if some headnode is above another headnode in a hierarchy, we want to check all triplets except those implied
+by the descendant headnode
+
+so, we compare, for each hiearchy in a headnode triplet combination, whether from vs to is a descendant of the other
+if, for any hierarchy, one is a descendant of the other, then we remove the set intersection from the node that is higher up (the opposite of a descendant)
+
+then, having done that, we recognize that the number of unique triplet lists pairs (from vs to) is much smaller than the number of rows in the 
+headnode triplet vs headnode triplet matrix
+
+so, we opt to use the unique pairings to one anotehr
+while the list of from pairs and the list of to pairs is a more compact representation, it is not the case that every from and every to are compared
+therefore, we cannot simply maintain two independent lists. the multiple of those two is often longer than the headnode triplet combination list
+
+there is a little finagling at the end, because the triplets were kept in sets (unhashable) and so we have to do some trickerty by typecasting lists and so on
+to get the proper list of unique pairs
+'''
+
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 from pprint import pprint
+import time
 
 def identify_species_descendants(temp_headnode):
     #print('here')
@@ -35,7 +72,7 @@ def build_total_test_panda(temp_panda):
 
     index_length=len(temp_panda.index)
     print(index_length)
-    hold=input('hold')
+    #hold=input('hold')
     for index, series in temp_panda.iterrows():
         print(index)
 
@@ -234,7 +271,7 @@ if __name__ == "__main__":
     pprint(triplet_map_dict)
     '''
     print(total_panda)
-    hold=input('total_panda')
+    #hold=input('total_panda')
 
     
     total_panda['to_triplets_inter_removed_if_nec']=total_panda.apply(
@@ -301,19 +338,56 @@ if __name__ == "__main__":
 
     print(total_panda)
     print(total_panda.columns)
-    print(total_panda['to_triplets_inter_removed_if_nec'].value_counts())
-    print(total_panda['from_triplets_inter_removed_if_nec'].value_counts())
-    print(len(total_panda['to_triplets_inter_removed_if_nec'].value_counts()))
-    print(len(total_panda['from_triplets_inter_removed_if_nec'].value_counts()))
-    print(len(input_panda['triplet_list'].value_counts()))
+    #print(total_panda['to_triplets_inter_removed_if_nec'].value_counts())
+    #print(total_panda['from_triplets_inter_removed_if_nec'].value_counts())
+    
+    #start1=time.time()
+    #print((total_panda['to_triplets_inter_removed_if_nec'].value_counts()))
+    #print((total_panda['from_triplets_inter_removed_if_nec'].value_counts()))
+    #end1=time.time()
+    
+
+    total_panda['to_triplets_inter_removed_if_nec']=total_panda['to_triplets_inter_removed_if_nec'].transform(list)
+    total_panda['from_triplets_inter_removed_if_nec']=total_panda['from_triplets_inter_removed_if_nec'].transform(list)
+
+
+    total_panda['to_triplets_inter_removed_if_nec']=total_panda['to_triplets_inter_removed_if_nec'].apply(lambda x: sorted(x))
+    total_panda['from_triplets_inter_removed_if_nec']=total_panda['from_triplets_inter_removed_if_nec'].apply(lambda x: sorted(x))
+
+    total_panda['to_triplets_inter_removed_if_nec']=total_panda['to_triplets_inter_removed_if_nec'].transform(tuple)
+    total_panda['from_triplets_inter_removed_if_nec']=total_panda['from_triplets_inter_removed_if_nec'].transform(tuple)
+
+
+    test_view=total_panda.loc[(total_panda['to_triplets_inter_removed_if_nec'] != ()) & (total_panda['from_triplets_inter_removed_if_nec'] != ())].copy()
+    test_view.reset_index(inplace=True)
+    print(test_view)
+
+
+    
+    #start2=time.time()
+    #print(len(total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique()))
+    #print(len(total_panda['from_triplets_inter_removed_if_nec'].transform(tuple).unique()))
+    '''
+    #end2=time.time()
+    ##print(end1-start1)
+    #print(end2-start2)
+    
+    #print('check time')
+
+    print(len(input_panda['triplet_list'].transform(tuple).unique()))
     #print(len(total_panda['to_triplets_inter_removed_if_nec'].unique()))
     #print(len(total_panda['from_triplets_inter_removed_if_nec'].unique()))
     
     #print(total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list())
+    ##output_dict={
+    ##    'triplets': (total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list() + total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()),
+    ##   'from_to': (['from' for element in total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list()] + ['to' for element in total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()])
+    ##}
+
     output_dict={
-        'triplets': (total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list() + total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()),
-        'from_to': (['from' for element in total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list()] + ['to' for element in total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()])
-    }
+        'triplets': (list(total_panda['from_triplets_inter_removed_if_nec'].transform(tuple).unique()) + list(total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique())),
+        'from_to': (['from' for element in total_panda['from_triplets_inter_removed_if_nec'].transform(tuple).unique()] + ['to' for element in total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique()])
+    }    
 
     empty_set_indices=[i for i,value in enumerate(output_dict['triplets']) if len(value)==0]
     print(empty_set_indices)
@@ -323,6 +397,58 @@ if __name__ == "__main__":
     output_dict_cleaned['triplets']=[element for i,element in enumerate(output_dict['triplets']) if i not in empty_set_indices]
     output_dict_cleaned['from_to']=[element for i,element in enumerate(output_dict['from_to']) if i not in empty_set_indices]
 
+    
     output_panda=pd.DataFrame.from_dict(output_dict_cleaned)
     print(output_panda)
     output_panda.to_pickle(output_address)
+    '''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    test_view['combo_column']=(list(zip(
+        test_view['to_triplets_inter_removed_if_nec'],#.transform(tuple),#.unique(),
+        test_view['from_triplets_inter_removed_if_nec']#.transform(tuple)#.unique()
+    )))
+    #print(test_view)
+    #print(test_view['combo_column'])
+
+    print(len(test_view['combo_column'].unique()))
+    print(len(test_view['to_triplets_inter_removed_if_nec'].unique()))
+    print(len(test_view['from_triplets_inter_removed_if_nec'].unique()))
+
+    #output_dict={
+    #    'combos':[]
+    #}
+    #output_series=test_view['combo_column'].unique()
+    #pprint(output_series)
+    #print(len(output_series))
+    output_series=pd.DataFrame(test_view['combo_column'].unique())
+    output_series=output_series.assign(**dict(zip('ft', output_series[0].str)))
+    print(output_series)
+    output_series.drop(0,axis='columns',inplace=True)
+    print(output_series)
+
+    output_series.rename({'f': 'from','t':'to'},axis='columns',inplace=True)
+    print(output_series)
+
+    output_series.sort_values(by='from',inplace=True)
+    print(output_series)
+    output_series.to_pickle(output_address)
