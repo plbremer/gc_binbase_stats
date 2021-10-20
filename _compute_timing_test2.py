@@ -1,6 +1,7 @@
 import numpy as np
 import pandas
 import time
+import os
 
 
 def extract_from_and_to_sets(temp_panda):
@@ -50,8 +51,8 @@ def prepare_list_of_results(temp_triplet_panda,temp_fold_panda):
     temp_view=temp_fold_panda.loc[temp_fold_panda.index.isin(current_from_triplets),:]
     for i in range(len(from_list)):
 
-        if (i%1000==0):
-            print(i)
+        #if (i%1000==0):
+        #    print(i)
         ##print(temp_view)
 
         if (from_list[i] != current_from_triplets):
@@ -74,32 +75,42 @@ def prepare_list_of_results(temp_triplet_panda,temp_fold_panda):
 
 if __name__ == "__main__":
 
-    start_time=time.time()
+    #start_time=time.time()
 
-    input_fold_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
+    #input_fold_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
     input_triplet_panda_address='/home/rictuar/delete_test_bin_calc/unique_triplets'
-    output_address='/home/rictuar/delete_test_bin_calc/calculation_results'
+    #output_address='/home/rictuar/delete_test_bin_calc/calculation_results'
 
+    input_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
+    output_base_address='/home/rictuar/delete_test_bin_calc/'
+
+    file_list=os.listdir('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/')
+    print(file_list)
+    hold=input('hold')
+    
+    
     triplet_panda=pandas.read_pickle(input_triplet_panda_address)
-    input_fold_panda=pandas.read_pickle(input_fold_panda_address)
+    #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
 
 
 
     #print(input_fold_panda)
     #hold=input('hold')
 
+    for temp_file in file_list:
+        start_time=time.time()
+        input_fold_panda_address=input_base_address+temp_file
+        input_fold_panda=pandas.read_pickle(input_fold_panda_address)
+        output_address=output_base_address+'calc_results_'+temp_file
 
-    results_list=prepare_list_of_results(triplet_panda,input_fold_panda)
 
-    triplet_panda['results']=results_list
-
-    #print(triplet_panda)
-    #print(triplet_panda['results'].value_counts())
-
-    triplet_panda.to_pickle(output_address)
-    end_time=time.time()
-
-    print(end_time-start_time)
+        results_list=prepare_list_of_results(triplet_panda,input_fold_panda)
+        triplet_panda['results']=results_list
+        #print(triplet_panda)
+        #print(triplet_panda['results'].value_counts())
+        triplet_panda.to_pickle(output_address)
+        end_time=time.time()
+        print(end_time-start_time)
 
 
     '''
