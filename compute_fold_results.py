@@ -75,18 +75,25 @@ def prepare_list_of_results(temp_triplet_panda,temp_fold_panda):
 
 if __name__ == "__main__":
 
+
+    count_cutoff=snakemake.params.count_cutoff
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_18_compute_fold_results/')
+    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_18_compute_fold_results/dummy.txt')
+
+
+
     #start_time=time.time()
 
     #input_fold_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
-    input_triplet_panda_address='/home/rictuar/delete_test_bin_calc/unique_triplets'
+    input_triplet_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
     #output_address='/home/rictuar/delete_test_bin_calc/calculation_results'
 
     input_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
-    output_base_address='/home/rictuar/delete_test_bin_calc/'
+    output_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_18_compute_fold_results/'
 
     file_list=os.listdir('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/')
     print(file_list)
-    hold=input('hold')
+    #hold=input('hold')
     
     
     triplet_panda=pandas.read_pickle(input_triplet_panda_address)
@@ -108,6 +115,13 @@ if __name__ == "__main__":
         triplet_panda['results']=results_list
         #print(triplet_panda)
         #print(triplet_panda['results'].value_counts())
+        
+        #print(temp_file[:-4])
+        compound_name=temp_file[:-4]
+        triplet_panda['compound']=[compound_name for i in range(len(triplet_panda.index))]
+        #print(triplet_panda)
+        #hold=input('hold')
+        
         triplet_panda.to_pickle(output_address)
         end_time=time.time()
         print(end_time-start_time)

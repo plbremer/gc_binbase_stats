@@ -1,6 +1,16 @@
-from typing_extensions import final
+#from typing_extensions import final
 import pandas
+import os
 
+'''
+at a certain point, it was realized that i would be pulling the data from the "gc binbase database" rather than binvestigate
+
+because of this, it became the case that the sample count would be a function of the species, organ, disease triplet only
+and not the number of non-ND samples for a particular compound, as is the case on binvestigate
+
+therefore, we just take the results from the earlier prepare count panda, where every column is now the same, and do a little
+work to get results for a table in our database
+'''
 
 
 def create_sample_list_column(temp_triplet_tuple):
@@ -32,21 +42,30 @@ def get_sum_sample_count(temp_sample_count_list):
 
 if __name__ == "__main__":
 
+    count_cutoff=snakemake.params.count_cutoff
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_19_prepare_count_matrix_2/')
+    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_19_prepare_count_matrix_2/dummy.txt')
+
+
+
     triplet_to_count_input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_15_prepare_count_matrix/full_count_matrix.bin'
     triplet_to_count_panda=pandas.read_pickle(triplet_to_count_input_panda_address)
+    unique_triplet_list_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/unique_triplets.bin'
+    output_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
     #actually a series
 
+    
+
+    #print(triplet_to_count_panda.index)
+
+    #print(triplet_to_count_panda)
+
+
     triplet_to_count_panda=triplet_to_count_panda.iloc[:,0].copy()
-
-    print(triplet_to_count_panda.index)
-
-    print(triplet_to_count_panda)
-
-    unique_triplet_list_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/unique_triplets.bin'
     unique_triplet_panda=pandas.read_pickle(unique_triplet_list_panda_address)
     
     
-    output_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/'
+    
     
     print(unique_triplet_panda)
 
