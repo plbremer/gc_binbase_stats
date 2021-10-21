@@ -187,6 +187,49 @@ rule step_16_calculate_fraction_triplets:
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/calculate_fraction_triplets.py"
 
+rule step_17_precompute_comparison_triplets:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_16_calculate_fraction_triplets/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_17_precompute_comparison_triplets/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/precompute_comparison_triplets.py"
+
+
+rule step_18_compute_fold_results:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_17_precompute_comparison_triplets/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_18_compute_fold_results/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/compute_fold_results.py"
+
+rule step_19_prepare_count_matrix_2:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_18_compute_fold_results/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_19_prepare_count_matrix_2/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/prepare_count_matrix_2.py"
+
+rule step_20_build_hierarchy_filter_tables:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_19_prepare_count_matrix_2/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_20_build_hierarchy_filter_tables/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/build_hierarchy_filter_tables.py"
+
+
+'''
 rule step_17_invoke_user_library:
     input:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_16_calculate_fraction_triplets/dummy.txt"
@@ -236,3 +279,4 @@ rule step_21_convert_networkx_to_cyto_format:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/convert_networkx_to_cyto_format.py"
+'''

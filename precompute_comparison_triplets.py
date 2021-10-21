@@ -39,6 +39,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from pprint import pprint
 import time
+import os
 
 def identify_species_descendants(temp_headnode):
     #print('here')
@@ -178,12 +179,19 @@ def remove_intersection_if_necessary_from(from_triplets,to_triplets,descendants_
 
 if __name__ == "__main__":
 
+
+    count_cutoff=snakemake.params.count_cutoff
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/')
+    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/dummy.txt')
+      
+
     count_cutoff=1
     input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
     species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
     organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
     disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
-    output_address='/home/rictuar/delete_test_bin_calc/unique_triplets'
+    unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
+    triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
 
     species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
     organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
@@ -363,6 +371,15 @@ if __name__ == "__main__":
     print(test_view)
 
 
+    test_view['headnode_triplet_from']=tuple(zip(test_view['species_headnode_from'],test_view['organ_headnode_from'],test_view['disease_headnode_from']))
+    test_view['headnode_triplet_to']=tuple(zip(test_view['species_headnode_to'],test_view['organ_headnode_to'],test_view['disease_headnode_to']))
+
+    test_view[['headnode_triplet_from','headnode_triplet_to','from_triplets_inter_removed_if_nec','to_triplets_inter_removed_if_nec']].to_pickle(triplet_headnode_to_triplet_tuple_ouput_address)
+
+    #hold=input('hold')
+
+
+
     
     #start2=time.time()
     #print(len(total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique()))
@@ -422,6 +439,7 @@ if __name__ == "__main__":
 
 
 
+
     
     test_view['combo_column']=(list(zip(
         test_view['to_triplets_inter_removed_if_nec'],#.transform(tuple),#.unique(),
@@ -446,9 +464,23 @@ if __name__ == "__main__":
     output_series.drop(0,axis='columns',inplace=True)
     print(output_series)
 
+    #hold=input('hold2')
     output_series.rename({'f': 'from','t':'to'},axis='columns',inplace=True)
+    
+    
+    #output_series['species_headnode_from']=test_view['species_headnode_from']
+    #output_series['organ_headnode_from']=test_view['organ_headnode_from']
+    #output_series['disease_headnode_from']=test_view['disease_headnode_from']
+    #output_series['species_headnode_to']=test_view['species_headnode_to']
+    #output_series['organ_headnode_to']=test_view['organ_headnode_to']
+    #output_series['disease_headnode_to']=test_view['disease_headnode_to']
+   
+    #output_series['headnode_triplet_from']=tuple(zip(output_series['species_headnode_from'],output_series['organ_headnode_from'],output_series['disease_headnode_from']))
+    #output_series['headnode_triplet_to']=tuple(zip(output_series['species_headnode_to'],output_series['organ_headnode_to'],output_series['disease_headnode_to']))
+
+
     print(output_series)
 
     output_series.sort_values(by='from',inplace=True)
     print(output_series)
-    output_series.to_pickle(output_address)
+    output_series.to_pickle(unique_triplets_output_address)
