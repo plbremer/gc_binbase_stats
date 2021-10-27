@@ -21,6 +21,7 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         print(temp_panda)
         temp_panda['distance_from_root']=temp_distance_list
         print(temp_panda)
+        temp_panda.to_pickle(temp_output_address)
 
     elif temp_hierarchy_type=='species':
 
@@ -35,7 +36,7 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         temp_panda['distance_from_root']=temp_distance_list
 
         print(temp_panda)
-
+        temp_panda.to_pickle(temp_output_address)
 
     elif temp_hierarchy_type=='organ':
 
@@ -50,6 +51,7 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         temp_panda['distance_from_root']=temp_distance_list
 
         print(temp_panda)       
+        temp_panda.to_pickle(temp_output_address)
 
     elif temp_hierarchy_type=='disease':
 
@@ -64,7 +66,7 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         temp_panda['distance_from_root']=temp_distance_list
 
         print(temp_panda)  
-
+        temp_panda.to_pickle(temp_output_address)
 
 
 if __name__ == "__main__":

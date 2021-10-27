@@ -160,25 +160,38 @@ if __name__ == "__main__":
 
 
 
-    for temp_file in file_list:
-        make_update_table_from_panda(
-            table_18_base_address+temp_file,
-            engine,
-            'fold_results',
-            [],
-            ('from_triplets', 'to_triplets', 'compound'),
-            [],
-            temp_dtype_dict={
-                'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
-                'to_triplets': postgresql.ARRAY(postgresql.TEXT),
-                'compound': postgresql.TEXT,
-                'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-            }
-        )
+    # for temp_file in file_list:
+    #     make_update_table_from_panda(
+    #         table_18_base_address+temp_file,
+    #         engine,
+    #         'fold_results',
+    #         [],
+    #         ('from_triplets', 'to_triplets', 'compound'),
+    #         [],
+    #         temp_dtype_dict={
+    #             'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
+    #             'to_triplets': postgresql.ARRAY(postgresql.TEXT),
+    #             'compound': postgresql.TEXT,
+    #             'to_triplets_inter_removed_if_nec': postgresql.FLOAT
+    #         }
+    #     )
 
-
-
-
+    # table_19_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_19_prepare_count_matrix_2/count_matrix.bin'
+    # make_update_table_from_panda(
+    #     table_19_address,
+    #     engine,
+    #     'unique_reduced_trip_list_to_properties',
+    #     [],
+    #     (['unique_triplets']),
+    #     [],
+    #     temp_dtype_dict={
+    #         'unique_triplets': postgresql.ARRAY(postgresql.TEXT), 
+    #         'triplet_count': postgresql.INTEGER, 
+    #         'sample_count_list': postgresql.ARRAY(postgresql.INTEGER),
+    #         'min_sample_count': postgresql.INTEGER, 
+    #         'sum_sample_count': postgresql.INTEGER
+    #     }
+    # )
 
     # def make_update_table_from_panda(
     #     temp_panda_address,
@@ -190,7 +203,26 @@ if __name__ == "__main__":
     #     temp_dtype_dict=None
     # ):
 
-
+    table_20_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_20_build_hierarchy_filter_tables/'
+    file_list=os.listdir(table_20_base_address)
+    file_list.remove('dummy.txt')
+    print(file_list)
+    #hold=input('hold')
+    
+    for temp_file in file_list:
+        make_update_table_from_panda(
+            table_20_base_address+temp_file,
+            engine,
+            'hierarchy_filter_'+temp_file[:-4],
+            [],
+            (['node_id']),
+            [],
+            temp_dtype_dict={
+                'node_id': postgresql.TEXT, 
+                'we_map_to': postgresql.TEXT, 
+                'distance_from_root': postgresql.INTEGER
+            }
+        )
 
 
 
