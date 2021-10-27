@@ -33,7 +33,7 @@ def one_df_transform(temp_df):
         temp_df.min(),
         temp_df.max()
     ]
-    return np.select(conditions,choices)
+    return float(np.select(conditions,choices))
 
 
 def prepare_list_of_results(temp_triplet_panda,temp_fold_panda):
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     #hold=input('hold')
     
     
-    triplet_panda=pandas.read_pickle(input_triplet_panda_address)
+    #triplet_panda=pandas.read_pickle(input_triplet_panda_address)
     #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
 
 
@@ -106,6 +106,10 @@ if __name__ == "__main__":
 
     for temp_file in file_list:
         start_time=time.time()
+        
+        #put here because we rename columns at the end of the loop
+        triplet_panda=pandas.read_pickle(input_triplet_panda_address)
+        
         input_fold_panda_address=input_base_address+temp_file
         input_fold_panda=pandas.read_pickle(input_fold_panda_address)
         output_address=output_base_address+'calc_results_'+temp_file
@@ -122,6 +126,20 @@ if __name__ == "__main__":
         #print(triplet_panda)
         #hold=input('hold')
         
+        triplet_panda=triplet_panda.reindex(
+            columns=['from','to','compound','results'],
+        )
+
+        #print(triplet_panda)
+        triplet_panda=triplet_panda.rename(
+            columns={
+                'from':'from_triplets',
+                'to':'to_triplets'
+            }#,
+            #inplace=True,
+            #axis='columns'
+        )
+        #print(triplet_panda)
         triplet_panda.to_pickle(output_address)
         end_time=time.time()
         print(end_time-start_time)
