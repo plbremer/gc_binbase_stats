@@ -229,54 +229,12 @@ rule step_20_build_hierarchy_filter_tables:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/build_hierarchy_filter_tables.py"
 
 
-'''
-rule step_17_invoke_user_library:
-    input:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_16_calculate_fraction_triplets/dummy.txt"
-    output:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_17_invoke_user_library/dummy.txt"
-    params:
-        count_cutoff="{count_cutoff}"
-    script:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/user_library/invoke_user_library.py"
-
-rule step_18_post_user_library_make_conglomerate_panda:
-    input:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_17_invoke_user_library/dummy.txt"
-    output:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_18_post_user_library_make_conglomerate_panda/dummy.txt"
-    params:
-        count_cutoff="{count_cutoff}"
-    script:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/post_user_library_make_conglomerate_panda.py"
-
-rule step_19_add_triplet_count_column:
-    input:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_18_post_user_library_make_conglomerate_panda/dummy.txt"
-    output:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_19_add_triplet_count_column/dummy.txt"
-    params:
-        count_cutoff="{count_cutoff}"
-    script:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/add_triplet_count_column.py"
-
-rule step_20_add_sample_count_column:
-    input:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_19_add_triplet_count_column/dummy.txt"
-    output:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_20_add_sample_count_column/dummy.txt"
-    params:
-        count_cutoff="{count_cutoff}"
-    script:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/add_sample_count_column.py"
-
 rule step_21_convert_networkx_to_cyto_format:
     input:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_20_add_sample_count_column/dummy.txt"
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_20_build_hierarchy_filter_tables/dummy.txt"
     output:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_21_convert_networkx_to_cyto_format/dummy.txt"
     params:
         count_cutoff="{count_cutoff}"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/convert_networkx_to_cyto_format.py"
-'''
