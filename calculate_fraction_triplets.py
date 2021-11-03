@@ -32,6 +32,8 @@ import pandas
 from generate_fold_change_matrices import show_all_organ_species_disease_triplets
 from reduce_hierarchy_complexity import draw_nx_for_analysis
 
+import multiprocessing
+
 
 def convert_organ_node_set_to_mesh_label_set(temp_organ_node_set,temp_organ_nx):
     '''
@@ -100,7 +102,8 @@ def identify_triplets_we_have_data_for(temp_species_we_map_to,temp_organ_we_map_
     return triplets, triplet_length
 
 #traverses species organ and disease nodeslist
-def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx):
+#def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx):
+def evaluate_headnode_combinations(temp_species_traversal_list):
     '''
    
     '''
@@ -114,12 +117,16 @@ def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx
     }
     #print(result_panda_dict_list)
 
-    species_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(temp_species_nx,source='1'))
+    
+    temp_species_nx=species_nx
+    temp_organ_nx=organ_nx
+    temp_disease_nx=disease_nx
+    
     organ_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(temp_organ_nx,source='organ'))
     disease_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(temp_disease_nx,source='disease'))
-
+    print(temp_species_traversal_list)
     #iterate through specices
-    for temp_species_headnode in species_traversal_list:
+    for temp_species_headnode in temp_species_traversal_list:
 
         temp_species_descendants=nx.algorithms.dag.descendants(temp_species_nx,temp_species_headnode)
         temp_species_descendants.add(temp_species_headnode)
@@ -179,17 +186,18 @@ def evaluate_headnode_combinations(temp_species_nx,temp_organ_nx,temp_disease_nx
                 #print(temp_disease_we_map_to)
                 #print(temp_triplets)
                 
-                
-                result_panda_dict_list['species_headnode'].append(temp_species_headnode)
-                result_panda_dict_list['organ_headnode'].append(temp_organ_headnode)
-                result_panda_dict_list['disease_headnode'].append(temp_disease_headnode)
-                result_panda_dict_list['possible_triplets'].append(temp_possibility_length)
-                result_panda_dict_list['actual_triplets'].append(temp_actual_triplet_length)
-                result_panda_dict_list['triplet_list'].append(temp_triplets)
+                if (temp_actual_triplet_length>0):
+                    result_panda_dict_list['species_headnode'].append(temp_species_headnode)
+                    result_panda_dict_list['organ_headnode'].append(temp_organ_headnode)
+                    result_panda_dict_list['disease_headnode'].append(temp_disease_headnode)
+                    result_panda_dict_list['possible_triplets'].append(temp_possibility_length)
+                    result_panda_dict_list['actual_triplets'].append(temp_actual_triplet_length)
+                    result_panda_dict_list['triplet_list'].append(temp_triplets)
     
     
-    print(result_panda_dict_list)
+    #print(result_panda_dict_list)
     result_panda=pandas.DataFrame.from_dict(result_panda_dict_list)
+    print(result_panda)
     return result_panda          
 
 
@@ -246,7 +254,43 @@ if __name__ == "__main__":
     #draw_nx_for_analysis(disease_nx,'species',organ_species_disease_triplet_panda['disease'].unique())
 
 
-    result_panda=evaluate_headnode_combinations(species_nx,organ_nx,disease_nx)
+    species_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(species_nx,source='1'))
+    #species_traversal_list=species_traversal_list[0:5]
+    
+    num_processes=5
+    chunk_size=len(species_traversal_list)//num_processes
+    species_traversal_list_list=list()
+    for i in range(num_processes):
+        if i< num_processes-1:
+            species_traversal_list_list.append(species_traversal_list[i*chunk_size:(i+1)*chunk_size])
+        elif i ==(num_processes-1):
+            species_traversal_list_list.append(species_traversal_list[i*chunk_size:])
+
+    print(species_traversal_list_list)
+    #hold=input('hold')
+
+    pool=multiprocessing.Pool(processes=num_processes)
+
+    result_panda_chunks=pool.map(evaluate_headnode_combinations,species_traversal_list_list)
+    #result_panda=result_panda_chunks[0].copy()
+
+    pool.close()
+
+    #for i in range(len(transformed_chunks)):
+    result_panda=pandas.concat(result_panda_chunks,axis='index',ignore_index=True,copy=True)
+        #post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
+    #post_species_transform_panda=pandas.concat(transformed_chunks)    
+    print(result_panda)
+    #hold=input('hold')
+
+    #result_panda=evaluate_headnode_combinations(species_nx,organ_nx,disease_nx)
+    
+    
+    
+    
+    
+    
+    
     result_panda['ratio']=result_panda['actual_triplets'].div(result_panda['possible_triplets'])
     print(result_panda)
     print(result_panda['possible_triplets'].value_counts())
