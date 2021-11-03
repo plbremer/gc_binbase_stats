@@ -116,40 +116,40 @@ if __name__ == "__main__":
     connection=engine.connect()
 
     table_16_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
-    # make_update_table_from_panda(
-    #     table_16_address,
-    #     engine,
-    #     'headnodes_to_triplets',
-    #     ['possible_triplets', 'actual_triplets', 'ratio'],
-    #     ('species_headnode', 'organ_headnode', 'disease_headnode'),
-    #     ['triplet_list'],
-    #     temp_dtype_dict={
-    #         'species_headnode': postgresql.TEXT,
-    #         'organ_headnode': postgresql.TEXT,
-    #         'disease_headnode': postgresql.TEXT,
-    #         'triplet_list': postgresql.ARRAY(postgresql.TEXT)            
-    #     }
-    # )
+    make_update_table_from_panda(
+        table_16_address,
+        engine,
+        'headnodes_to_triplets',
+        ['possible_triplets', 'actual_triplets', 'ratio'],
+        ('species_headnode', 'organ_headnode', 'disease_headnode'),
+        ['triplet_list'],
+        temp_dtype_dict={
+            'species_headnode': postgresql.TEXT,
+            'organ_headnode': postgresql.TEXT,
+            'disease_headnode': postgresql.TEXT,
+            'triplet_list': postgresql.ARRAY(postgresql.TEXT)            
+        }
+    )
 
 
 
 
     
-    # table_17_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
-    # make_update_table_from_panda(
-    #     table_17_address,
-    #     engine,
-    #     'headnode_pairs_to_triplet_list_pair',
-    #     [],
-    #     ('headnode_triplet_from', 'headnode_triplet_to'),
-    #     [],
-    #     temp_dtype_dict={
-    #         'headnode_triplet_from': postgresql.ARRAY(postgresql.TEXT), 
-    #         'headnode_triplet_to': postgresql.ARRAY(postgresql.TEXT),
-    #         'from_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT),
-    #         'to_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT)
-    #     }
-    # )
+    table_17_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
+    make_update_table_from_panda(
+        table_17_address,
+        engine,
+        'headnode_pairs_to_triplet_list_pair',
+        [],
+        ('headnode_triplet_from', 'headnode_triplet_to'),
+        [],
+        temp_dtype_dict={
+            'headnode_triplet_from': postgresql.ARRAY(postgresql.TEXT), 
+            'headnode_triplet_to': postgresql.ARRAY(postgresql.TEXT),
+            'from_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT),
+            'to_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT)
+        }
+    )
     
 
     table_18_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_18_compute_fold_results/'
@@ -160,38 +160,38 @@ if __name__ == "__main__":
 
 
 
-    # for temp_file in file_list:
-    #     make_update_table_from_panda(
-    #         table_18_base_address+temp_file,
-    #         engine,
-    #         'fold_results',
-    #         [],
-    #         ('from_triplets', 'to_triplets', 'compound'),
-    #         [],
-    #         temp_dtype_dict={
-    #             'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
-    #             'to_triplets': postgresql.ARRAY(postgresql.TEXT),
-    #             'compound': postgresql.TEXT,
-    #             'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-    #         }
-    #     )
+    for temp_file in file_list:
+        make_update_table_from_panda(
+            table_18_base_address+temp_file,
+            engine,
+            'fold_results',
+            [],
+            ('from_triplets', 'to_triplets', 'compound'),
+            [],
+            temp_dtype_dict={
+                'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
+                'to_triplets': postgresql.ARRAY(postgresql.TEXT),
+                'compound': postgresql.TEXT,
+                'to_triplets_inter_removed_if_nec': postgresql.FLOAT
+            }
+        )
 
-    # table_19_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_19_prepare_count_matrix_2/count_matrix.bin'
-    # make_update_table_from_panda(
-    #     table_19_address,
-    #     engine,
-    #     'unique_reduced_trip_list_to_properties',
-    #     [],
-    #     (['unique_triplets']),
-    #     [],
-    #     temp_dtype_dict={
-    #         'unique_triplets': postgresql.ARRAY(postgresql.TEXT), 
-    #         'triplet_count': postgresql.INTEGER, 
-    #         'sample_count_list': postgresql.ARRAY(postgresql.INTEGER),
-    #         'min_sample_count': postgresql.INTEGER, 
-    #         'sum_sample_count': postgresql.INTEGER
-    #     }
-    # )
+    table_19_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_19_prepare_count_matrix_2/count_matrix.bin'
+    make_update_table_from_panda(
+        table_19_address,
+        engine,
+        'unique_reduced_trip_list_to_properties',
+        [],
+        (['unique_triplets']),
+        [],
+        temp_dtype_dict={
+            'unique_triplets': postgresql.ARRAY(postgresql.TEXT), 
+            'triplet_count': postgresql.INTEGER, 
+            'sample_count_list': postgresql.ARRAY(postgresql.INTEGER),
+            'min_sample_count': postgresql.INTEGER, 
+            'sum_sample_count': postgresql.INTEGER
+        }
+    )
 
     # def make_update_table_from_panda(
     #     temp_panda_address,
