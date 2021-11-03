@@ -41,6 +41,8 @@ from pprint import pprint
 import time
 import os
 
+import multiprocessing
+
 def identify_species_descendants(temp_headnode):
     #print('here')
     #print(type(temp_headnode))
@@ -225,6 +227,19 @@ if __name__ == "__main__":
     #nx.draw(species_nx,with_labels=True)
     #plt.show()
     total_panda=build_total_test_panda(input_panda)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     print(total_panda)
     total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
 

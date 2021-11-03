@@ -237,7 +237,6 @@ rule step_21_convert_networkx_to_cyto_format:
     params:
         count_cutoff="{count_cutoff}"
     script:
-<<<<<<< HEAD
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/convert_networkx_to_cyto_format.py"
 
 
@@ -283,6 +282,3 @@ rule step_20_add_sample_count_column:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/add_sample_count_column.py"
 
 '''
-=======
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/convert_networkx_to_cyto_format.py"
->>>>>>> 59ee878a628a6f6ecdc7bf0731a56d0cde3759d0

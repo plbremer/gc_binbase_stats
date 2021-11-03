@@ -148,7 +148,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_panda=create_text_for_keep_files(temp_nx,'compound')
         temp_panda.to_csv(output_base_address+'compound_list.csv',sep='¬')
         #print(temp_panda)
-        hold=input('letting you put nodes to keep text file in directory')
+        #hold=input('letting you put nodes to keep text file in directory')
 
         draw_nx_for_analysis(temp_nx,'compound')
         compounds_to_keep_panda=pandas.read_csv(temp_node_keep_address)
@@ -165,7 +165,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_panda=create_text_for_keep_files(temp_nx,temp_hierarchy_type,species_set)
         #print(temp_panda)
         temp_panda.to_csv(output_base_address+'species_list.csv',sep='¬')
-        hold=input('letting you put nodes to keep text file in directory')
+        #hold=input('letting you put nodes to keep text file in directory')
 
         draw_nx_for_analysis(temp_nx,temp_hierarchy_type,species_set)
         species_to_keep_panda=pandas.read_csv(temp_node_keep_address,)
@@ -182,7 +182,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_panda=create_text_for_keep_files(temp_nx,temp_hierarchy_type,organ_set)
         #print(temp_panda)
         temp_panda.to_csv(output_base_address+'organ_list.csv',sep='¬')
-        hold=input('letting you put nodes to keep text file in directory')
+        #hold=input('letting you put nodes to keep text file in directory')
 
         draw_nx_for_analysis(temp_nx,temp_hierarchy_type,organ_set)
         organs_to_keep_panda=pandas.read_csv(temp_node_keep_address)
