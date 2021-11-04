@@ -152,7 +152,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
     elif temp_hierarchy_type=='species':
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
 
-
+        species_set={i[1] for i in organ_species_disease_triplet_list}
         species_to_keep_panda=pandas.read_csv(temp_node_keep_address,)
         keep_list=species_to_keep_panda['nodes_to_keep'].astype(str).to_list()
         remove_unwanted_nodes(temp_nx,keep_list,temp_hierarchy_type)
@@ -162,6 +162,8 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
     elif temp_hierarchy_type=='organ':
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
 
+
+        organ_set={i[0] for i in organ_species_disease_triplet_list}
         #draw_nx_for_analysis(temp_nx,temp_hierarchy_type,organ_set)
         organs_to_keep_panda=pandas.read_csv(temp_node_keep_address)
         keep_list=organs_to_keep_panda['nodes_to_keep'].to_list()
@@ -172,6 +174,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
     elif temp_hierarchy_type=='disease':
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
 
+        disease_set={i[2] for i in organ_species_disease_triplet_list}
         diseases_to_keep_panda=pandas.read_csv(temp_node_keep_address)
         keep_list=diseases_to_keep_panda['nodes_to_keep'].to_list()
         #print(keep_list)

@@ -15,7 +15,7 @@ we start with a list of headnode combinations
 for every headnode combination (from), we append append a list of that headnode combination's index to the end of the list of headnode combinations (to)
 (we start at the current index for the from because the fold matrix is "anti symmetric" (lower diagonal is negative of upper diagonal))
 
-then, for every single from vs to combinations (# of headnode triplets * ((1/2)*# of headnode triplets)) we do a triplet combination reduction operation
+then, for every single from vs to combinations (# of headnode triplets * ((1/2)*# of headnode triplets)) we do a triplet combination reduction operation (remove intersection)
 
 this is motivated by the "except for" clause, which is , if some headnode is above another headnode in a hierarchy, we want to check all triplets except those implied
 by the descendant headnode
@@ -23,12 +23,13 @@ by the descendant headnode
 so, we compare, for each hiearchy in a headnode triplet combination, whether from vs to is a descendant of the other
 if, for any hierarchy, one is a descendant of the other, then we remove the set intersection from the node that is higher up (the opposite of a descendant)
 
-then, having done that, we recognize that the number of unique triplet lists pairs (from vs to) is much smaller than the number of rows in the 
+1) then, having done that, we recognize that the number of unique triplet lists *pairs* (from vs to) is much smaller than the number of rows in the 
 headnode triplet vs headnode triplet matrix
 
 so, we opt to use the unique pairings to one anotehr
 while the list of from pairs and the list of to pairs is a more compact representation, it is not the case that every from and every to are compared
 therefore, we cannot simply maintain two independent lists. the multiple of those two is often longer than the headnode triplet combination list
+(so we maintain the list shown in 1))
 
 there is a little finagling at the end, because the triplets were kept in sets (unhashable) and so we have to do some trickerty by typecasting lists and so on
 to get the proper list of unique pairs
@@ -189,9 +190,9 @@ if __name__ == "__main__":
 
     count_cutoff=1
     input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
-    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
-    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
-    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
+    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
     unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
     triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
 

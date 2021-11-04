@@ -264,7 +264,7 @@ if __name__=="__main__":
 
     compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
     compound_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_compound.txt'
-    compound_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/compounds_networkx.bin'
+    compound_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/cyto_compounds.json'
     do_everything(compound_nx_address,compound_node_keep_address,compound_cyto_output_address,'compound')
     
 
@@ -277,7 +277,7 @@ if __name__=="__main__":
     #begin species
     species_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/species_networkx.bin'
     species_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_species.txt'
-    species_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/species_networkx.bin'
+    species_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/cyto_species.json'
     do_everything(species_nx_address,species_node_keep_address,species_cyto_output_address,'species')
 
     #get the set of organs in this networkx
@@ -288,13 +288,13 @@ if __name__=="__main__":
 
     organ_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
     organ_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_organ.txt'
-    organ_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/organ_networkx.bin'
+    organ_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/cyto_organ.json'
     do_everything(organ_nx_address,organ_node_keep_address,organ_cyto_output_address,'organ')
     
 
     disease_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
     disease_node_keep_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/networkx_shrink_disease.txt'
-    disease_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/disease_networkx.bin'
+    disease_cyto_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_pre_dash/cyto_disease.json'
     do_everything(disease_nx_address,disease_node_keep_address,disease_cyto_output_address,'disease')    
 
 

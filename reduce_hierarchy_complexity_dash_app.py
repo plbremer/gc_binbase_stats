@@ -10,6 +10,9 @@ from pprint import pprint
 import pandas
 from dash.dependencies import Input, Output, State
 
+#from sys import argv
+import sys
+
 '''
 at the moment, the way that this works is, you kill step 14 4 times, once for compound species organ disease
 and each time, you come here and run the thing for the iteration that you killed it for
@@ -25,9 +28,20 @@ app=dash.Dash(__name__,external_stylesheets=external_stylesheets,show_undo_redo=
 #to get the dagre layout for cytoscape
 cyto.load_extra_layouts()
 
+if sys.argv[1]=='compound':
+    annotation_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/compound_list.csv'
+    json_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/cyto_compounds.json'
+elif sys.argv[1]=='species':
+    annotation_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/species_list.csv'
+    json_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/cyto_species.json'
+elif sys.argv[1]=='organ':
+    annotation_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/organ_list.csv'
+    json_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/cyto_organ.json'
+elif sys.argv[1]=='disease':
+    annotation_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/disease_list.csv'
+    json_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_pre_dash/cyto_disease.json'
 
-annotation_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity/organ_list.csv'
-json_address='/home/rictuar/coding_projects/fiehn_work/binvestigate_webapp/dash_app_input/cyto_format_organ.json'
+
 
 annotations_panda=pandas.read_csv(annotation_address,sep='¬')
 
@@ -160,7 +174,7 @@ app.layout=html.Div(
                         )
                     ]
                 ),
-                width='auto',
+                width=12,
                 align='center'
             ),
             justify='center'
