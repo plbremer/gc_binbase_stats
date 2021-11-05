@@ -40,6 +40,7 @@ import matplotlib.pyplot as plt
 from pprint import pprint
 import time
 import os
+import sys
 
 import multiprocessing
 
@@ -54,7 +55,7 @@ def identify_organ_descendants(temp_headnode):
 def identify_disease_descendants(temp_headnode):
     return nx.algorithms.dag.descendants(disease_nx,temp_headnode)
 
-def build_total_test_panda(temp_panda):
+def build_total_test_panda(temp_panda,temp_lowerbound,temp_upperbound):
 
     total_panda_dict={
         'species_headnode_from':[],
@@ -78,6 +79,10 @@ def build_total_test_panda(temp_panda):
     #hold=input('hold')
     for index, series in temp_panda.iterrows():
         print(index)
+        if index<temp_lowerbound:
+            continue
+        if index>temp_upperbound:
+            break
 
         #pprint(series['species_headnode'])
         total_panda_dict['species_headnode_from']=total_panda_dict['species_headnode_from']+[series['species_headnode'] for j in range(index+1,index_length)]
@@ -181,19 +186,22 @@ def remove_intersection_if_necessary_from(from_triplets,to_triplets,descendants_
 
 if __name__ == "__main__":
 
-
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/')
+    count_cutoff=sys.argv[1]
+    this_executions_row_lowerbound=sys.argv[2]
+    this_executions_row_upperbound=sys.argv[3]
+    #count_cutoff=snakemake.params.count_cutoff
+    
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/')
     os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/dummy.txt')
       
 
-    count_cutoff=1
-    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    #count_cutoff=1
+    ###input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
     species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
     organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
     disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
-    unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
-    triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
+    unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique_triplets'+str(int(int(this_executions_row_lowerbound)/1000))+'.bin'
+    triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/headnodes_to_triplet_list'+str(int(int(this_executions_row_lowerbound)/1000))+'.bin'
 
     species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
     organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
@@ -226,7 +234,7 @@ if __name__ == "__main__":
 
     #nx.draw(species_nx,with_labels=True)
     #plt.show()
-    total_panda=build_total_test_panda(input_panda)
+    total_panda=build_total_test_panda(input_panda,this_executions_row_lowerbound,this_executions_row_upperbound)
     
     
     
