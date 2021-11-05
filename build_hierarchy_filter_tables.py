@@ -141,10 +141,10 @@ if __name__ == "__main__":
 
     #count_cutoff=1
 
-    compound_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity/compounds_networkx.bin'
-    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/species_networkx.bin'
-    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/organ_networkx.bin'
-    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity/disease_networkx.bin'
+    compound_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
+    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
 
     compound_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/table_compound.txt'
     species_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/table_species.txt'

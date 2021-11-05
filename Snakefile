@@ -156,20 +156,29 @@ rule step_13_swap_fold_matrix_multiindex:
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/swap_fold_matrix_multiindex.py"
 
-rule step_14_reduce_hierarchy_complexity:
+rule step_14_reduce_hierarchy_complexity_pre_dash:
     input:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_13_swap_fold_matrix_multiindex/dummy.txt"
     output:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity/dummy.txt"
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity_pre_dash/dummy.txt"
     params:
         count_cutoff="{count_cutoff}"
     script:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/reduce_hierarchy_complexity.py"
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/reduce_hierarchy_complexity_pre_dash.py"
 
+rule step_14_reduce_hierarchy_complexity_post_dash:
+    input:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity_pre_dash/dummy.txt"
+    output:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity_post_dash/dummy.txt"
+    params:
+        count_cutoff="{count_cutoff}"
+    script:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/reduce_hierarchy_complexity_post_dash.py"
 
 rule step_15_prepare_count_matrix:
     input:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity/dummy.txt"
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_14_reduce_hierarchy_complexity_post_dash/dummy.txt"
     output:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/{count_cutoff}/step_15_prepare_count_matrix/dummy.txt"
     params:
