@@ -204,7 +204,8 @@ rule step_17_precompute_comparison_triplets:
     params:
         count_cutoff="{count_cutoff}"
     script:
-        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/precompute_comparison_triplets.py"
+    #    "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/precompute_comparison_triplets.py"
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/precompute_comparison_triplets_wrapper.py"
 
 
 rule step_18_compute_fold_results:

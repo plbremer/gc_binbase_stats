@@ -353,7 +353,7 @@ if __name__=="__main__":
     
     ###multiprocessing sending starting and ending indices to precompute
 
-    num_processes=2
+    num_processes=4
     #chunk_size = list_of_starting_index_counters//num_processes
     #panda_chunks=list()
     #for i in range(0,num_processes):
@@ -373,6 +373,7 @@ if __name__=="__main__":
     #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
     #post_species_transform_panda=pd.concat(transformed_chunks)
 
+    pool.close()
 
     unique_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/'
     unique_result_chunk_list=os.listdir(unique_base_address)
