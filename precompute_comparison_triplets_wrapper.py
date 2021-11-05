@@ -1,40 +1,3 @@
-'''
-At some point i realized that many of the results of hiearchical headnodes depended only on whether or not
-one or more triplets existed depending on the headnode choice
-
-this script accepts the panda that describes the triplets that are implied by each possible headnode combination
-many of these headnode combinations imply zero triplets
-
-this script takes the aforementiond panda
-it drops all rows where zero triplets are implied by the headnode combination
-
-we recognize that every headnode combination can be tested against every headnode combination (from vs to)
-
-
-we start with a list of headnode combinations
-for every headnode combination (from), we append append a list of that headnode combination's index to the end of the list of headnode combinations (to)
-(we start at the current index for the from because the fold matrix is "anti symmetric" (lower diagonal is negative of upper diagonal))
-
-then, for every single from vs to combinations (# of headnode triplets * ((1/2)*# of headnode triplets)) we do a triplet combination reduction operation (remove intersection)
-
-this is motivated by the "except for" clause, which is , if some headnode is above another headnode in a hierarchy, we want to check all triplets except those implied
-by the descendant headnode
-
-so, we compare, for each hiearchy in a headnode triplet combination, whether from vs to is a descendant of the other
-if, for any hierarchy, one is a descendant of the other, then we remove the set intersection from the node that is higher up (the opposite of a descendant)
-
-1) then, having done that, we recognize that the number of unique triplet lists *pairs* (from vs to) is much smaller than the number of rows in the 
-headnode triplet vs headnode triplet matrix
-
-so, we opt to use the unique pairings to one anotehr
-while the list of from pairs and the list of to pairs is a more compact representation, it is not the case that every from and every to are compared
-therefore, we cannot simply maintain two independent lists. the multiple of those two is often longer than the headnode triplet combination list
-(so we maintain the list shown in 1))
-
-there is a little finagling at the end, because the triplets were kept in sets (unhashable) and so we have to do some trickerty by typecasting lists and so on
-to get the proper list of unique pairs
-'''
-
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -82,7 +45,7 @@ def build_total_test_panda(temp_panda,temp_lowerbound,temp_upperbound):
         print(index)
         if index<temp_lowerbound:
             continue
-        if index>temp_upperbound:
+        if index>=temp_upperbound:
             break
 
         #pprint(series['species_headnode'])
@@ -122,26 +85,26 @@ def build_total_test_panda(temp_panda,temp_lowerbound,temp_upperbound):
     return total_panda
 
 
-def identify_if_from_or_to_are_descendants_species(temp_from,temp_to):
-    if temp_from in species_set_subtraction_hashmap[temp_to]:
+def identify_if_from_or_to_are_descendants_species(temp_from,temp_to,temp_species_set_subtraction_hashmap):
+    if temp_from in temp_species_set_subtraction_hashmap[temp_to]:
         return 'from_descendant_of_to'
-    elif temp_to in species_set_subtraction_hashmap[temp_from]:
+    elif temp_to in temp_species_set_subtraction_hashmap[temp_from]:
         return 'to_descendant_of_from'
     else:
         return 'neither'
 
-def identify_if_from_or_to_are_descendants_organ(temp_from,temp_to):
-    if temp_from in organ_set_subtraction_hashmap[temp_to]:
+def identify_if_from_or_to_are_descendants_organ(temp_from,temp_to,temp_organ_set_subtraction_hashmap):
+    if temp_from in temp_organ_set_subtraction_hashmap[temp_to]:
         return 'from_descendant_of_to'
-    elif temp_to in organ_set_subtraction_hashmap[temp_from]:
+    elif temp_to in temp_organ_set_subtraction_hashmap[temp_from]:
         return 'to_descendant_of_from'
     else:
         return 'neither'
   
-def identify_if_from_or_to_are_descendants_disease(temp_from,temp_to):
-    if temp_from in disease_set_subtraction_hashmap[temp_to]:
+def identify_if_from_or_to_are_descendants_disease(temp_from,temp_to,temp_disease_set_subtraction_hashmap):
+    if temp_from in temp_disease_set_subtraction_hashmap[temp_to]:
         return 'from_descendant_of_to'
-    elif temp_to in disease_set_subtraction_hashmap[temp_from]:
+    elif temp_to in temp_disease_set_subtraction_hashmap[temp_from]:
         return 'to_descendant_of_from'
     else:
         return 'neither'
@@ -184,24 +147,18 @@ def remove_intersection_if_necessary_from(from_triplets,to_triplets,descendants_
     else:
         return from_triplets
 
+def pseudo_main(chunk_counter):
 
-if __name__ == "__main__":
+    this_executions_lower_bound=chunk_counter*1000
+    this_executions_upper_bound=(chunk_counter*1000)+1000
 
-    count_cutoff=sys.argv[1]
-    this_executions_row_lowerbound=sys.argv[2]
-    this_executions_row_upperbound=sys.argv[3]
-    #count_cutoff=snakemake.params.count_cutoff
-    
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/dummy.txt')
-      
-    count_cutoff=1
-    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    #count_cutoff=1
+    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
     species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
     organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
     disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
-    unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
-    triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
+    unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/unique_triplets'+str(this_executions_lower_bound)+'.bin'
+    triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/mapping/headnodes_to_triplet_list'+str(this_executions_lower_bound)+'.bin'
 
     species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
     organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
@@ -226,36 +183,22 @@ if __name__ == "__main__":
 
     print(input_panda['species_headnode'])
 
-    #for temp_node in species_nx.nodes:
-    #    print(type(temp_node))
-
-
-    
 
     #nx.draw(species_nx,with_labels=True)
     #plt.show()
-    total_panda=build_total_test_panda(input_panda,this_executions_row_lowerbound,this_executions_row_upperbound)
+    total_panda=build_total_test_panda(input_panda,this_executions_lower_bound,this_executions_upper_bound)
+    
+   
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    #print(total_panda)
-    #total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
+    print(total_panda)
+    total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
 
     species_set_subtraction_hashmap_values=input_panda['species_headnode'].apply(identify_species_descendants)
     species_set_subtraction_hashmap=dict(zip(input_panda['species_headnode'],species_set_subtraction_hashmap_values))
     
     total_panda['descendants_species']=total_panda.apply(
-        lambda x: identify_if_from_or_to_are_descendants_species(x['species_headnode_from'],x['species_headnode_to']),
+        lambda x: identify_if_from_or_to_are_descendants_species(x['species_headnode_from'],x['species_headnode_to'],species_set_subtraction_hashmap),
         axis='columns'
     )
     print(species_set_subtraction_hashmap)
@@ -268,7 +211,7 @@ if __name__ == "__main__":
     organ_set_subtraction_hashmap=dict(zip(input_panda['organ_headnode'],organ_set_subtraction_hashmap_values))
     
     total_panda['descendants_organ']=total_panda.apply(
-        lambda x: identify_if_from_or_to_are_descendants_organ(x['organ_headnode_from'],x['organ_headnode_to']),
+        lambda x: identify_if_from_or_to_are_descendants_organ(x['organ_headnode_from'],x['organ_headnode_to'],organ_set_subtraction_hashmap),
         axis='columns'
     )
     print(organ_set_subtraction_hashmap)
@@ -282,44 +225,18 @@ if __name__ == "__main__":
     disease_set_subtraction_hashmap=dict(zip(input_panda['disease_headnode'],disease_set_subtraction_hashmap_values))
     
     total_panda['descendants_disease']=total_panda.apply(
-        lambda x: identify_if_from_or_to_are_descendants_disease(x['disease_headnode_from'],x['disease_headnode_to']),
+        lambda x: identify_if_from_or_to_are_descendants_disease(x['disease_headnode_from'],x['disease_headnode_to'],disease_set_subtraction_hashmap),
         axis='columns'
     )
     print(disease_set_subtraction_hashmap)
 
     print(total_panda['descendants_disease'].value_counts())
     
-
-    '''
-    #did this way in case crash memory
-    #append to and from triplets
-    #
-    triplet_map_key=list(zip(input_panda['species_headnode'],input_panda['organ_headnode'],input_panda['disease_headnode']))
-    print(triplet_map_key)
-
-    triplet_map_dict=dict(zip(triplet_map_key,input_panda['triplet_list']))
-
-    pprint(triplet_map_dict)
-    '''
     print(total_panda)
-    #hold=input('total_panda')
-
     
     total_panda['to_triplets_inter_removed_if_nec']=total_panda.apply(
         lambda x: remove_intersection_if_necessary_to(
-            
-            #x['species_headnode_from'],
-            #x['organ_headnode_from'],
-            #x['disease_headnode_from'],
-            #x['species_headnode_to'],
-            #x['organ_headnode_to'],
-            #x['disease_headnode_to'],
 
-            
-            
-            
-            
-            
             x['from_triplets'],
             x['to_triplets'],
             x['descendants_species'],
@@ -340,42 +257,6 @@ if __name__ == "__main__":
         axis='columns'
     )
 
-
-    #condition_list_from=[
-    #    (total_panda['descendants_species']=='from_descendant_of_to' or total_panda['descendants_organ']=='from_descendant_of_to' or total_panda['descendants_disease']=='from_descendant_of_to')
-    #]
-    #choice_list_from=[
-    #    total_panda['from_triplets'].difference(total_panda['to_triplets']),
-    #]
-    #total_panda['to_triplets_inter_removed_if_nec']=total_panda.apply((lambda x: x['to_triplets'].difference(x['from_triplets'])), axis='columns')
-    '''
-    print(total_panda.columns)
-    total_panda['to_triplets_inter_removed_if_nec']=total_panda['to_triplets']
-    #total_panda['to_triplets_inter_removed_if_nec']=total_panda.apply((lambda x: x['to_triplets'].difference(x['from_triplets'])), axis='columns')
-    total_panda['to_triplets_inter_removed_if_nec']=total_panda.where(
-        cond=((total_panda['descendants_species']!='from_descendant_of_to') & (total_panda['descendants_organ']!='from_descendant_of_to') & (total_panda['descendants_disease']!='from_descendant_of_to')),
-        #other=total_panda['to_triplets'].difference(total_panda['from_triplets']),
-        other=lambda x: x['to_triplets'].difference(x['from_triplets']),
-        axis='columns'
-        #other=()
-    )
-    '''
-    #total_panda['to_triplets_inter_removed_if_nec']=total_panda['to_triplets_inter_removed_if_nec'].where(
-    #    cond=((total_panda['descendants_species']!='from_descendant_of_to') & (total_panda['descendants_organ']!='from_descendant_of_to') & (total_panda['descendants_disease']!='from_descendant_of_to'))
-    #)
-    #choicelist_from=
-
-    #total_panda['from_triplets_inter_removed_if_nec']
-
-    print(total_panda)
-    print(total_panda.columns)
-    #print(total_panda['to_triplets_inter_removed_if_nec'].value_counts())
-    #print(total_panda['from_triplets_inter_removed_if_nec'].value_counts())
-    
-    #start1=time.time()
-    #print((total_panda['to_triplets_inter_removed_if_nec'].value_counts()))
-    #print((total_panda['from_triplets_inter_removed_if_nec'].value_counts()))
-    #end1=time.time()
     
 
     total_panda['to_triplets_inter_removed_if_nec']=total_panda['to_triplets_inter_removed_if_nec'].transform(list)
@@ -399,73 +280,6 @@ if __name__ == "__main__":
 
     test_view[['headnode_triplet_from','headnode_triplet_to','from_triplets_inter_removed_if_nec','to_triplets_inter_removed_if_nec']].to_pickle(triplet_headnode_to_triplet_tuple_ouput_address)
 
-    #hold=input('hold')
-
-
-    ########################################33
-    #for tomorrow, this is where we split the script
-    #########################################
-
-    
-    #start2=time.time()
-    #print(len(total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique()))
-    #print(len(total_panda['from_triplets_inter_removed_if_nec'].transform(tuple).unique()))
-    '''
-    #end2=time.time()
-    ##print(end1-start1)
-    #print(end2-start2)
-    
-    #print('check time')
-
-    print(len(input_panda['triplet_list'].transform(tuple).unique()))
-    #print(len(total_panda['to_triplets_inter_removed_if_nec'].unique()))
-    #print(len(total_panda['from_triplets_inter_removed_if_nec'].unique()))
-    
-    #print(total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list())
-    ##output_dict={
-    ##    'triplets': (total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list() + total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()),
-    ##   'from_to': (['from' for element in total_panda['from_triplets_inter_removed_if_nec'].value_counts().index.to_list()] + ['to' for element in total_panda['to_triplets_inter_removed_if_nec'].value_counts().index.to_list()])
-    ##}
-
-    output_dict={
-        'triplets': (list(total_panda['from_triplets_inter_removed_if_nec'].transform(tuple).unique()) + list(total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique())),
-        'from_to': (['from' for element in total_panda['from_triplets_inter_removed_if_nec'].transform(tuple).unique()] + ['to' for element in total_panda['to_triplets_inter_removed_if_nec'].transform(tuple).unique()])
-    }    
-
-    empty_set_indices=[i for i,value in enumerate(output_dict['triplets']) if len(value)==0]
-    print(empty_set_indices)
-    #empty_set_indices
-
-    output_dict_cleaned={}
-    output_dict_cleaned['triplets']=[element for i,element in enumerate(output_dict['triplets']) if i not in empty_set_indices]
-    output_dict_cleaned['from_to']=[element for i,element in enumerate(output_dict['from_to']) if i not in empty_set_indices]
-
-    
-    output_panda=pd.DataFrame.from_dict(output_dict_cleaned)
-    print(output_panda)
-    output_panda.to_pickle(output_address)
-    '''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
     test_view['combo_column']=(list(zip(
         test_view['to_triplets_inter_removed_if_nec'],#.transform(tuple),#.unique(),
@@ -478,12 +292,6 @@ if __name__ == "__main__":
     print(len(test_view['to_triplets_inter_removed_if_nec'].unique()))
     print(len(test_view['from_triplets_inter_removed_if_nec'].unique()))
 
-    #output_dict={
-    #    'combos':[]
-    #}
-    #output_series=test_view['combo_column'].unique()
-    #pprint(output_series)
-    #print(len(output_series))
     output_series=pd.DataFrame(test_view['combo_column'].unique())
     output_series=output_series.assign(**dict(zip('ft', output_series[0].str)))
     print(output_series)
@@ -493,16 +301,6 @@ if __name__ == "__main__":
     #hold=input('hold2')
     output_series.rename({'f': 'from','t':'to'},axis='columns',inplace=True)
     
-    
-    #output_series['species_headnode_from']=test_view['species_headnode_from']
-    #output_series['organ_headnode_from']=test_view['organ_headnode_from']
-    #output_series['disease_headnode_from']=test_view['disease_headnode_from']
-    #output_series['species_headnode_to']=test_view['species_headnode_to']
-    #output_series['organ_headnode_to']=test_view['organ_headnode_to']
-    #output_series['disease_headnode_to']=test_view['disease_headnode_to']
-   
-    #output_series['headnode_triplet_from']=tuple(zip(output_series['species_headnode_from'],output_series['organ_headnode_from'],output_series['disease_headnode_from']))
-    #output_series['headnode_triplet_to']=tuple(zip(output_series['species_headnode_to'],output_series['organ_headnode_to'],output_series['disease_headnode_to']))
 
 
     print(output_series)
@@ -510,3 +308,87 @@ if __name__ == "__main__":
     output_series.sort_values(by='from',inplace=True)
     print(output_series)
     output_series.to_pickle(unique_triplets_output_address)
+
+
+
+
+
+if __name__=="__main__":
+    count_cutoff=1
+    #defined here to provide globals##
+    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    #unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique_triplets'+str(this_executions_lower_bound)+'.bin'
+    #triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/headnodes_to_triplet_list'+str(this_executions_lower_bound)+'.bin'
+
+    species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
+    organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
+    disease_nx=nx.readwrite.gpickle.read_gpickle(disease_nx_input_address)
+    ###
+
+
+    
+
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/')
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/mapping/')
+    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/dummy.txt')
+ 
+    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    temp=pd.read_pickle(input_panda_address)
+    row_count=len(temp.index)
+    print(temp)
+
+    
+    #list_of_starting_indices_and_ending_indices=list()
+    #print(row_count)
+    #print(row_count//1000)
+    list_of_starting_index_counters=[i for i in range(1+(row_count//1000))]
+
+    #for i in range(row_count//1000):
+    #    list_of_starting_indices_and_ending_indices.append((i*1000,(i*1000)+1000))
+    #print(list_of_starting_indices_and_ending_indices)
+    #list_of_starting_indices_and_ending_indices.append( ((row_count//1000)*1000,row_count)  )
+    #print(list_of_starting_indices_and_ending_indices)
+    
+    ###multiprocessing sending starting and ending indices to precompute
+
+    num_processes=2
+    #chunk_size = list_of_starting_index_counters//num_processes
+    #panda_chunks=list()
+    #for i in range(0,num_processes):
+    #chunks = [post_species_transform_panda.iloc[post_species_transform_panda[i:i + chunk_size]] for i in range(0, post_species_transform_panda.shape[0], chunk_size)]
+        #if i<(num_processes-1):
+            #panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+        #elif i==(num_processes-1):
+            #panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:])
+    #print(panda_chunks)
+    #hold=input('check chunks')
+    pool = multiprocessing.Pool(processes=num_processes)
+    #transformed_chunks=
+    pool.map(pseudo_main,list_of_starting_index_counters)
+    #transform_organ_column(post_species_transform_panda)
+    #recombine_chunks
+    #for i in range(len(transformed_chunks)):
+    #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
+    #post_species_transform_panda=pd.concat(transformed_chunks)
+
+
+    unique_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/'
+    unique_result_chunk_list=os.listdir(unique_base_address)
+    unique_result_panda=pd.read_pickle(unique_base_address+unique_result_chunk_list[0])
+    for i in range(1,len(unique_result_chunk_list)):
+        temp_panda=pd.read_pickle(unique_base_address+unique_result_chunk_list[i])
+        unique_result_panda=pd.concat([unique_result_panda,temp_panda],axis='index',ignore_index=True)
+        unique_result_panda=unique_result_panda.drop_duplicates(ignore_index=True)
+    unique_result_panda.to_pickle('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin')
+
+
+    mapping_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/mapping/'
+    mapping_result_chunk_list=os.listdir(mapping_base_address)
+    mapping_result_panda=pd.read_pickle(mapping_base_address+mapping_result_chunk_list[0])
+    for i in range(1,len(mapping_result_chunk_list)):
+        temp_panda=pd.read_pickle(mapping_base_address+mapping_result_chunk_list[i])
+        mapping_result_panda=pd.concat([mapping_result_panda,temp_panda],axis='index',ignore_index=True)
+        #mapping_result_panda=mapping_result_panda.drop_duplicates(ignore_index=True)
+    mapping_result_panda.to_pickle('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin')
