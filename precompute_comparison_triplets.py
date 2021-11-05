@@ -241,8 +241,8 @@ if __name__ == "__main__":
     
     
     
-    print(total_panda)
-    total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
+    #print(total_panda)
+    #total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
 
     species_set_subtraction_hashmap_values=input_panda['species_headnode'].apply(identify_species_descendants)
     species_set_subtraction_hashmap=dict(zip(input_panda['species_headnode'],species_set_subtraction_hashmap_values))
@@ -395,6 +395,9 @@ if __name__ == "__main__":
     #hold=input('hold')
 
 
+    ########################################33
+    #for tomorrow, this is where we split the script
+    #########################################
 
     
     #start2=time.time()
