@@ -192,7 +192,7 @@ def pseudo_main(chunk_counter):
     
     
     print(total_panda)
-    total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
+    #total_panda.to_pickle('/home/rictuar/delete_test_bin_calc/panda')
 
     species_set_subtraction_hashmap_values=input_panda['species_headnode'].apply(identify_species_descendants)
     species_set_subtraction_hashmap=dict(zip(input_panda['species_headnode'],species_set_subtraction_hashmap_values))
@@ -278,8 +278,10 @@ def pseudo_main(chunk_counter):
     test_view['headnode_triplet_from']=tuple(zip(test_view['species_headnode_from'],test_view['organ_headnode_from'],test_view['disease_headnode_from']))
     test_view['headnode_triplet_to']=tuple(zip(test_view['species_headnode_to'],test_view['organ_headnode_to'],test_view['disease_headnode_to']))
 
-    test_view[['headnode_triplet_from','headnode_triplet_to','from_triplets_inter_removed_if_nec','to_triplets_inter_removed_if_nec']].to_pickle(triplet_headnode_to_triplet_tuple_ouput_address)
 
+
+    #test_view[['headnode_triplet_from','headnode_triplet_to','from_triplets_inter_removed_if_nec','to_triplets_inter_removed_if_nec']].to_pickle(triplet_headnode_to_triplet_tuple_ouput_address)
+    test_view[['species_headnode_from','organ_headnode_from','disease_headnode_from','species_headnode_to','organ_headnode_to','disease_headnode_to','from_triplets_inter_removed_if_nec','to_triplets_inter_removed_if_nec']].to_pickle(triplet_headnode_to_triplet_tuple_ouput_address)
     
     test_view['combo_column']=(list(zip(
         test_view['to_triplets_inter_removed_if_nec'],#.transform(tuple),#.unique(),

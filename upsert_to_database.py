@@ -120,20 +120,19 @@ if __name__ == "__main__":
         table_16_address,
         engine,
         'headnodes_to_triplets',
-        ['possible_triplets', 'actual_triplets', 'ratio'],
+        ['possible_triplets', 'actual_triplets', 'ratio','triplet_list'],
         ('species_headnode', 'organ_headnode', 'disease_headnode'),
-        ['triplet_list'],
+        #['triplet_list'],
+        [],
         temp_dtype_dict={
             'species_headnode': postgresql.TEXT,
             'organ_headnode': postgresql.TEXT,
             'disease_headnode': postgresql.TEXT,
-            'triplet_list': postgresql.ARRAY(postgresql.TEXT)            
+            #'triplet_list': postgresql.ARRAY(postgresql.TEXT)            
         }
     )
 
-
-
-
+    print('16 done')
     
     table_17_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
     make_update_table_from_panda(
@@ -141,16 +140,24 @@ if __name__ == "__main__":
         engine,
         'headnode_pairs_to_triplet_list_pair',
         [],
-        ('headnode_triplet_from', 'headnode_triplet_to'),
+        #('headnode_triplet_from', 'headnode_triplet_to'),
+        ('species_headnode_from','organ_headnode_from','disease_headnode_from','species_headnode_to','organ_headnode_to','disease_headnode_to'),
         [],
         temp_dtype_dict={
-            'headnode_triplet_from': postgresql.ARRAY(postgresql.TEXT), 
-            'headnode_triplet_to': postgresql.ARRAY(postgresql.TEXT),
+            #'headnode_triplet_from': postgresql.ARRAY(postgresql.TEXT), 
+            #'headnode_triplet_to': postgresql.ARRAY(postgresql.TEXT),
+            'species_headnode_from': postgresql.TEXT,
+            'organ_headnode_from': postgresql.TEXT,
+            'disease_headnode_from': postgresql.TEXT,
+            'species_headnode_to': postgresql.TEXT,
+            'organ_headnode_to': postgresql.TEXT,
+            'disease_headnode_to': postgresql.TEXT,
             'from_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT),
             'to_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT)
         }
     )
-    
+
+    print('17 done')    
 
     table_18_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_18_compute_fold_results/'
     file_list=os.listdir(table_18_base_address)
@@ -176,6 +183,7 @@ if __name__ == "__main__":
             }
         )
 
+    print('18 done')
     table_19_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_19_prepare_count_matrix_2/count_matrix.bin'
     make_update_table_from_panda(
         table_19_address,
@@ -203,6 +211,7 @@ if __name__ == "__main__":
     #     temp_dtype_dict=None
     # ):
 
+    print('19 done')
     table_20_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_20_build_hierarchy_filter_tables/'
     file_list=os.listdir(table_20_base_address)
     file_list.remove('dummy.txt')
@@ -224,6 +233,7 @@ if __name__ == "__main__":
             }
         )
 
+    print('20 done')
 
 
 
