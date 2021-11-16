@@ -13,8 +13,11 @@ rule step_1_species_transformed:
     params:
         count_cutoff="{count_cutoff}"
         #output_base="/home/rictuar/coding_projects/fiehn_work/text_files/mona_vfnpl/snakemake_mapping_mona_to_best_worst/{adduct}/{instrument}/parameters_minDist_{min_dist}_nNeighbors_{n_neighbors}_blurSigma_{blur_sigma}_depthCutoff_{depth_cutoff}/"
+    conda:
+        "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/envs/binvestigate_3_6_fresh.yml"
     script:
         "/home/rictuar/coding_projects/fiehn_work/gc_bin_base/code/transform_written_species_to_ncbi_species.py"
+
 
 rule step_2a_create_organ_networkx:
     input:
