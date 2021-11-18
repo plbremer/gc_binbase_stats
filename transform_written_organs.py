@@ -10,6 +10,7 @@ import networkx as nx
 import multiprocessing
 from functools import partial
 from pprint import pprint
+import sys
 
 #thoughts on the way that the organ names work
 #these are more complicated. its possible that he organs were used in ways that are not congruent.
@@ -193,14 +194,17 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
 
 if __name__ == "__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
-    post_species_transform_input_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
-    organ_networkx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    disease_networkx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    organ_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/organ_map.txt'
-    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2b_organ_transformed/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2b_organ_transformed/dummy.txt')
+
+
+    min_fold_change=sys.argv[1]
+    cores_available=int(sys.argv[2])
+    post_species_transform_input_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
+    organ_networkx_input_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    disease_networkx_input_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    organ_mapping_address='../text_files/species_organ_maps/organ_map.txt'
+    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/dummy.txt')
 
     post_species_transform_panda=pandas.read_pickle(post_species_transform_input_pickle_address)
     
@@ -220,7 +224,7 @@ if __name__ == "__main__":
     
     #according to the file that we create using the previous output, we transform the panda's organ lists
     #num_processes = multiprocessing.cpu_count()
-    num_processes=4
+    num_processes=cores_available
     chunk_size = len(post_species_transform_panda.index)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):

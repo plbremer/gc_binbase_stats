@@ -2,6 +2,7 @@ import pandas
 from ete3 import NCBITaxa
 import transform_written_species_to_ncbi_species
 import os
+import sys
 
 
 
@@ -33,12 +34,13 @@ def return_taxid_panda_for_species_set(temp_species_set):
 
 if __name__=="__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
+    min_fold_change=sys.argv[1]
+    #min_fold_change=snakemake.params.min_fold_change
     #note that, unusually, we refer to a much earlier panda
-    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
-    output_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_10_create_species_taxid_mapping/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_10_create_species_taxid_mapping/dummy.txt')
+    input_panda_address='../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
+    output_panda_address='../text_files/results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/dummy.txt')
      
     
     
