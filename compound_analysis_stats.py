@@ -1,10 +1,10 @@
-import obonet
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas
 import numpy as np
 import os
 from networkx.drawing.nx_pydot import graphviz_layout
+import sys
 
 def check_fold_matrix_maintains_combinations(temp_panda,temp_fold_number,temp_count_meeting_fold_number):
     '''
@@ -114,13 +114,18 @@ def visualize_added_classes(temp_nx):
 
 if __name__ == "__main__":
     
-    predecessor_count=snakemake.params.predecessor_count
-    fold_number=snakemake.params.fold_number
-    count_meeting_fold_number=snakemake.params.count_meeting_fold_number
-    count_cutoff=snakemake.params.count_cutoff
-    input_graph_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_9_compound_analysis_stats/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_9_compound_analysis_stats/dummy.txt')
+    min_fold_change=int(sys.argv[1] )
+    predecessor_count =int(sys.argv[2])
+    fold_number=int(sys.argv[3])
+    count_meeting_fold_number=int(sys.argv[4])
+
+    # predecessor_count=snakemake.params.predecessor_count
+    # fold_number=snakemake.params.fold_number
+    # count_meeting_fold_number=snakemake.params.count_meeting_fold_number
+    # count_cutoff=snakemake.params.count_cutoff
+    input_graph_address='../text_files/results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_9_compound_analysis_stats/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_9_compound_analysis_stats/dummy.txt')
  
     #predecessor_count=2
     #fold_number=2

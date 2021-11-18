@@ -1,3 +1,4 @@
+import sys
 import obonet
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -345,8 +346,8 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
     ]
     '''
     
-    
-    num_processes = multiprocessing.cpu_count()
+    num_processes=cores_available
+    #num_processes = multiprocessing.cpu_count()
     chunk_size = len(all_predecessors_concatenated_DataFrame.columns)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):
@@ -390,12 +391,15 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
 
 
 if __name__ == "__main__":
-    count_cutoff=snakemake.params.count_cutoff
-    input_graph_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
-    output_graph_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
-    individual_fold_matrix_directory_base='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_8_perform_compound_hierarchical_analysis/dummy.txt')
+    
+    min_fold_change=sys.argv[1]
+    cores_available=int(sys.argv[2])
+    #min_fold_change=snakemake.params.min_fold_change
+    input_graph_address='../text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
+    output_graph_address='../text_files/results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    individual_fold_matrix_directory_base='../text_files/results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/dummy.txt')
 
     #read in network
     compound_network=nx.readwrite.gpickle.read_gpickle(input_graph_address)

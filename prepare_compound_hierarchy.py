@@ -1,3 +1,4 @@
+import sys
 import obonet
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -137,13 +138,15 @@ def visualize_added_classes(temp_nx,temp_original_classyfire_nodecount):
 
 
 if __name__ == "__main__":
-    #count_cutoff=10
-    count_cutoff=snakemake.params.count_cutoff
+    
+    
+    #min_fold_change=10
+    min_fold_change=sys.argv[1]
     obo_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/classyfire_files/ChemOnt_2_1.obo'
-    binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    output_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_7_prepare_compound_hierarchy/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_7_prepare_compound_hierarchy/dummy.txt')
+    binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    output_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
+    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/')
+    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/dummy.txt')
 
     parsed_obo=obonet.read_obo(obo_file_address)
 
@@ -179,5 +182,8 @@ if __name__ == "__main__":
     add_all_bins_to_network(parsed_obo,binvestigate_panda,class_to_node_dict)
     #for each bin assign as a child node of the deepest node that is possible
 
+
+    #nx.draw(parsed_obo)
+    #plt.show()    
     #visualize_added_classes(parsed_obo,original_classyfire_node_count)
     nx.readwrite.gpickle.write_gpickle(parsed_obo,output_file_address)

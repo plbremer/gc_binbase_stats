@@ -1,6 +1,7 @@
 import numpy as np
 import pandas
 import os
+import sys
 #the general thought process for the bin transformation is that we
 #add an inchikey
 #remove species/organ/intensity/count hierarchy based on count (thought about 
@@ -234,12 +235,12 @@ def aggregate_redundancies(temp_panda):
 if __name__ == "__main__":
 
     #if snakemake in globals():
-    count_cutoff=int(snakemake.params.count_cutoff)
-    initial_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
-    inchikey_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/inchikey_mapping.txt'
-    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_3_bins_transformed/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_3_bins_transformed/dummy.txt')
+    min_fold_change=sys.argv[1]
+    initial_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
+    inchikey_mapping_address='../text_files/species_organ_maps/inchikey_mapping.txt'
+    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/dummy.txt')
  
     #read in the initial panda....
     initial_panda=pandas.read_pickle(initial_pickle_address)
@@ -264,6 +265,8 @@ if __name__ == "__main__":
     #like the species and the organs, we remove from the quadruplet (species, organ, intensity, count)
     #if there are fewer samples than the cutoff that we specify (cant trust numbers from 1 sample)
     #note that there are no transforms in this one, only removals
+    #we assign count_cutoff to be zero to make it so that all triplets are kept
+    count_cutoff=0
     transform_count_column(initial_panda,count_cutoff)
 
     #The purpose of this function is to aggregate redundancies after the transforms.

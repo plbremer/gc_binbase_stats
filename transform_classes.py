@@ -1,3 +1,4 @@
+import sys
 import pandas
 import os
 
@@ -60,12 +61,13 @@ def update_curated_classes_from_mapping(temp_panda, temp_class_mapping_address):
 if __name__ == "__main__":
 
     #if snakemake in globals():
-    count_cutoff=snakemake.params.count_cutoff
-    initial_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
-    class_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/classes_curated_map.txt'
-    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_4_classes_transformed/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_4_classes_transformed/dummy.txt')
+    #min_fold_change=snakemake.params.min_fold_change
+    min_fold_change=sys.argv[1]
+    initial_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
+    class_mapping_address='../text_files/species_organ_maps/classes_curated_map.txt'
+    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/dummy.txt')
     #else:
     #    initial_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_bins_transformed.bin'
     #    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_classes_transformed.bin'

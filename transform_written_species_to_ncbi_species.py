@@ -3,7 +3,7 @@ import pandas
 from ete3 import NCBITaxa
 import os
 import multiprocessing
-
+import sys
 
 def get_all_strings_in_list_across_panda_column(temp_panda,temp_column_name):
     '''
@@ -115,13 +115,14 @@ def transform_species_column(temp_bin_panda):
 if __name__ == "__main__":
 
 
-    count_cutoff=snakemake.params.count_cutoff
-    binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/shortened_file_for_test.bin'
+    min_fold_change=sys.argv[1]
+    cores_available=int(sys.argv[2])
+    binvestigate_pickle_address='../text_files/binvestigate_pull/shortened_file_for_test.bin'
     #binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/binvestigate_pickle_protocol_0.bin'
-    species_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/species_map.txt'
-    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_1_species_transformed/dummy.txt')
+    species_mapping_address='../text_files/species_organ_maps/species_map.txt'
+    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/dummy.txt')
     
 
     binvestigate_panda=pandas.read_pickle(binvestigate_pickle_address)
@@ -147,7 +148,7 @@ if __name__ == "__main__":
     #'species_mapping_address' location
     #translate species names according to some transform list and drop things that either have no translation or are identified with a translation 'drop'
     #num_processes = multiprocessing.cpu_count()
-    num_processes= 4
+    num_processes= cores_available
     chunk_size = len(binvestigate_panda.index)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):

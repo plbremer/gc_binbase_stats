@@ -16,6 +16,7 @@ import networkx as nx
 from collections import defaultdict
 from pprint import pprint
 import matplotlib.pyplot as plt
+import sys
 
 #author Uli Koehler provides function readMeSh
 #__author__ = "Uli Koehler"
@@ -140,12 +141,13 @@ def add_nodepath_and_label_to_endnode_to_networkx(temp_nx,temp_mesh_entry):
 
 if __name__ == "__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
-    mesh_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/mesh_ascii/d2021.bin'
-    output_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    output_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/dummy.txt')
+    min_fold_change=sys.argv[1]
+    #cores_available=sys.argv[2]
+    mesh_file_address='../text_files/mesh_ascii/d2021.bin'
+    output_organ_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    output_disease_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/dummy.txt')
 
 
     organ_networkx=nx.DiGraph()
@@ -162,6 +164,7 @@ if __name__ == "__main__":
 
     #we add a parent node to all the 'C' trees because those are the disease trees, and we 
     #want to conveniently take those and make them their own networkx
+    #this list was manually obtained by going to the mesh website and looking at all of the headnodes that they had
     for temp in ['C01','C04','C05','C06','C07','C08','C09','C10','C11','C12','C13','C14','C15','C16','C17','C18','C19','C20','C21','C22','C23','C24','C25','C26']:
         nx.add_path(organ_networkx,['C',temp])
     organ_networkx.nodes['C']['mesh_label']='Disease'
