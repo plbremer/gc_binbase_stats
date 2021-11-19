@@ -9,6 +9,7 @@ import prepare_species_networkx
 import matplotlib.pyplot as plt
 import pydot
 from networkx.drawing.nx_pydot import graphviz_layout
+import sys
 
 ##basically the design that i will use to simplify the organ hierarchy
 #cut network to those nodes related to a fold branch
@@ -139,17 +140,17 @@ def contract_irrelevant_nodes(temp_nx,temp_binvestigate_entries_set):
 
 
 if __name__ == "__main__":
-    count_cutoff=snakemake.params.count_cutoff
-    #count_cutoff=10
-    #'+str(count_cutoff)+'
+    min_fold_change=sys.argv[1]
+    #min_fold_change=10
+    #'+str(min_fold_change)+'
     #probably could use the step_5 one if the "with fold matrices" version gets too massive for ram
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    input_complete_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    input_complete_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    output_organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
-    output_disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_12_prepare_organ_and_disease_networkx/dummy.txt')
+    input_binvestigate_panda_address='../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    input_complete_organ_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    input_complete_disease_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    output_organ_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
+    output_disease_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/dummy.txt')
 
 
 
@@ -182,6 +183,19 @@ if __name__ == "__main__":
     #for real entire dataset
     ###organ_headnodes_list=['J01','A01','A02','A08','A13','D27','G07','E07','B01','A11','A15','J02','A12','D20','A07','A10','A03','A16','B05','A17','A14','A06','A05','A04','A09','A18','A19','D12','E05','G09']
     #organ_headnode='organ'
+
+    #ok so the fix is
+    #create a list of all possible mesh headings
+    #filter such that we retain only those that are in organ_networkx (aka from the data/curations)
+    #im not about to read and type all of the possible nodes, so we just try A to Z and 01 to 50 which i know contains the 
+    #headnode list of interest
+    number_string_list=['01','02','03','04','05','06','07','08','09']+[str(i) for i in range(10,51)]
+    total_organ_headnodes_list=[]
+    for i in ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']:
+        for j in number_string_list:
+            total_organ_headnodes_list.append(i+j)
+    organ_headnodes_list=[i for i in total_organ_headnodes_list if (i in organ_networkx.nodes)]
+
     organ_networkx.add_node('organ',mesh_label='organ')
     temp_organ_edges=[('organ',temp_node) for temp_node in organ_headnodes_list]
     organ_networkx.add_edges_from(temp_organ_edges)
@@ -211,6 +225,21 @@ if __name__ == "__main__":
     ###disease_headnodes_list=['C06','C04','C14','C19','C08','C15','C13','C18','C16','C20','C17','C12','C10','No']
     ###seems like we use this one in toy datasets atm
     disease_headnodes_list=['C04','C08','C17','No']
+    
+    
+    #ok so the fix is
+    #create a list of all possible mesh headings
+    #filter such that we retain only those that are in disease_networkx (aka from the data/curations)
+    #im not about to read and type all of the possible nodes, so we just try A to Z and 01 to 50 which i know contains the 
+    #headnode list of interest
+    number_string_list=['01','02','03','04','05','06','07','08','09']+[str(i) for i in range(10,51)]
+    total_disease_headnodes_list=[]
+    for i in ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']:
+        for j in number_string_list:
+            total_disease_headnodes_list.append(i+j)
+    total_disease_headnodes_list.append('No')
+    disease_headnodes_list=[i for i in total_disease_headnodes_list if (i in disease_networkx.nodes)]
+
     disease_networkx.add_node('disease',mesh_label='disease')
     temp_disease_edges=[('disease',temp_node) for temp_node in disease_headnodes_list]
     disease_networkx.add_edges_from(temp_disease_edges)
