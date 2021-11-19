@@ -11,6 +11,7 @@ import networkx as nx
 from pprint import pprint
 import pydot
 from networkx.drawing.nx_pydot import graphviz_layout
+import sys
 
 def get_all_strings_in_list_across_panda_column(temp_panda,temp_column_name):
     '''
@@ -96,17 +97,17 @@ def visualize_nodes_on_a_list(temp_nx,temp_list,temp_attribute_name):
 
 if __name__ == "__main__":
 
-    #count_cutoff=10
-    count_cutoff=snakemake.params.count_cutoff
+    #min_fold_change=10
+    min_fold_change=sys.argv[1]
     #the input panda here is the taxid<->species mapping.
     #we do not need to get a taxonomy mapping because metagenompy prepares that automatically
     #from a local database
-    input_mapping_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    output_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/species_networkx.bin'
-    output_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/dummy.txt')
+    input_mapping_panda_address='../text_files/results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
+    input_binvestigate_panda_address='../text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    output_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/species_networkx.bin'
+    output_binvestigate_panda_address='../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/')
+    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/dummy.txt')
 
     #read in things or make the species network from databse
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
