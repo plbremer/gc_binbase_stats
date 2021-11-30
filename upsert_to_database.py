@@ -64,9 +64,44 @@ def make_update_table_from_panda(
             '''
         )
     else:
-        to_be_upserted='to_be_upserted'
+        
+        ###an attempt at upsertion that doesnt work###
+        # to_be_upserted='to_be_upserted'
+        # temp_panda.to_sql(
+        #     to_be_upserted,
+        #     engine,
+        #     index=False,
+        #     dtype=temp_dtype_dict
+        # )
+        # temp_big_string=', '.join(temp_columns_for_primary_key)
+        # temp_big_string='('+temp_big_string+')'
+        # connection.execute(
+        #     f'''
+        #     ALTER TABLE {to_be_upserted} ADD PRIMARY KEY {temp_big_string};
+        #     '''
+        # )
+        # temp_big_string=', '.join(temp_panda.columns)
+        # temp_big_string='('+temp_big_string+')'
+        # connection.execute(
+        #     f'''
+        #     INSERT INTO {temp_table_name} 
+        #     SELECT * from {to_be_upserted};
+        #     '''
+        # )
+        # connection.execute(
+        #     f'''
+        #     DROP TABLE {to_be_upserted};
+        #     '''
+        # )       
+
+        connection.execute(
+            f'''
+            DROP TABLE {temp_table_name};
+            '''
+        )
+
         temp_panda.to_sql(
-            to_be_upserted,
+            temp_table_name,
             engine,
             index=False,
             dtype=temp_dtype_dict
@@ -75,26 +110,10 @@ def make_update_table_from_panda(
         temp_big_string='('+temp_big_string+')'
         connection.execute(
             f'''
-            ALTER TABLE {to_be_upserted} ADD PRIMARY KEY {temp_big_string};
+            ALTER TABLE {temp_table_name} ADD PRIMARY KEY {temp_big_string};
             '''
-        )
-        temp_big_string=', '.join(temp_panda.columns)
-        temp_big_string='('+temp_big_string+')'
-        connection.execute(
-            f'''
-            INSERT INTO {temp_table_name} 
-            SELECT * from {to_be_upserted};
-            '''
-            #SELECT {temp_big_string} FROM {to_be_upserted};
-        )
-        connection.execute(
-            f'''
-            DROP TABLE {to_be_upserted};
-            '''
-        )       
-    
-        # INSERT INTO "{table_name}" ({headers_sql_txt}) 
-        # SELECT {headers_sql_txt} FROM "{temp_table_name}"
+        )        
+
 
 
 
