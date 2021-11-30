@@ -102,12 +102,12 @@ if __name__ == "__main__":
     #the input panda here is the taxid<->species mapping.
     #we do not need to get a taxonomy mapping because metagenompy prepares that automatically
     #from a local database
-    input_mapping_panda_address='../text_files/results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
-    input_binvestigate_panda_address='../text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    output_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/species_networkx.bin'
-    output_binvestigate_panda_address='../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/dummy.txt')
+    input_mapping_panda_address='../results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
+    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    output_networkx_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/species_networkx.bin'
+    output_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/dummy.txt')
 
     #read in things or make the species network from databse
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)

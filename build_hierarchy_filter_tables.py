@@ -1,10 +1,10 @@
 import os
 import pandas
 import networkx as nx
-from reduce_hierarchy_complexity import create_text_for_keep_files
+from reduce_hierarchy_complexity_post_dash import create_text_for_keep_files
 from generate_fold_change_matrices import show_all_organ_species_disease_triplets
 import matplotlib.pyplot as plt
-
+import sys
 
 
 def calculate_max_distance_from_leaves(temp_source,temp_current_node,temp_nx):
@@ -134,26 +134,26 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
 if __name__ == "__main__":
 
 
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/dummy.txt')
+    min_fold_change=sys.argv[1]
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/dummy.txt')
 
 
-    #count_cutoff=1
+    #min_fold_change=1
 
-    compound_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
-    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
-    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
-    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    compound_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
+    species_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
 
-    compound_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/table_compound.txt'
-    species_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/table_species.txt'
-    organ_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/table_organ.txt'
-    disease_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_20_build_hierarchy_filter_tables/table_disease.txt'
+    compound_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_compound.txt'
+    species_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_species.txt'
+    organ_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_organ.txt'
+    disease_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease.txt'
 
 
     #required for species, organ, and disease
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
     organ_species_disease_triplet_list=show_all_organ_species_disease_triplets(binvestigate_panda)
 

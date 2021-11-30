@@ -236,11 +236,11 @@ if __name__ == "__main__":
 
     #if snakemake in globals():
     min_fold_change=sys.argv[1]
-    initial_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
-    inchikey_mapping_address='../text_files/species_organ_maps/inchikey_mapping.txt'
-    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/dummy.txt')
+    initial_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
+    inchikey_mapping_address='../resources/species_organ_maps/inchikey_mapping.txt'
+    output_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_3_bins_transformed/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_3_bins_transformed/dummy.txt')
  
     #read in the initial panda....
     initial_panda=pandas.read_pickle(initial_pickle_address)

@@ -4,6 +4,7 @@ from sqlalchemy.dialects import postgresql
 import pandas
 from pprint import pprint
 import os
+import sys
 
 from sqlalchemy.sql.sqltypes import TEXT
 
@@ -100,22 +101,41 @@ def make_update_table_from_panda(
 if __name__ == "__main__":
 
 
-    
-    my_server='localhost'
-    my_database='binvestigate_first'
-    my_dialect='postgresql'
-    my_driver='psycopg2'
-    my_username='rictuar'
-    my_password='elaine123'
 
 
-    my_connection=f'{my_dialect}+{my_driver}://{my_username}:{my_password}@{my_server}/{my_database}'
 
+    min_fold_change=sys.argv[1]
+    use_aws=(sys.argv[2])
+    print(use_aws)
+
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_22_upsert_to_database/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_22_upsert_to_database/dummy.txt')
+
+    if use_aws=='False':
+        my_server='localhost'
+        my_database='binvestigate_first'
+        my_dialect='postgresql'
+        my_driver='psycopg2'
+        my_username='rictuar'
+        my_password='elaine123'
+        my_port='5432'
+
+    elif use_aws=='True':
+        my_server='fold-result-database.czbab8f7pgfj.us-east-2.rds.amazonaws.com'
+        my_database='foldresults'
+        my_dialect='postgresql'
+        my_driver='psycopg2'
+        my_username='postgres'
+        my_password='elaine123'
+        my_port='5430'
+
+
+    my_connection=f'{my_dialect}+{my_driver}://{my_username}:{my_password}@{my_server}:{my_port}/{my_database}'
 
     engine=create_engine(my_connection)#,echo=True)
     connection=engine.connect()
 
-    table_16_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    table_16_address='../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
     make_update_table_from_panda(
         table_16_address,
         engine,
@@ -134,7 +154,7 @@ if __name__ == "__main__":
 
     print('16 done')
     
-    table_17_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
+    table_17_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
     make_update_table_from_panda(
         table_17_address,
         engine,
@@ -159,7 +179,7 @@ if __name__ == "__main__":
 
     print('17 done')    
 
-    table_18_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_18_compute_fold_results/'
+    table_18_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/'
     file_list=os.listdir(table_18_base_address)
     file_list.remove('dummy.txt')
     print(file_list)
@@ -168,6 +188,7 @@ if __name__ == "__main__":
 
 
     for temp_file in file_list:
+        print(temp_file)
         make_update_table_from_panda(
             table_18_base_address+temp_file,
             engine,
@@ -184,7 +205,7 @@ if __name__ == "__main__":
         )
 
     print('18 done')
-    table_19_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_19_prepare_count_matrix_2/count_matrix.bin'
+    table_19_address='../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
     make_update_table_from_panda(
         table_19_address,
         engine,
@@ -212,7 +233,7 @@ if __name__ == "__main__":
     # ):
 
     print('19 done')
-    table_20_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_20_build_hierarchy_filter_tables/'
+    table_20_base_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/'
     file_list=os.listdir(table_20_base_address)
     file_list.remove('dummy.txt')
     print(file_list)

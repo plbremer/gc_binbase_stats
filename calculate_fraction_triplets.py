@@ -30,7 +30,8 @@ import os
 import networkx as nx
 import pandas
 from generate_fold_change_matrices import show_all_organ_species_disease_triplets
-from reduce_hierarchy_complexity import draw_nx_for_analysis
+from reduce_hierarchy_complexity_post_dash import draw_nx_for_analysis
+import sys
 
 import multiprocessing
 
@@ -228,16 +229,17 @@ def evaluate_headnode_combinations(temp_species_traversal_list):
 if __name__ == "__main__":
 
 
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/dummy.txt')
+    min_fold_change=sys.argv[1]
+    num_processes=int(sys.argv[2])
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/dummy.txt')
     
 
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
-    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
-    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
-    output_triplet_count_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    species_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    output_triplet_count_panda_address='../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
 
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
     organ_species_disease_triplet_list=list(show_all_organ_species_disease_triplets(binvestigate_panda))
@@ -257,7 +259,7 @@ if __name__ == "__main__":
     species_traversal_list=list(nx.algorithms.traversal.depth_first_search.dfs_postorder_nodes(species_nx,source='1'))
     #species_traversal_list=species_traversal_list[0:5]
     
-    num_processes=5
+    
     chunk_size=len(species_traversal_list)//num_processes
     species_traversal_list_list=list()
     for i in range(num_processes):

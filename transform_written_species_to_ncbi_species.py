@@ -4,6 +4,9 @@ from ete3 import NCBITaxa
 import os
 import multiprocessing
 import sys
+from sqlalchemy import create_engine
+from sqlalchemy import Table, String
+from sqlalchemy.dialects import postgresql
 
 def get_all_strings_in_list_across_panda_column(temp_panda,temp_column_name):
     '''
@@ -117,16 +120,30 @@ if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    binvestigate_pickle_address='../text_files/binvestigate_pull/shortened_file_for_test.bin'
+    start_from_aws=(sys.argv[3])
+    binvestigate_pickle_address='../resources/binvestigate_pull/shortened_file_for_test.bin'
     #binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/binvestigate_pickle_protocol_0.bin'
-    species_mapping_address='../text_files/species_organ_maps/species_map.txt'
-    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/dummy.txt')
+    species_mapping_address='../resources/species_organ_maps/species_map.txt'
+    output_pickle_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_1_species_transformed/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_1_species_transformed/dummy.txt')
     
 
-    binvestigate_panda=pandas.read_pickle(binvestigate_pickle_address)
-    
+    if start_from_aws=='False':
+        print('hello')
+        binvestigate_panda=pandas.read_pickle(binvestigate_pickle_address)
+    elif start_from_aws=='True':
+        my_server='info-from-binvestigate.czbab8f7pgfj.us-east-2.rds.amazonaws.com'
+        my_database='binvestigate'
+        my_dialect='postgresql'
+        my_driver='psycopg2'
+        my_username='postgres'
+        my_password='elaine123'
+        my_connection=f'{my_dialect}+{my_driver}://{my_username}:{my_password}@{my_server}/{my_database}'
+        engine=create_engine(my_connection)#,echo=True)
+        connection=engine.connect()
+        binvestigate_panda=pandas.read_sql_table(table_name='pseudo_carrot', con=my_connection)
+
     #identify species names that do not map to the NCBI database
     #this is done one time not as part of the "informatics pipeline" but rather
     #so that we can build the "species_mapping.txt"

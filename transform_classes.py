@@ -63,11 +63,11 @@ if __name__ == "__main__":
     #if snakemake in globals():
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
-    initial_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
-    class_mapping_address='../text_files/species_organ_maps/classes_curated_map.txt'
-    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/dummy.txt')
+    initial_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
+    class_mapping_address='../resources/species_organ_maps/classes_curated_map.txt'
+    output_pickle_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_4_classes_transformed/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_4_classes_transformed/dummy.txt')
     #else:
     #    initial_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_bins_transformed.bin'
     #    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_classes_transformed.bin'

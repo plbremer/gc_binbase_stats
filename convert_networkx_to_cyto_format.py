@@ -2,6 +2,7 @@ import networkx as nx
 from pprint import pprint
 import json
 import os
+import sys
 
 def convert_networkx(temp_input_address,temp_output_address,temp_is_compound_nx):
     '''
@@ -24,26 +25,26 @@ def convert_networkx(temp_input_address,temp_output_address,temp_is_compound_nx)
 
 if __name__ == "__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_21_convert_networkx_to_cyto_format/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_21_convert_networkx_to_cyto_format/dummy.txt')
+    min_fold_change=sys.argv[1]
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_21_convert_networkx_to_cyto_format/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_21_convert_networkx_to_cyto_format/dummy.txt')
 
 
 
-    compound_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
-    compound_networkx_address_output='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_21_convert_networkx_to_cyto_format/cyto_format_compound.json'
+    compound_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
+    compound_networkx_address_output='../results/'+str(min_fold_change)+'/step_21_convert_networkx_to_cyto_format/cyto_format_compound.json'
     convert_networkx(compound_networkx_address,compound_networkx_address_output,True)
     
-    species_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
-    species_networkx_address_output='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_21_convert_networkx_to_cyto_format/cyto_format_species.json'
+    species_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    species_networkx_address_output='../results/'+str(min_fold_change)+'/step_21_convert_networkx_to_cyto_format/cyto_format_species.json'
     convert_networkx(species_networkx_address,species_networkx_address_output,False)
 
-    organ_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
-    organ_networkx_address_output='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_21_convert_networkx_to_cyto_format/cyto_format_organ.json'
+    organ_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    organ_networkx_address_output='../results/'+str(min_fold_change)+'/step_21_convert_networkx_to_cyto_format/cyto_format_organ.json'
     convert_networkx(organ_networkx_address,organ_networkx_address_output,False)
 
-    disease_networkx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
-    disease_networkx_address_output='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_21_convert_networkx_to_cyto_format/cyto_format_disease.json'
+    disease_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    disease_networkx_address_output='../results/'+str(min_fold_change)+'/step_21_convert_networkx_to_cyto_format/cyto_format_disease.json'
     convert_networkx(disease_networkx_address,disease_networkx_address_output,False)    
     
 

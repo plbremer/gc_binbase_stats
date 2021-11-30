@@ -123,9 +123,9 @@ if __name__ == "__main__":
     # fold_number=snakemake.params.fold_number
     # count_meeting_fold_number=snakemake.params.count_meeting_fold_number
     # count_cutoff=snakemake.params.count_cutoff
-    input_graph_address='../text_files/results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_9_compound_analysis_stats/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_9_compound_analysis_stats/dummy.txt')
+    input_graph_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_9_compound_analysis_stats/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_9_compound_analysis_stats/dummy.txt')
  
     #predecessor_count=2
     #fold_number=2

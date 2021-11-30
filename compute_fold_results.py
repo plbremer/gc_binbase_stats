@@ -2,7 +2,8 @@ import numpy as np
 import pandas
 import time
 import os
-
+import sys
+import multiprocessing
 
 def extract_from_and_to_sets(temp_panda):
     from_list=temp_panda.loc[temp_panda['from_to']=='from']['triplets'].to_list()
@@ -69,42 +70,9 @@ def prepare_list_of_results(temp_triplet_panda,temp_fold_panda):
 
     return temp_results_list
 
-        
 
-
-
-if __name__ == "__main__":
-
-
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_18_compute_fold_results/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_18_compute_fold_results/dummy.txt')
-
-
-
-    #start_time=time.time()
-
-    #input_fold_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
-    input_triplet_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
-    #output_address='/home/rictuar/delete_test_bin_calc/calculation_results'
-
-    input_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
-    output_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_18_compute_fold_results/'
-
-    file_list=os.listdir('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/')
-    print(file_list)
-    #hold=input('hold')
-    
-    
-    #triplet_panda=pandas.read_pickle(input_triplet_panda_address)
-    #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
-
-
-
-    #print(input_fold_panda)
-    #hold=input('hold')
-
-    for temp_file in file_list:
+def perform_fold_analysis(temp_file_list):
+    for temp_file in temp_file_list:
         start_time=time.time()
         
         #put here because we rename columns at the end of the loop
@@ -143,6 +111,73 @@ if __name__ == "__main__":
         triplet_panda.to_pickle(output_address)
         end_time=time.time()
         print(end_time-start_time)
+
+
+
+if __name__ == "__main__":
+
+
+    min_fold_change=sys.argv[1]
+    num_processes=int(sys.argv[2])
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_18_compute_fold_results/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_18_compute_fold_results/dummy.txt')
+
+
+
+    #start_time=time.time()
+
+    #input_fold_panda_address='../results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
+    input_triplet_panda_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
+    #output_address='/home/rictuar/delete_test_bin_calc/calculation_results'
+
+    input_base_address='../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
+    output_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/'
+
+    file_list=os.listdir('../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/')
+    print(file_list)
+    #hold=input('hold')
+    
+    
+    #triplet_panda=pandas.read_pickle(input_triplet_panda_address)
+    #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
+
+
+
+    #print(input_fold_panda)
+    #hold=input('hold')
+
+    
+    chunk_size=len(file_list)//num_processes
+    file_list_list=list()
+    for i in range(num_processes):
+        if i< num_processes-1:
+            file_list_list.append(file_list[i*chunk_size:(i+1)*chunk_size])
+        elif i ==(num_processes-1):
+            file_list_list.append(file_list[i*chunk_size:])
+
+
+    #print(file_list_list)
+    #hold=input('hold')
+
+
+    pool = multiprocessing.Pool(processes=num_processes)
+    #transformed_chunks=
+    pool.map(perform_fold_analysis,file_list_list)
+    #transform_organ_column(post_species_transform_panda)
+    #recombine_chunks
+    #for i in range(len(transformed_chunks)):
+    #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
+    #post_species_transform_panda=pd.concat(transformed_chunks)
+
+    pool.close()
+
+
+
+
+
+
+
+
 
 
     '''

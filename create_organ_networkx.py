@@ -143,11 +143,11 @@ if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
     #cores_available=sys.argv[2]
-    mesh_file_address='../text_files/mesh_ascii/d2021.bin'
-    output_organ_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    output_disease_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/dummy.txt')
+    mesh_file_address='../resources/mesh_ascii/d2021.bin'
+    output_organ_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    output_disease_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/dummy.txt')
 
 
     organ_networkx=nx.DiGraph()

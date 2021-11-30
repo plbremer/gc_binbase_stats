@@ -5,6 +5,7 @@ from pprint import pprint
 from generate_fold_change_matrices import show_all_organ_species_disease_triplets
 from itertools import chain
 import os
+import sys
 
 def prepare_empty_count_panda(temp_triplet_set,temp_nx):
     '''
@@ -125,17 +126,17 @@ def fill_count_panda_classes(empty_panda,temp_nx):
 
 if __name__ == "__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_15_prepare_count_matrix/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_15_prepare_count_matrix/dummy.txt')
+    min_fold_change=sys.argv[1]
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_15_prepare_count_matrix/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_15_prepare_count_matrix/dummy.txt')
     
     
     
-    input_binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    compound_nx_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
-    output_address_full_count='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_15_prepare_count_matrix/full_count_matrix.bin'
-    output_address_min_count='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_15_prepare_count_matrix/min_count_matrix.bin'
-    output_address_sum_count='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_15_prepare_count_matrix/sum_count_matrix.bin'
+    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    compound_nx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
+    output_address_full_count='../results/'+str(min_fold_change)+'/step_15_prepare_count_matrix/full_count_matrix.bin'
+    output_address_min_count='../results/'+str(min_fold_change)+'/step_15_prepare_count_matrix/min_count_matrix.bin'
+    output_address_sum_count='../results/'+str(min_fold_change)+'/step_15_prepare_count_matrix/sum_count_matrix.bin'
 
     compound_nx=nx.readwrite.gpickle.read_gpickle(compound_nx_address)
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)

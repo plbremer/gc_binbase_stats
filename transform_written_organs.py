@@ -198,13 +198,13 @@ if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    post_species_transform_input_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
-    organ_networkx_input_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    disease_networkx_input_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    organ_mapping_address='../text_files/species_organ_maps/organ_map.txt'
-    output_pickle_address='../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_2b_organ_transformed/dummy.txt')
+    post_species_transform_input_pickle_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
+    organ_networkx_input_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    disease_networkx_input_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    organ_mapping_address='../resources/species_organ_maps/organ_map.txt'
+    output_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_2b_organ_transformed/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_2b_organ_transformed/dummy.txt')
 
     post_species_transform_panda=pandas.read_pickle(post_species_transform_input_pickle_address)
     

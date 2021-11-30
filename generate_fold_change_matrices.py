@@ -198,10 +198,10 @@ if __name__ == "__main__":
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    input_panda_address='../text_files/results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
-    output_panda_address='../text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/dummy.txt')
+    input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
+    output_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/dummy.txt')
 
     input_panda=pandas.read_pickle(input_panda_address)
     print(input_panda)

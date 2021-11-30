@@ -67,10 +67,10 @@ if __name__ == "__main__":
 
     #if snakemake in globals():
     min_fold_change=sys.argv[1]
-    input_panda_address='../text_files/results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
-    output_panda_address='../text_files/results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_5_panda_cleaned/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_5_panda_cleaned/dummy.txt')
+    input_panda_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
+    output_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_5_panda_cleaned/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_5_panda_cleaned/dummy.txt')
 
     input_panda=pandas.read_pickle(input_panda_address)
     #delete rows if the parallel lists organ/species/special property are empty

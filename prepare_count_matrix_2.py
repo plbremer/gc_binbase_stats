@@ -1,6 +1,7 @@
 #from typing_extensions import final
 import pandas
 import os
+import sys
 
 '''
 at a certain point, it was realized that i would be pulling the data from the "gc binbase database" rather than binvestigate
@@ -42,16 +43,16 @@ def get_sum_sample_count(temp_sample_count_list):
 
 if __name__ == "__main__":
 
-    count_cutoff=snakemake.params.count_cutoff
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_19_prepare_count_matrix_2/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_19_prepare_count_matrix_2/dummy.txt')
+    min_fold_change=sys.argv[1]
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/dummy.txt')
 
 
 
-    triplet_to_count_input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_15_prepare_count_matrix/full_count_matrix.bin'
+    triplet_to_count_input_panda_address='../results/'+str(min_fold_change)+'/step_15_prepare_count_matrix/full_count_matrix.bin'
     triplet_to_count_panda=pandas.read_pickle(triplet_to_count_input_panda_address)
-    unique_triplet_list_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/1/step_17_precompute_comparison_triplets/unique_triplets.bin'
-    output_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
+    unique_triplet_list_panda_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
+    output_panda_address='../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
     #actually a series
 
     

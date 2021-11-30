@@ -142,11 +142,11 @@ if __name__ == "__main__":
     
     #min_fold_change=10
     min_fold_change=sys.argv[1]
-    obo_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/classyfire_files/ChemOnt_2_1.obo'
-    binvestigate_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    output_file_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/dummy.txt')
+    obo_file_address='../resources/classyfire_files/ChemOnt_2_1.obo'
+    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    output_file_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/dummy.txt')
 
     parsed_obo=obonet.read_obo(obo_file_address)
 

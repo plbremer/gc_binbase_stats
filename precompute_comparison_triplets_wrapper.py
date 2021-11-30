@@ -152,13 +152,13 @@ def pseudo_main(chunk_counter):
     this_executions_lower_bound=chunk_counter*1000
     this_executions_upper_bound=(chunk_counter*1000)+1000
 
-    #count_cutoff=1
-    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
-    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
-    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
-    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
-    unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/unique_triplets'+str(this_executions_lower_bound)+'.bin'
-    triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/mapping/headnodes_to_triplet_list'+str(this_executions_lower_bound)+'.bin'
+    #min_fold_change=1
+    input_panda_address='../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    species_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    unique_triplets_output_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/unique/unique_triplets'+str(this_executions_lower_bound)+'.bin'
+    triplet_headnode_to_triplet_tuple_ouput_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/mapping/headnodes_to_triplet_list'+str(this_executions_lower_bound)+'.bin'
 
     species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
     organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
@@ -316,13 +316,14 @@ def pseudo_main(chunk_counter):
 
 
 if __name__=="__main__":
-    count_cutoff=1
+    min_fold_change=sys.argv[1]
+    num_processes=int(sys.argv[2])
     #defined here to provide globals##
-    species_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
-    organ_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
-    disease_nx_input_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
-    #unique_triplets_output_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique_triplets'+str(this_executions_lower_bound)+'.bin'
-    #triplet_headnode_to_triplet_tuple_ouput_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/headnodes_to_triplet_list'+str(this_executions_lower_bound)+'.bin'
+    species_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    organ_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    disease_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    #unique_triplets_output_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/unique_triplets'+str(this_executions_lower_bound)+'.bin'
+    #triplet_headnode_to_triplet_tuple_ouput_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/headnodes_to_triplet_list'+str(this_executions_lower_bound)+'.bin'
 
     species_nx=nx.readwrite.gpickle.read_gpickle(species_nx_input_address)
     organ_nx=nx.readwrite.gpickle.read_gpickle(organ_nx_input_address)
@@ -332,11 +333,11 @@ if __name__=="__main__":
 
     
 
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/')
-    os.system('mkdir -p /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/mapping/')
-    os.system('touch /home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/dummy.txt')
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/unique/')
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/mapping/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/dummy.txt')
  
-    input_panda_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
+    input_panda_address='../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
     temp=pd.read_pickle(input_panda_address)
     row_count=len(temp.index)
     print(temp)
@@ -355,7 +356,7 @@ if __name__=="__main__":
     
     ###multiprocessing sending starting and ending indices to precompute
 
-    num_processes=4
+    
     #chunk_size = list_of_starting_index_counters//num_processes
     #panda_chunks=list()
     #for i in range(0,num_processes):
@@ -377,21 +378,21 @@ if __name__=="__main__":
 
     pool.close()
 
-    unique_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/unique/'
+    unique_base_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/unique/'
     unique_result_chunk_list=os.listdir(unique_base_address)
     unique_result_panda=pd.read_pickle(unique_base_address+unique_result_chunk_list[0])
     for i in range(1,len(unique_result_chunk_list)):
         temp_panda=pd.read_pickle(unique_base_address+unique_result_chunk_list[i])
         unique_result_panda=pd.concat([unique_result_panda,temp_panda],axis='index',ignore_index=True)
         unique_result_panda=unique_result_panda.drop_duplicates(ignore_index=True)
-    unique_result_panda.to_pickle('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/unique_triplets.bin')
+    unique_result_panda.to_pickle('../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/unique_triplets.bin')
 
 
-    mapping_base_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/chunks/mapping/'
+    mapping_base_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/chunks/mapping/'
     mapping_result_chunk_list=os.listdir(mapping_base_address)
     mapping_result_panda=pd.read_pickle(mapping_base_address+mapping_result_chunk_list[0])
     for i in range(1,len(mapping_result_chunk_list)):
         temp_panda=pd.read_pickle(mapping_base_address+mapping_result_chunk_list[i])
         mapping_result_panda=pd.concat([mapping_result_panda,temp_panda],axis='index',ignore_index=True)
         #mapping_result_panda=mapping_result_panda.drop_duplicates(ignore_index=True)
-    mapping_result_panda.to_pickle('/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/results/'+str(count_cutoff)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin')
+    mapping_result_panda.to_pickle('../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin')

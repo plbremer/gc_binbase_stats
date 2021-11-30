@@ -144,13 +144,13 @@ if __name__ == "__main__":
     #min_fold_change=10
     #'+str(min_fold_change)+'
     #probably could use the step_5 one if the "with fold matrices" version gets too massive for ram
-    input_binvestigate_panda_address='../text_files/results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    input_complete_organ_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
-    input_complete_disease_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    output_organ_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
-    output_disease_networkx_address='../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
-    os.system('mkdir -p ../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/')
-    os.system('touch ../text_files/results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/dummy.txt')
+    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    input_complete_organ_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
+    input_complete_disease_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
+    output_organ_networkx_address='../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
+    output_disease_networkx_address='../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/dummy.txt')
 
 
 
