@@ -16,7 +16,8 @@ def make_update_table_from_panda(
     temp_columns_to_drop,
     temp_columns_for_primary_key,
     temp_columns_that_are_lists,
-    temp_dtype_dict=None
+    temp_first_iteration,
+    temp_dtype_dict=None,
 ):
     '''
     open panda
@@ -38,32 +39,33 @@ def make_update_table_from_panda(
         #     continue
             
 
-    temp_cursor=connection.execute(
-        f'''
-        SELECT EXISTS (
-            SELECT FROM information_schema.tables
-            WHERE table_schema = 'public'
-            AND table_name = '{temp_table_name}'
-        );
-        '''
-    )
+    # temp_cursor=connection.execute(
+    #     f'''
+    #     SELECT EXISTS (
+    #         SELECT FROM information_schema.tables
+    #         WHERE table_schema = 'public'
+    #         AND table_name = '{temp_table_name}'
+    #     );
+    #     '''
+    # )
 
     #if the table does not already exist
-    if (temp_cursor.first()[0]) == False:
-        temp_panda.to_sql(
-            temp_table_name,
-            engine,
-            index=False,
-            dtype=temp_dtype_dict
-        )
-        temp_big_string=', '.join(temp_columns_for_primary_key)
-        temp_big_string='('+temp_big_string+')'
-        connection.execute(
-            f'''
-            ALTER TABLE {temp_table_name} ADD PRIMARY KEY {temp_big_string};
-            '''
-        )
-    else:
+    # if (temp_cursor.first()[0]) == False:
+    #     temp_panda.to_sql(
+    #         temp_table_name,
+    #         engine,
+    #         index=False,
+    #         dtype=temp_dtype_dict
+    #     )
+    #     temp_big_string=', '.join(temp_columns_for_primary_key)
+    #     temp_big_string='('+temp_big_string+')'
+    #     connection.execute(
+    #         f'''
+    #         ALTER TABLE {temp_table_name} ADD PRIMARY KEY {temp_big_string};
+    #         '''
+    #     )
+    
+    # else:
         
         ###an attempt at upsertion that doesnt work###
         # to_be_upserted='to_be_upserted'
@@ -93,6 +95,10 @@ def make_update_table_from_panda(
         #     DROP TABLE {to_be_upserted};
         #     '''
         # )       
+    if temp_first_iteration==True:
+        #if this is the first time we encounter this table
+        #so true for 16,17,19,20 always
+        #once for 18
 
         connection.execute(
             f'''
@@ -104,7 +110,7 @@ def make_update_table_from_panda(
             temp_table_name,
             engine,
             index=False,
-            dtype=temp_dtype_dict
+            dtype=temp_dtype_dict,
         )
         temp_big_string=', '.join(temp_columns_for_primary_key)
         temp_big_string='('+temp_big_string+')'
@@ -112,7 +118,16 @@ def make_update_table_from_panda(
             f'''
             ALTER TABLE {temp_table_name} ADD PRIMARY KEY {temp_big_string};
             '''
-        )        
+        )    
+
+    elif temp_first_iteration==False:
+        temp_panda.to_sql(
+            temp_table_name,
+            engine,
+            index=False,
+            dtype=temp_dtype_dict,
+            if_exists='append'
+        )
 
 
 
@@ -163,12 +178,13 @@ if __name__ == "__main__":
         ('species_headnode', 'organ_headnode', 'disease_headnode'),
         #['triplet_list'],
         [],
+        True,
         temp_dtype_dict={
             'species_headnode': postgresql.TEXT,
             'organ_headnode': postgresql.TEXT,
             'disease_headnode': postgresql.TEXT,
             #'triplet_list': postgresql.ARRAY(postgresql.TEXT)            
-        }
+        },
     )
 
     print('16 done')
@@ -182,6 +198,7 @@ if __name__ == "__main__":
         #('headnode_triplet_from', 'headnode_triplet_to'),
         ('species_headnode_from','organ_headnode_from','disease_headnode_from','species_headnode_to','organ_headnode_to','disease_headnode_to'),
         [],
+        True,
         temp_dtype_dict={
             #'headnode_triplet_from': postgresql.ARRAY(postgresql.TEXT), 
             #'headnode_triplet_to': postgresql.ARRAY(postgresql.TEXT),
@@ -206,22 +223,42 @@ if __name__ == "__main__":
 
 
 
-    for temp_file in file_list:
+    for i,temp_file in enumerate(file_list):
         print(temp_file)
-        make_update_table_from_panda(
-            table_18_base_address+temp_file,
-            engine,
-            'fold_results',
-            [],
-            ('from_triplets', 'to_triplets', 'compound'),
-            [],
-            temp_dtype_dict={
-                'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
-                'to_triplets': postgresql.ARRAY(postgresql.TEXT),
-                'compound': postgresql.TEXT,
-                'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-            }
-        )
+        #if this is the first "fold result", then we want to 
+        #drop the previous table. otherwise, just append
+        if i == 0:
+            make_update_table_from_panda(
+                table_18_base_address+temp_file,
+                engine,
+                'fold_results',
+                [],
+                ('from_triplets', 'to_triplets', 'compound'),
+                [],
+                True,
+                temp_dtype_dict={
+                    'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
+                    'to_triplets': postgresql.ARRAY(postgresql.TEXT),
+                    'compound': postgresql.TEXT,
+                    'to_triplets_inter_removed_if_nec': postgresql.FLOAT
+                }
+            )
+        elif i != 0:
+            make_update_table_from_panda(
+                table_18_base_address+temp_file,
+                engine,
+                'fold_results',
+                [],
+                ('from_triplets', 'to_triplets', 'compound'),
+                [],
+                False,
+                temp_dtype_dict={
+                    'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
+                    'to_triplets': postgresql.ARRAY(postgresql.TEXT),
+                    'compound': postgresql.TEXT,
+                    'to_triplets_inter_removed_if_nec': postgresql.FLOAT
+                }
+            )            
 
     print('18 done')
     table_19_address='../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
@@ -232,6 +269,7 @@ if __name__ == "__main__":
         [],
         (['unique_triplets']),
         [],
+        True,
         temp_dtype_dict={
             'unique_triplets': postgresql.ARRAY(postgresql.TEXT), 
             'triplet_count': postgresql.INTEGER, 
@@ -266,6 +304,7 @@ if __name__ == "__main__":
             [],
             (['node_id']),
             [],
+            True,
             temp_dtype_dict={
                 'node_id': postgresql.TEXT, 
                 'we_map_to': postgresql.TEXT, 

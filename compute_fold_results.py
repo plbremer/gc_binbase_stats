@@ -137,7 +137,10 @@ if __name__ == "__main__":
     print(file_list)
     #hold=input('hold')
     
-    
+    compounds_to_keep=pandas.read_csv('../resources/species_organ_maps/networkx_shrink_compound.txt')
+    compounds_to_keep_list=compounds_to_keep['nodes_to_keep'].to_list()
+    shortened_file_list=[i for i in file_list if i[:-4] in compounds_to_keep_list]
+    file_list=shortened_file_list
     #triplet_panda=pandas.read_pickle(input_triplet_panda_address)
     #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
 
