@@ -293,6 +293,9 @@ if __name__ == "__main__":
     table_20_base_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/'
     file_list=os.listdir(table_20_base_address)
     file_list.remove('dummy.txt')
+    file_list.remove('table_disease_dash.bin')
+    file_list.remove('table_species_dash.bin')
+    file_list.remove('table_organ_dash.bin')
     print(file_list)
     #hold=input('hold')
     

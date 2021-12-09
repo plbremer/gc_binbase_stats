@@ -34,7 +34,7 @@ def calculate_max_distance_from_leaves(temp_source,temp_current_node,temp_nx):
 
 
 
-def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
+def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type,temp_output_address_2=None):
 
     if temp_hierarchy_type=='compound':
         
@@ -67,6 +67,13 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         species_set={i[1] for i in organ_species_disease_triplet_list}
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         temp_panda=create_text_for_keep_files(temp_nx,'species',species_set)
+        
+        #add in to get the panda that lets the species, organ, disease talk to each other
+        temp_dash_app_map_panda=temp_panda.copy()
+        temp_dash_app_map_panda['latin_name']=temp_dash_app_map_panda.english_name.str.split('|',expand=True)[0].str.strip()
+        temp_dash_app_map_panda.to_pickle(temp_output_address_2)
+        
+        
         temp_panda.drop('english_name',inplace=True,axis='columns')
 
         temp_distance_list=[
@@ -89,6 +96,12 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         organ_set={i[0] for i in organ_species_disease_triplet_list}
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         temp_panda=create_text_for_keep_files(temp_nx,'organ',organ_set)
+        
+        #add in to get the panda that lets the species, organ, disease talk to each other
+        #temp_dash_app_map_panda=temp_panda.copy()
+        #temp_dash_app_map_panda['latin_name']=temp_dash_app_map_panda.english_name.str.split('|',expand=True)[0].str.strip()
+        temp_panda.to_pickle(temp_output_address_2)
+        
         temp_panda.drop('english_name',inplace=True,axis='columns')
 
         nx.draw(temp_nx,with_labels=True)
@@ -113,6 +126,12 @@ def do_everything(temp_nx_address,temp_output_address,temp_hierarchy_type):
         disease_set={i[2] for i in organ_species_disease_triplet_list}
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
         temp_panda=create_text_for_keep_files(temp_nx,'disease',disease_set)
+        
+        #add in to get the panda that lets the species, organ, disease talk to each other
+        #temp_dash_app_map_panda=temp_panda.copy()
+        #temp_dash_app_map_panda['latin_name']=temp_dash_app_map_panda.english_name.str.split('|',expand=True)[0].str.strip()
+        temp_panda.to_pickle(temp_output_address_2)
+        
         temp_panda.drop('english_name',inplace=True,axis='columns')
 
         temp_distance_list=[
@@ -146,10 +165,15 @@ if __name__ == "__main__":
     organ_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
     disease_nx_input_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
 
-    compound_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_compound.txt'
-    species_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_species.txt'
-    organ_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_organ.txt'
-    disease_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease.txt'
+    compound_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_compound.bin'
+    species_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_species.bin'
+    organ_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_organ.bin'
+    disease_output_address='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease.bin'
+
+
+    species_output_address_2='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_species_dash.bin'
+    organ_output_address_2='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_organ_dash.bin'
+    disease_output_address_2='../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease_dash.bin'
 
 
     #required for species, organ, and disease
@@ -158,6 +182,6 @@ if __name__ == "__main__":
     organ_species_disease_triplet_list=show_all_organ_species_disease_triplets(binvestigate_panda)
 
     do_everything(compound_nx_input_address,compound_output_address,'compound')
-    do_everything(species_nx_input_address,species_output_address,'species')
-    do_everything(organ_nx_input_address,organ_output_address,'organ')
-    do_everything(disease_nx_input_address,disease_output_address,'disease')
+    do_everything(species_nx_input_address,species_output_address,'species',species_output_address_2)
+    do_everything(organ_nx_input_address,organ_output_address,'organ',organ_output_address_2)
+    do_everything(disease_nx_input_address,disease_output_address,'disease',disease_output_address_2)

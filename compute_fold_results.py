@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
     file_list=os.listdir('../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/')
     print(file_list)
-    #hold=input('hold')
+    hold=input('hold')
     
     compounds_to_keep=pandas.read_csv('../resources/species_organ_maps/networkx_shrink_compound.txt')
     compounds_to_keep_list=compounds_to_keep['nodes_to_keep'].to_list()
