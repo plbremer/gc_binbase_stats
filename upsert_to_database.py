@@ -259,8 +259,8 @@ if __name__ == "__main__":
             'species_headnode_to': postgresql.TEXT,
             'organ_headnode_to': postgresql.TEXT,
             'disease_headnode_to': postgresql.TEXT,
-            'from_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT),
-            'to_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT)
+            'from_triplets_inter_removed_if_nec': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
+            'to_triplets_inter_removed_if_nec': postgresql.INTEGER#postgresql.ARRAY(postgresql.TEXT)
         },
         temp_append_antisymmetric_result=17
     )
@@ -289,8 +289,8 @@ if __name__ == "__main__":
                 [],
                 True,
                 temp_dtype_dict={
-                    'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
-                    'to_triplets': postgresql.ARRAY(postgresql.TEXT),
+                    'from_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
+                    'to_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
                     'compound': postgresql.TEXT,
                     'to_triplets_inter_removed_if_nec': postgresql.FLOAT
                 },
@@ -306,8 +306,8 @@ if __name__ == "__main__":
                 [],
                 False,
                 temp_dtype_dict={
-                    'from_triplets': postgresql.ARRAY(postgresql.TEXT), 
-                    'to_triplets': postgresql.ARRAY(postgresql.TEXT),
+                    'from_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
+                    'to_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
                     'compound': postgresql.TEXT,
                     'to_triplets_inter_removed_if_nec': postgresql.FLOAT
                 },
@@ -325,11 +325,12 @@ if __name__ == "__main__":
         [],
         True,
         temp_dtype_dict={
-            'unique_triplets': postgresql.ARRAY(postgresql.TEXT), 
+            'unique_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
             'triplet_count': postgresql.INTEGER, 
             'sample_count_list': postgresql.ARRAY(postgresql.INTEGER),
             'min_sample_count': postgresql.INTEGER, 
-            'sum_sample_count': postgresql.INTEGER
+            'sum_sample_count': postgresql.INTEGER,
+            'unique_triplet_list_real': postgresql.ARRAY(postgresql.TEXT)
         }
     )
 
