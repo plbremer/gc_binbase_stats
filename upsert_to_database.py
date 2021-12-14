@@ -9,6 +9,34 @@ import sys
 from sqlalchemy.sql.sqltypes import TEXT
 
 
+def make_flipped_results_panda(upper_diagonal_panda,temp_list_of_columns_to_flip,temp_list_of_columns_to_negative):
+    '''
+    i faced a decision: have the tool do the inverse query (because the results are anti symmetric) and the normal query
+    and combine the results
+    or have the database have both sets of results
+    because the memory overhead for the results actually seems small, i am going have the anti results and results in DB
+    this panda makes the anti results from the results, which get appended to the main panda just before that panda is uplaoded
+    '''
+
+    #make a copy of the panda
+    lower_diagonal=upper_diagonal_panda.copy(deep=True)    
+    #swap the data
+    for i in temp_list_of_columns_to_flip:
+        lower_diagonal[[i[0],i[1]]]=lower_diagonal[[i[1],i[0]]]
+    # lower_diagonal.rename()
+    #make the particular columns negative
+    for i in temp_list_of_columns_to_negative:
+        lower_diagonal[i]=-1*lower_diagonal[i]
+    #swap the name-a-roos
+    #not necessary because the first step swap
+    # lower_diagonal_name_map = {lower_diagonal.columns[i]:temp_new_column_name_order[i] for i in range(len(temp_new_column_name_order))}
+    # lower_diagonal.rename(lower_diagonal_name_map, axis=1, inplace=True)
+
+
+    return lower_diagonal
+
+
+
 def make_update_table_from_panda(
     temp_panda_address,
     temp_engine,
@@ -18,6 +46,7 @@ def make_update_table_from_panda(
     temp_columns_that_are_lists,
     temp_first_iteration,
     temp_dtype_dict=None,
+    temp_append_antisymmetric_result=None
 ):
     '''
     open panda
@@ -29,6 +58,28 @@ def make_update_table_from_panda(
     alter table primary key
     '''
     temp_panda=pandas.read_pickle(temp_panda_address)
+
+    if temp_append_antisymmetric_result is not None:
+        if temp_append_antisymmetric_result==17:
+            lower_diagonal_panda=make_flipped_results_panda(
+                temp_panda,
+                [('species_headnode_from','species_headnode_to'),('organ_headnode_from','organ_headnode_to'),('disease_headnode_from','disease_headnode_to'),('from_triplets_inter_removed_if_nec','to_triplets_inter_removed_if_nec')],
+                []
+            )
+            temp_panda=pandas.concat(objs=[temp_panda,lower_diagonal_panda],axis='index',join='outer',ignore_index=True)
+
+        elif temp_append_antisymmetric_result==18:
+            lower_diagonal_panda=make_flipped_results_panda(
+                temp_panda,
+                [('from_triplets','to_triplets')],
+                ['results']
+            )
+            temp_panda=pandas.concat(objs=[temp_panda,lower_diagonal_panda],axis='index',join='outer',ignore_index=True)
+            temp_panda.drop_duplicates(subset=['from_triplets','to_triplets','compound'],keep='first',inplace=True)
+
+        # print(temp_panda)
+        # print(temp_panda)
+        # hold=input('hold')
     
     temp_panda.drop(temp_columns_to_drop,inplace=True,axis='columns')
 
@@ -210,7 +261,8 @@ if __name__ == "__main__":
             'disease_headnode_to': postgresql.TEXT,
             'from_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT),
             'to_triplets_inter_removed_if_nec': postgresql.ARRAY(postgresql.TEXT)
-        }
+        },
+        temp_append_antisymmetric_result=17
     )
 
     print('17 done')    
@@ -241,7 +293,8 @@ if __name__ == "__main__":
                     'to_triplets': postgresql.ARRAY(postgresql.TEXT),
                     'compound': postgresql.TEXT,
                     'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-                }
+                },
+                temp_append_antisymmetric_result=18
             )
         elif i != 0:
             make_update_table_from_panda(
@@ -257,7 +310,8 @@ if __name__ == "__main__":
                     'to_triplets': postgresql.ARRAY(postgresql.TEXT),
                     'compound': postgresql.TEXT,
                     'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-                }
+                },
+                temp_append_antisymmetric_result=18
             )            
 
     print('18 done')
