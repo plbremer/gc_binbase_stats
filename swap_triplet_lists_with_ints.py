@@ -44,14 +44,14 @@ if __name__=="__main__":
     }
 
     #go to the step 17 panda and swap the triplet lists with the integer
-    # step_17_panda_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
-    # step_17_panda=pandas.read_pickle(step_17_panda_address)
+    step_17_panda_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/headnodes_to_triplet_list.bin'
+    step_17_panda=pandas.read_pickle(step_17_panda_address)
     
-    # step_17_panda['from_triplets_inter_removed_if_nec']=step_17_panda['from_triplets_inter_removed_if_nec'].astype(str).replace(triplet_int_mapping_dict)
-    # print('step 17 swap 1 done')
-    # step_17_panda['to_triplets_inter_removed_if_nec']=step_17_panda['to_triplets_inter_removed_if_nec'].astype(str).replace(triplet_int_mapping_dict)
-    # print('step 17 swap 2 done')
-    # step_17_panda.to_pickle(step_17_panda_address)
+    step_17_panda['from_triplets_inter_removed_if_nec']=step_17_panda['from_triplets_inter_removed_if_nec'].astype(str).replace(triplet_int_mapping_dict)
+    print('step 17 swap 1 done')
+    step_17_panda['to_triplets_inter_removed_if_nec']=step_17_panda['to_triplets_inter_removed_if_nec'].astype(str).replace(triplet_int_mapping_dict)
+    print('step 17 swap 2 done')
+    step_17_panda.to_pickle(step_17_panda_address)
 
     #go to the stp 18 pandas and swap the triplet lists with the integer
     table_18_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/'

@@ -5,6 +5,7 @@ import pandas
 from pprint import pprint
 import os
 import sys
+import psycopg2
 
 from sqlalchemy.sql.sqltypes import TEXT
 
@@ -151,17 +152,22 @@ def make_update_table_from_panda(
         #so true for 16,17,19,20 always
         #once for 18
 
-        connection.execute(
-            f'''
-            DROP TABLE {temp_table_name};
-            '''
-        )
+        # try:
+        #     connection.execute(
+        #         f'''
+        #         DROP TABLE {temp_table_name};
+        #         '''
+        #     )
+        # except psycopg2.errors.UndefinedTable:
+        #     pass
+
 
         temp_panda.to_sql(
             temp_table_name,
             engine,
             index=False,
             dtype=temp_dtype_dict,
+            if_exists='replace'
         )
         temp_big_string=', '.join(temp_columns_for_primary_key)
         temp_big_string='('+temp_big_string+')'
@@ -182,7 +188,7 @@ def make_update_table_from_panda(
 
 
 
-
+cd
 if __name__ == "__main__":
 
 

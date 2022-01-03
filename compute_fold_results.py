@@ -143,7 +143,7 @@ if __name__ == "__main__":
     file_list=shortened_file_list
     #triplet_panda=pandas.read_pickle(input_triplet_panda_address)
     #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
-
+    print(file_list)
 
 
     #print(input_fold_panda)
