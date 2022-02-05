@@ -188,7 +188,7 @@ def make_update_table_from_panda(
 
 
 
-cd
+
 if __name__ == "__main__":
 
 
