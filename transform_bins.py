@@ -2,6 +2,7 @@ import numpy as np
 import pandas
 import os
 import sys
+import itertools
 #the general thought process for the bin transformation is that we
 #add an inchikey
 #remove species/organ/intensity/count hierarchy based on count (thought about 
@@ -16,7 +17,12 @@ def drop_repeats_in_group(temp_panda):
     this drops those  
 
     it was noticed that the sunburst diagram info was the same for all bins with the same group
-    so first we double check this on our own      
+    so first we double check this on our own     
+
+    update 2-5-2022 plb
+    we basically dont get info from binvestigate anymore, now we get info directly from carrot 
+    carrot does not support groups at the moment
+    will have to ignore them for now and perhaps revisit later?
     '''
     #get the groups that appear at least one time
     group_value_counts=temp_panda['group'].value_counts()
@@ -28,17 +34,29 @@ def drop_repeats_in_group(temp_panda):
         if value == 1:
             continue
 
+        #we dont want to remove things that dont have a group
+        if pandas.isnull(index):
+            continue
+
+        
         #in this block we confirm that for each group, all [organ, species, intensity are the same]
         #which we expect because the sunburst diagrams are all the same
         zeroth_index=temp_panda.loc[temp_panda['group'] == index].index[0]
         non_zeroth_indices=temp_panda.loc[temp_panda['group'] == index].index[1:]
         for subset_index, subset_series in temp_panda.loc[temp_panda['group'] == index].iterrows():
+
+
             if subset_series['organ'] != temp_panda.loc[temp_panda['group']==index].loc[zeroth_index,'organ']:
                 hold=input('there is a difference amongst the organs')
             elif subset_series['species'] != temp_panda.loc[temp_panda['group']==index].loc[zeroth_index,'species']:
                 hold=input('there is a difference amongst the speciess')
-            elif subset_series['intensity'] != temp_panda.loc[temp_panda['group']==index].loc[zeroth_index,'intensity']:
-                hold=input('there is a difference amongst the intensitys')
+            elif subset_series['median_intensity'] != temp_panda.loc[temp_panda['group']==index].loc[zeroth_index,'median_intensity']:
+                print(index)
+                print(value)
+                print(subset_series)
+                hold=input('there is a difference amongst the median intensitys')
+            elif subset_series['total_intensity'] != temp_panda.loc[temp_panda['group']==index].loc[zeroth_index,'total_intensity']:
+                hold=input('there is a difference amongst the total intensitys')
             
         #for a group, after confirming teh same, we drop that 
         temp_panda.drop(labels=non_zeroth_indices,axis='index',inplace=True)
@@ -93,7 +111,7 @@ def update_inchikey_from_mapping(temp_panda, temp_inchikey_mapping_address):
         temp_main_panda_index=temp_panda.index[temp_panda['id']==series['id']]
         temp_panda.at[temp_main_panda_index,'inchikey_curated']=series['inchikey_curated']
 
-def divide_intensities_by_count(temp_panda):
+def divide_total_intensities_by_count(temp_panda):
     '''
     when calling rest binvestigate, the intensites are aggregates, whereas the GUI renderings are averages
     so we must make this conversion manaully
@@ -102,8 +120,8 @@ def divide_intensities_by_count(temp_panda):
         #print(index)
         #print(np.array(series['intensity']))
         #print(np.array(series['count']))
-        new_intensities=list(np.divide(np.array(series['intensity']),np.array(series['count'])))
-        temp_panda.at[index,'intensity']=new_intensities
+        new_intensities=list(np.divide(np.array(series['total_intensity']),np.array(series['count'])))
+        temp_panda.at[index,'total_intensity']=new_intensities
         #hold=input('one iteration')
 
 def transform_count_column(temp_bin_panda,temp_count_cutoff):
@@ -153,13 +171,9 @@ def transform_intensity_column(temp_bin_panda):
 def get_list_of_redundancies(temp_organ_list,temp_species_list,temp_properties_list):
     '''
     zip the organs and the species together
-
     make a dict where the keys are the set of (organ, species)
-
     values are unique lists
-
     every time you encounter a pair, indicate the index
-
     then, those with dupes are those where the len of value is >1 and we have the indices
     '''
 
@@ -179,11 +193,8 @@ def get_list_of_redundancies(temp_organ_list,temp_species_list,temp_properties_l
 def aggregate_redundancies(temp_panda):
     '''
     The purpose of this function is to aggregate redundancies after the transforms.
-
     redundancies are "multiple intensity values" that have the "same organ and same species" (and the same special property)
-
     this can occur, for example, after rattus+rattisimus,liver and rattus,liver both become rattus,liver
-
     we search all of these and aggregate them
     '''
 
@@ -196,7 +207,9 @@ def aggregate_redundancies(temp_panda):
         temp_species_list=list()
         temp_organ_list=list()
         temp_count_list=list()
-        temp_intensity_list=list()   
+        temp_median_intensity_list=list()   
+        temp_total_intensity_list=list()
+        temp_annotation_distribution_list=list()
         temp_special_property_list=list()
 
 
@@ -207,7 +220,9 @@ def aggregate_redundancies(temp_panda):
                 temp_species_list.append(series['species'][redundancy_dict[temp_triplet][0]])
                 temp_organ_list.append(series['organ'][redundancy_dict[temp_triplet][0]])
                 temp_count_list.append(series['count'][redundancy_dict[temp_triplet][0]])
-                temp_intensity_list.append(series['intensity'][redundancy_dict[temp_triplet][0]])
+                temp_median_intensity_list.append(series['median_intensity'][redundancy_dict[temp_triplet][0]])
+                temp_total_intensity_list.append(series['total_intensity'][redundancy_dict[temp_triplet][0]])
+                temp_annotation_distribution_list.append(series['annotation_distribution'][redundancy_dict[temp_triplet][0]])
                 temp_special_property_list.append(series['special_property_list'][redundancy_dict[temp_triplet][0]])
                 continue
 
@@ -215,26 +230,44 @@ def aggregate_redundancies(temp_panda):
                 #we can directly use the aggregate sum because a future file, transform_bins
                 #does the division of the intensity by the sum. so we dont need to do a weighted
                 #average
+                #plb 2-5-2022
+                #i dont think above makes total sense, but i think that we just need to make sure that
+                #we do what we think we should do for multiple of the same sod
+                #sum the total intensity
+                #do whatever with the median intensity - we will have to recalculate this with a new function in thsi script
+                #append the annotation distributions "sub"lists
 
                 aggregate_count=sum([series['count'][i] for i in redundancy_dict[temp_triplet]])
-                aggregate_intensity=sum([series['intensity'][i] for i in redundancy_dict[temp_triplet]])                
+                aggregate_intensity=sum([series['total_intensity'][i] for i in redundancy_dict[temp_triplet]])                
+                #for the annotation distribution, first make a lisft of the sublists, then "flatten" it
+                aggregate_annotation_distribution=list()
+                [aggregate_annotation_distribution.append(series['annotation_distribution'][i]) for i in redundancy_dict[temp_triplet]]
+                aggregate_annotation_distribution=list(itertools.chain.from_iterable(aggregate_annotation_distribution))
+                #for the median, we get the numpy median of the new total aggregate distribution
+                aggregate_median_intensity=np.median(aggregate_annotation_distribution)
+
 
                 temp_species_list.append(temp_triplet[1])
                 temp_organ_list.append(temp_triplet[0])
                 temp_special_property_list.append(temp_triplet[2])
                 temp_count_list.append(aggregate_count)
-                temp_intensity_list.append(aggregate_intensity)
+                temp_total_intensity_list.append(aggregate_intensity)
+                temp_median_intensity_list.append(aggregate_median_intensity)
+                temp_annotation_distribution_list.append(aggregate_annotation_distribution)
+
+
 
         temp_panda.at[index,'species']=temp_species_list
         temp_panda.at[index,'organ']=temp_organ_list
         temp_panda.at[index,'count']=temp_count_list
-        temp_panda.at[index,'intensity']=temp_intensity_list
+        temp_panda.at[index,'total_intensity']=temp_total_intensity_list
         temp_panda.at[index,'special_property_list']=temp_special_property_list
+        temp_panda.at[index,'median_intensity']=temp_median_intensity_list
+        temp_panda.at[index,'annotation_distribution']=temp_annotation_distribution_list
 
 
 if __name__ == "__main__":
 
-    #if snakemake in globals():
     min_fold_change=sys.argv[1]
     initial_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
     inchikey_mapping_address='../resources/species_organ_maps/inchikey_mapping.txt'
@@ -252,35 +285,56 @@ if __name__ == "__main__":
 
     #just like the species and organs, we need to create a list of things that we transform
     #in this case, the transformation is of the inchikeys
-    print_all_bin_identifiers(initial_panda)
+    #update 2-5-2022 plb
+    #we arent going to get the inchikeys from identifiers. we are going to get a custom map from oliver
+    #that goes into the beginning input panda that we build from carrot
+    #we instead update with this single line from that method
+    ##print_all_bin_identifiers(initial_panda)
+    initial_panda.fillna(value='@@@@@@@',inplace=True)
 
     #just like the species and organs, based on some external txt
     #we update the inchikeys
+    #update 2-5-2022 plb 
+    #we simplified the formatting of the input file to just 3 columns, id, inchikey, and inchikey_curated
     update_inchikey_from_mapping(initial_panda,inchikey_mapping_address)
+    print(initial_panda)
+    hold=input('hold')
 
     #sometimes the binvestigate rest calls provided species/organs with intensities of zero
     #this causes nonsense runtime/divide-by-zero errors
-    transform_intensity_column(initial_panda)
+    #update 2-5-2022 plb 
+    #since we get data from carrot, at this point there should be no intensities of zero
+    #so we do not do this as a way to avoid surprising results
+    #transform_intensity_column(initial_panda)
 
     #like the species and the organs, we remove from the quadruplet (species, organ, intensity, count)
     #if there are fewer samples than the cutoff that we specify (cant trust numbers from 1 sample)
     #note that there are no transforms in this one, only removals
     #we assign count_cutoff to be zero to make it so that all triplets are kept
-    count_cutoff=0
-    transform_count_column(initial_panda,count_cutoff)
+    #update 2-5-2022 plb 
+    #since we get data from carrot, at this point there should be no counts of zero
+    #so we do not do this as a way to avoid surprising result
+    #count_cutoff=0
+    #transform_count_column(initial_panda,count_cutoff)
 
     #The purpose of this function is to aggregate redundancies after the transforms.
     #redundancies are "multiple intensity values" that have the "same organ and same species"
     #this can occur, for example, after rattus+rattisimus,liver and rattus,liver both become rattus,liver
     #we search all of these and aggregate them
+    #update 2-5-2022 plb 
+    #redid this function
     aggregate_redundancies(initial_panda)
 
     #when calling rest binvestigate, the intensites are aggregates, whereas the GUI renderings are averages
     #so we must make this conversion manaully
-    divide_intensities_by_count(initial_panda)
+    #update 2-5-2022 plb 
+    #we only divide the total intensities
+    #leave the median intensity alone
+    divide_total_intensities_by_count(initial_panda)
 
     #########################
     #later, we may add a class from a ML algorithm
+    #no. we wont. - plb 2-5-2022
     #########################
 
     #print to file

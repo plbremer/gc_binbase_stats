@@ -90,13 +90,17 @@ def transform_species_column(temp_bin_panda):
                 indices_to_drop=[i for i in range(0,len(bin_series['species'])) if bin_series['species'][i] == mapping_series['list_of_species_that_had_zero_ncbi_id']]
                 species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
                 organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
-                intensity_list_with_indices_removed=list(np.delete(bin_series['intensity'],indices_to_drop))
+                total_intensity_list_with_indices_removed=list(np.delete(bin_series['total_intensity'],indices_to_drop))
+                median_intensity_list_with_indices_removed=list(np.delete(bin_series['median_intensity'],indices_to_drop))
                 count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
+                annotation_distribution_list_with_indices_removed=list(np.delete(bin_series['annotation_distribution'],indices_to_drop))
 
                 temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
-                temp_bin_panda.at[bin_index,'intensity']=intensity_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'total_intensity']=total_intensity_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'median_intensity']=median_intensity_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'count']=count_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
 
         #if we have a transformation
         elif mapping_series['most_specific'] != 'drop':
@@ -121,8 +125,8 @@ if __name__ == "__main__":
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
     start_from_aws=(sys.argv[3])
-    binvestigate_pickle_address='../resources/binvestigate_pull/shortened_file_for_test.bin'
-    #binvestigate_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/binvestigate_pull/binvestigate_pickle_protocol_0.bin'
+    binvestigate_pickle_address='../resources/pipeline_input_2.bin'
+    #binvestigate_pickle_address='../resources/binvestigate_pull/shortened_file_for_test.bin'
     species_mapping_address='../resources/species_organ_maps/species_map.txt'
     output_pickle_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_1_species_transformed/')

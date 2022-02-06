@@ -135,15 +135,20 @@ def transform_organ_column(temp_bin_panda):
                 indices_to_drop=[i for i in range(0,len(bin_series['organ'])) if (bin_series['organ'][i] == mapping_series['organ_initial']) and (bin_series['species'][i] == mapping_series['species'])]
                 organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
                 species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
-                intensity_list_with_indices_removed=list(np.delete(bin_series['intensity'],indices_to_drop))
+                total_intensity_list_with_indices_removed=list(np.delete(bin_series['total_intensity'],indices_to_drop))
+                median_intensity_list_with_indices_removed=list(np.delete(bin_series['median_intensity'],indices_to_drop))
                 count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
                 special_property_list_with_indices_removed=list(np.delete(bin_series['special_property_list'],indices_to_drop))
+                annotation_distribution_list_with_indices_removed=list(np.delete(bin_series['annotation_distribution'],indices_to_drop))
 
                 temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
-                temp_bin_panda.at[bin_index,'intensity']=intensity_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'total_intensity']=total_intensity_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'median_intensity']=median_intensity_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'count']=count_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'special_property_list']=special_property_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
+
 #                if mapping_series['species']=='Sus scrofa domesticus' and mapping_series['organ_final']=='Drop':
 #                    #print(bin_series['organ'])
 #                    print(indices_to_drop)
