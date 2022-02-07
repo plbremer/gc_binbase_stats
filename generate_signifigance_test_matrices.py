@@ -6,6 +6,7 @@ import multiprocessing
 from pprint import pprint
 import sys
 from itertools import repeat
+import scipy.stats
 
 
 def show_all_organ_species_disease_triplets(temp_panda):
@@ -17,80 +18,42 @@ def show_all_organ_species_disease_triplets(temp_panda):
     return set_of_organ_species_disease_tuples
 
 
-def calculate_one_fold_change_matrix_trip(temp_bin,temp_MultiIndex,fold_change_type):
+def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance):
     '''
-    The general logic for a fold change matrix is -
-
-    get the total set of (species, organ, disease) that exist in binvestigate
-    calculate the fold change matrix as the outer product of this list with itself
-
-    We use the total set so that we can just superimpose all matrices and compare values at the same cell location
-
-    each cell in the matrix follows a punnit square logic
-
-                        to
-                finite      missing         
-        finite  divide      -np.inf   
-                (sign +/-)
-    from
-
-        missing np.inf      np.nan
-    plb edit 2-6-2022
-    the above matrix is basically a moot point now because all compounds for all sod have a non-zero 
-    average or median intensity
+    asdf
     '''
 
     #this is the fold change matrix that we start with
     temp_DataFrame=pandas.DataFrame(data=np.nan,index=temp_MultiIndex,columns=temp_MultiIndex)
     tuple_list=zip(temp_bin['organ'],temp_bin['species'],temp_bin['special_property_list'])
-    intensity_dict=dict(zip(tuple_list,temp_bin[fold_change_type]))
+    distribution_dict=dict(zip(tuple_list,temp_bin['annotation_distribution']))
 
     #we iterate through the rows in the fold change matrix
     #we couldnt do neat .apply or other vectorized approaches because the data required
     #were in lists for each bin (series)
     for index,series in temp_DataFrame.iterrows():
 
-        try:
-            from_intensity=intensity_dict[series.name]
-            for temp_column in temp_DataFrame.columns:
-                #if we are on a diagonal
-                if index == temp_column:
-                    temp_DataFrame.at[series.name,temp_column]=np.nan
-                    continue
-                try:
-                    if intensity_dict[temp_column]>from_intensity:
-                        temp_DataFrame.at[series.name,temp_column]=intensity_dict[temp_column]/from_intensity
-                    else:
-                        temp_DataFrame.at[series.name,temp_column]=-from_intensity/intensity_dict[temp_column]
-                #plb edit 2-6-2022
-                #i dont think that we will ever see key errors at this point
-                #because every sod has a distribution because data come form carrot
-                #i think that this applies to all key errors here
-                except KeyError:
-                    temp_DataFrame.at[series.name,temp_column]=-np.inf
-
-        except KeyError:
-            for temp_column in temp_DataFrame.columns:
-                #if we are on a diagonal
-                if index == temp_column:
-                    temp_DataFrame.at[series.name,temp_column]=np.nan
-                    continue
-                try:
-                    if (intensity_dict[temp_column]):
-                        temp_DataFrame.at[series.name,temp_column]=np.inf
-                except KeyError:
-                    continue
+        from_distribution=distribution_dict[series.name]
+        for temp_column in temp_DataFrame.columns:
+            #if we are on a diagonal
+            if index == temp_column:
+                temp_DataFrame.at[series.name,temp_column]=np.nan
+                continue
+            else:
+                #placeholder while scipy is down
+                temp_DataFrame.at[series.name,temp_column]=1
 
     return temp_DataFrame
 
 
-def calculate_all_fold_change_matrices_trip(temp_panda,fold_change_type):
+def calculate_all_signifigance_matrices_trip(temp_panda,signifigance_type):
     '''
+    asdf
     '''
 
     temp_organ_species_disease_tuple_list=organ_species_disease_tuple_list
 
-    temp_panda['fold_change_'+fold_change_type]='pre_analysis'
+    temp_panda['signifigance_'+signifigance_type]='pre_analysis'
 
     #we use multiindex so that we can do cute things switching the ordering later
     my_MultiIndex=pandas.MultiIndex.from_tuples(tuples=temp_organ_species_disease_tuple_list,sortorder=None,names=['organ','species','disease'])
@@ -99,7 +62,7 @@ def calculate_all_fold_change_matrices_trip(temp_panda,fold_change_type):
         #we print merely to see how long this is taking
         print(index)
         print(series['name'])
-        temp_panda.at[index,'fold_change_'+fold_change_type]=calculate_one_fold_change_matrix_trip(series,my_MultiIndex,fold_change_type)    
+        temp_panda.at[index,'signifigance_'+signifigance_type]=calculate_one_signifigance_matrix_trip(series,my_MultiIndex,signifigance_type)    
 
     return temp_panda
 
@@ -112,10 +75,10 @@ if __name__ == "__main__":
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
-    output_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/')
-    os.system('touch ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/dummy.txt')
+    input_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    output_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/dummy.txt')
 
     input_panda=pandas.read_pickle(input_panda_address)
     print(input_panda)
@@ -135,7 +98,7 @@ if __name__ == "__main__":
     
     ####
     #num_processes = multiprocessing.cpu_count()
-    temp_fold_change_type='total_intensity'
+    temp_signifigance_type='mannwhitney'
     num_processes=cores_available
     chunk_size = len(input_panda.index)//num_processes
     panda_chunks=list()
@@ -147,8 +110,8 @@ if __name__ == "__main__":
     print(panda_chunks)
     hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
-    transformed_chunks=pool.starmap(calculate_all_fold_change_matrices_trip,temp_iterable)
+    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type)))
+    transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
     #recombine_chunks
     pool.close()
     pool.join()
@@ -156,11 +119,10 @@ if __name__ == "__main__":
         input_panda.loc[transformed_chunks[i].index]=transformed_chunks[i]
     input_panda=pandas.concat(transformed_chunks)
     ####
-
 
     ####
     #num_processes = multiprocessing.cpu_count()
-    temp_fold_change_type='median_intensity'
+    temp_signifigance_type='welch'
     num_processes=cores_available
     chunk_size = len(input_panda.index)//num_processes
     panda_chunks=list()
@@ -172,8 +134,8 @@ if __name__ == "__main__":
     print(panda_chunks)
     hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
-    transformed_chunks=pool.starmap(calculate_all_fold_change_matrices_trip,temp_iterable)
+    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type)))
+    transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
     #recombine_chunks
     pool.close()
     pool.join()
@@ -181,6 +143,7 @@ if __name__ == "__main__":
         input_panda.loc[transformed_chunks[i].index]=transformed_chunks[i]
     input_panda=pandas.concat(transformed_chunks)
     ####
+
 
 
     #output as pickle
