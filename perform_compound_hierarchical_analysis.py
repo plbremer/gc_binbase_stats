@@ -46,16 +46,6 @@ def recursively_calculate_fold_matrices(temp_nx,bottom_node):
     current_predecessor_iterator=temp_nx.predecessors(bottom_node)
     current_predecessor_list=list(current_predecessor_iterator)
 
-    '''
-    predecessors_all_have_fold_matrices=True
-    for predecessor in current_predecessor_iterator:
-        try:
-            temp_nx.nodes[predecessor]['fold_change_matrix']
-        except KeyError:
-            predecessors_all_have_fold_matrices=False
-    '''
-    #print(list(current_predecessor_iterator))
-    #hold=input('pre separate predecessors')
     predecessors_with_fold_matrices=list()
     predecessors_without_fold_matrices=list()
     for predecessor in current_predecessor_list:
@@ -65,109 +55,17 @@ def recursively_calculate_fold_matrices(temp_nx,bottom_node):
                 predecessors_with_fold_matrices.append(predecessor)
         except KeyError:
             predecessors_without_fold_matrices.append(predecessor)
-    #print(predecessors_with_fold_matrices)
-    #print(predecessors_without_fold_matrices)
-    #hold=input('post separate predacessors')
 
-    #if predecessors_all_have_fold_matrices:
     if len(predecessors_without_fold_matrices) == 0:
-        #print('we found a base case')
-        #print(predecessors_with_fold_matrices)
-        #print(predecessors_without_fold_matrices)
-        #print(current_predecessor_list)
-        #hold=input('we found a base case')
         calculate_combined_fold_change_matrix_vectorized(temp_nx,current_predecessor_list,bottom_node)
         return
     else:
         #recursively calculate fold change matrices for subgraph for each predecessor in without
-        #print('we found a recursive case')
-        #print(predecessors_with_fold_matrices)
-        #print(predecessors_without_fold_matrices)
-        #print(current_predecessor_list)
-        #hold=input('we found a recursive case')
         for temp_predecessor in predecessors_without_fold_matrices:
             recursively_calculate_fold_matrices(temp_nx,temp_predecessor)
         #calculate combined fold change matrix with all predacessors (which, after  the above, will be both lists)
         calculate_combined_fold_change_matrix_vectorized(temp_nx,current_predecessor_list,bottom_node)
         return
-        
-        #for temp predecessor in list of predecessors
-        #calculate combined matrix (recursively calulate combined fold matrix (temp predacessor))
-
-#perform fold change matrix analysis
-def calculate_combined_fold_change_matrix(temp_nx,temp_predecessor_list,temp_bottom_node):
-    #hyperparameters that we currently have as (implicitly by the way this is coded)
-    ##average or lowest -> lowest
-    ##how many exceptions -> no exceptions
-
-    temp_MultiIndex=temp_nx.nodes[temp_predecessor_list[0]]['fold_change_matrix'].columns
-    temp_DataFrame=pandas.DataFrame(data=np.nan,index=temp_MultiIndex,columns=temp_MultiIndex)
-    print(temp_DataFrame)
-    #hold=input('check test just after creation')
-
-    predecessor_fold_matrices=[temp_nx.nodes[temp_predecessor]['fold_change_matrix'] for temp_predecessor in temp_predecessor_list]
-
-    all_predecessors_concatenated_DataFrame=pandas.concat(
-        objs=predecessor_fold_matrices,
-        keys=range(0,len(temp_predecessor_list))
-        )
-
-    #print(temp_DataFrame)
-    print(all_predecessors_concatenated_DataFrame)
-    hold=input('check form of dataframe')
-
-    for index, series in temp_DataFrame.iterrows():
-        print(index)
-        for temp_column in temp_DataFrame.columns:
-            #print(series)
-            #print(index)
-            #print(temp_column)
-            
-            one_cell_slice=all_predecessors_concatenated_DataFrame.xs(
-                key=(index[0],index[1],index[2]),
-                level=(1,2,3)
-            )[temp_column]
-            print(one_cell_slice.values)
-            #print(one_cell_slice.isnull())
-            #print(one_cell_slice.isnull().values)
-            #print(one_cell_slice.isnull().values.any())
-            #hold=input('logc check')
-
-            
-             
-            if one_cell_slice.isnull().values.any():
-                temp_DataFrame.at[series.name,temp_column]=np.nan
-                #temp_DataFrame.at[series.name,temp_column]='hello'
-            elif all(one_cell_slice==np.inf):
-                temp_DataFrame.at[series.name,temp_column]=np.inf
-            elif all(one_cell_slice==-np.inf):
-                temp_DataFrame.at[series.name,temp_column]=-np.inf
-            elif any(one_cell_slice<0) and any(one_cell_slice>0):
-                temp_DataFrame.at[series.name,temp_column]=0
-            elif any(one_cell_slice==0):
-                temp_DataFrame.at[series.name,temp_column]=0
-            elif all(one_cell_slice>0):
-                temp_DataFrame.at[series.name,temp_column]=min(one_cell_slice)
-            elif all(one_cell_slice<0):
-                temp_DataFrame.at[series.name,temp_column]=max(one_cell_slice)
-            else:
-                hold=input('something is wrong - fold matrix malformed')
-
-            #print(temp_DataFrame.at[series.name,temp_column])
-            #hold=input('working on multislice')
-
-    #        slice_across_all_predacessors_one_cell=
-    
-    #print(all_predecessors_concatenated_DataFrame)
-    #print(temp_DataFrame)
-    #print(temp_nx.nodes[temp_bottom_node]['name'])
-    #hold=input('check combination dataframe')    
-    
-    temp_nx.nodes[temp_bottom_node]['fold_change_matrix']=temp_DataFrame
-    temp_nx.nodes[temp_bottom_node]['type_of_node']='combination'
-    
-
-    #indices of the min value of all
 
 def visualize_added_classes(temp_nx):
     '''
@@ -204,18 +102,7 @@ def write_each_compound_fold_change_matrix_to_file(temp_nx,temp_address_base):
     for temp_node in temp_nx.nodes:
         temp_nx.nodes[temp_node]['fold_change_matrix'].to_pickle(total_address+str(temp_node)+'.bin')
 
-
-
-
-
-
-
-
 def one_cell_transform(temp_cell):
-
-    #print(temp_cell)
-    #print(temp_cell.values)
-    #print(np.isnan(temp_cell.values).any())
     conditions=[
         np.isnan(temp_cell.values).any(),
         all(temp_cell==np.inf),
@@ -235,44 +122,11 @@ def one_cell_transform(temp_cell):
         min(temp_cell),
         max(temp_cell)
     ]
-    #print(np.select(conditions,choices))
-    #hold=input('one')
 
     return np.select(conditions,choices)
 
-
-
-
 def one_column_custom_aggregation(temp_column):
-    #print('hi')
-    #print('bye')
-    #hold=input('temp colum')
-    #print(temp_column.groupby(level=('organ','species','disease')).agg(func=one_cell_transform))
-    #hold=input('temp column grouped')
-    #print(temp_column.name)
-
     return temp_column.groupby(level=('organ','species','disease')).agg(func=one_cell_transform)
-    '''
-    conditions=[
-        temp_column.groupby(level=('organ','species','disease')).values.isnull().any(),
-        all(temp_column.groupby(level=('organ','species','disease'))==np.inf),
-        all(temp_column.groupby(level=('organ','species','disease'))==-np.inf),
-        any(temp_column.groupby(level=('organ','species','disease'))<0) and any(temp_column.groupby(level=('organ','species','disease'))>0),
-        any(temp_column.groupby(level=('organ','species','disease'))==0),
-        all(temp_column.groupby(level=('organ','species','disease'))>0),
-        all(temp_column.groupby(level=('organ','species','disease'))<0)
-    ]
-
-    choices=[
-        np.nan,
-        np.inf,
-        -np.inf,
-        0,
-        0,
-        min(temp_column.groupby(level=('organ','species','disease'))),
-        max(temp_column.groupby(level=('organ','species','disease')))
-    ]
-    '''
     
 
 #perform fold change matrix analysis
@@ -284,9 +138,6 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
     temp_MultiIndex=temp_nx.nodes[temp_predecessor_list[0]]['fold_change_matrix'].columns
     temp_DataFrame=pandas.DataFrame(data=np.nan,index=temp_MultiIndex,columns=temp_MultiIndex)
     print(temp_bottom_node)
-    #print(temp_predecessor_list)
-    #print(temp_DataFrame)
-    #hold=input('check test just after creation')
 
     #if there is only one predecessor, then we dont need to calculate anything, just copy and return
     if len(temp_predecessor_list)==1:
@@ -294,10 +145,7 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
         temp_nx.nodes[temp_bottom_node]['type_of_node']='combination'
         return
 
-
-
     predecessor_fold_matrices=[temp_nx.nodes[temp_predecessor]['fold_change_matrix'] for temp_predecessor in temp_predecessor_list]
-
 
     all_predecessors_concatenated_DataFrame=pandas.concat(
         objs=predecessor_fold_matrices,
@@ -306,9 +154,6 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
 
     #if the enitre predecessor list is nan or 0 then there is no meaningful information
     #makethe next one entirely np.nan and return
-    #print(all_predecessors_concatenated_DataFrame.apply(pandas.Series.value_counts).index.to_list())
-    #print([True if temp in [np.nan, 0] else False for temp in all_predecessors_concatenated_DataFrame.apply(pandas.Series.value_counts).index.to_list()])
-    #hold=input('hodl')
     
     if all([True if temp in [np.nan, 0] else False for temp in all_predecessors_concatenated_DataFrame.apply(pandas.Series.value_counts).index.to_list()]):
         #hold=input('here')
@@ -317,35 +162,6 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
         temp_nx.nodes[temp_bottom_node]['type_of_node']='combination'
         return
 
-
-    #print(all_predecessors_concatenated_DataFrame)
-    #hold=input('better not be length one')
-    #print(temp_DataFrame)
-    #print(all_predecessors_concatenated_DataFrame)
-    #hold=input('check form of dataframe')
-
-    '''
-    conditions=[
-        all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3)).isnull().values.any(),
-        all(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3)))==np.inf,
-        all(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3)))==-np.inf,
-        any((all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3)))<0) and any((all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3)))>0),
-        any(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3))==0),
-        all(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3))>0),
-        all(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3))<0)
-    ]
-
-    choices=[
-        np.nan,
-        np.inf,
-        -np.inf,
-        0,
-        0,
-        min(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3))),
-        max(all_predecessors_concatenated_DataFrame.xs(key=(index[0],index[1],index[2]),level=(1,2,3)))
-    ]
-    '''
-    
     num_processes=cores_available
     #num_processes = multiprocessing.cpu_count()
     chunk_size = len(all_predecessors_concatenated_DataFrame.columns)//num_processes
@@ -366,32 +182,15 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
             temp_DataFrame.iloc[:,i*chunk_size:(i+1)*chunk_size]=transformed_chunks[i]
         elif i==(num_processes-1):
             temp_DataFrame.iloc[:,i*chunk_size:]=transformed_chunks[i]
-    #temp_DataFrame=pandas.concat(transformed_chunks)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    #temp_DataFrame=all_predecessors_concatenated_DataFrame.agg(func=one_column_custom_aggregation)
-
-    #print(temp_DataFrame)
-    #hold=input('did agg')
-    #temp_DataFrame=np.select(conditions,choices)
     
     temp_nx.nodes[temp_bottom_node]['fold_change_matrix']=temp_DataFrame
     temp_nx.nodes[temp_bottom_node]['type_of_node']='combination'
-    
-
-    #indices of the min value of all
-
 
 
 if __name__ == "__main__":
     
+    hold=input('step_8 hold')
+
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
     #min_fold_change=snakemake.params.min_fold_change

@@ -110,6 +110,8 @@ if __name__ == "__main__":
     os.system('touch ../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/dummy.txt')
 
     #read in things or make the species network from databse
+    #plb edit 2-6-2022
+    #even tho we added a signifigance testing step, we only get the species form step six, so we can leave "step_6" above alone
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
     total_ncbi_networkx = metagenompy.generate_taxonomy_network(auto_download=True)
     species_taxid_panda=pandas.read_pickle(input_mapping_panda_address)

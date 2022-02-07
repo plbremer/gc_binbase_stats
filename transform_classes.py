@@ -14,12 +14,17 @@ import os
 
 #the general logic for this is like other transforms - check a mapping.txt and replace
 
+#if the bin did not have an inchikey identity, then the classes are all "pre_curation_file"
+
 def print_bin_information_for_classes_curated(temp_panda):
     '''
     this prints the id and inchikey_curated for creation of the curated_class transform mapping.tsv
     '''
     pandas.options.display.max_rows=10000
-    print(temp_panda.loc[(temp_panda['inchikey_curated']!='@@@@@@@') & (temp_panda['inchikey_curated']!='pre_curation_file') ][['id','inchikey_curated']])
+    #plb update 2-6-2022
+    #we now want the pipeline to handle unknown compounds, so we print things where the inchikey curated is "junk"
+    #print(temp_panda.loc[(temp_panda['inchikey_curated']!='@@@@@@@') & (temp_panda['inchikey_curated']!='pre_curation_file') ][['id','inchikey_curated']])
+    print(temp_panda[['id','inchikey_curated']])
     pandas.reset_option('display.max_rows')
 
 def update_curated_classes_from_mapping(temp_panda, temp_class_mapping_address):
@@ -89,5 +94,6 @@ if __name__ == "__main__":
     #in this way, each class could be added to the compound hierarchy#
     ###############################################
     ###############################################
+
 
     initial_panda.to_pickle(output_pickle_address)

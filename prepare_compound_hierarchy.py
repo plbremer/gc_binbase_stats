@@ -105,7 +105,13 @@ def add_one_node_to_classyfire_network(temp_nx,temp_bin,temp_class_to_node_dict)
     current_bin_name=temp_bin['deepest_class']
 
     #get the name of the node that this bin will connect to
-    node_to_connect_to=temp_class_to_node_dict[current_bin_name]
+    #plb 2-6-2022
+    #basically, if the compound is unknown, then we connect directly to the root node
+    try:
+        node_to_connect_to=temp_class_to_node_dict[current_bin_name]
+    except KeyError:
+        node_to_connect_to='CHEMONTID:9999999'
+
 
     #hold=input('first prints')
     #add this bin as a node in the network
@@ -113,9 +119,12 @@ def add_one_node_to_classyfire_network(temp_nx,temp_bin,temp_class_to_node_dict)
     temp_nx.add_node(
         int(temp_bin['id']),
         inchikey=temp_bin['inchikey'],
-        fold_change_matrix=temp_bin['fold_change_matrix'],
         type_of_node='from_binvestigate',
-        common_name=temp_bin['name']
+        common_name=temp_bin['name'],
+        fold_change_matrix_average=temp_bin['fold_change_total_intensity'],
+        fold_change_matrix_median=temp_bin['fold_change_median_intensity'],
+        signifigance_matrix_mannwhitney=temp_bin['signifigance_mannwhitney'],
+        signifigance_matrix_welch=temp_bin['signifigance_welch']
     )
 
     #add a connection between the added node and the class that it is most specifically
@@ -139,11 +148,10 @@ def visualize_added_classes(temp_nx,temp_original_classyfire_nodecount):
 
 if __name__ == "__main__":
     
-    
     #min_fold_change=10
     min_fold_change=sys.argv[1]
     obo_file_address='../resources/classyfire_files/ChemOnt_2_1.obo'
-    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
     output_file_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/dummy.txt')
@@ -186,4 +194,5 @@ if __name__ == "__main__":
     #nx.draw(parsed_obo)
     #plt.show()    
     #visualize_added_classes(parsed_obo,original_classyfire_node_count)
+    #hold=input('hold again')
     nx.readwrite.gpickle.write_gpickle(parsed_obo,output_file_address)
