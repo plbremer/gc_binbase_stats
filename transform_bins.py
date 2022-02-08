@@ -133,19 +133,27 @@ def transform_count_column(temp_bin_panda,temp_count_cutoff):
     '''
 
     for bin_index, bin_series in temp_bin_panda.iterrows():
-        #print(bin_index)
+        print(bin_index)
         indices_to_drop=[i for i in range(0,len(bin_series['count'])) if bin_series['count'][i] < temp_count_cutoff]
         species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
         organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
-        intensity_list_with_indices_removed=list(np.delete(bin_series['intensity'],indices_to_drop))
         count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
         special_property_list_with_indices_removed=list(np.delete(bin_series['special_property_list'],indices_to_drop))
+        total_intensity_list_with_indices_removed=list(np.delete(bin_series['total_intensity'],indices_to_drop))
+        median_intensity_list_with_indices_removed=list(np.delete(bin_series['median_intensity'],indices_to_drop))
+        #without the typecast
+        #VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated.
+        annotation_distribution_list_with_indices_removed=list(np.delete(np.array(bin_series['annotation_distribution'],dtype=object),indices_to_drop))
 
         temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
         temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
-        temp_bin_panda.at[bin_index,'intensity']=intensity_list_with_indices_removed
         temp_bin_panda.at[bin_index,'count']=count_list_with_indices_removed
         temp_bin_panda.at[bin_index,'special_property_list']=special_property_list_with_indices_removed
+        temp_bin_panda.at[bin_index,'total_intensity']=total_intensity_list_with_indices_removed
+        temp_bin_panda.at[bin_index,'median_intensity']=median_intensity_list_with_indices_removed
+        temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
+
+    hold=input('hold')
 
 def transform_intensity_column(temp_bin_panda):
     '''
@@ -269,6 +277,7 @@ def aggregate_redundancies(temp_panda):
 if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
+    count_cutoff=int(sys.argv[2])
     initial_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
     inchikey_mapping_address='../resources/species_organ_maps/inchikey_mapping.txt'
     output_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
@@ -307,16 +316,6 @@ if __name__ == "__main__":
     #so we do not do this as a way to avoid surprising results
     #transform_intensity_column(initial_panda)
 
-    #like the species and the organs, we remove from the quadruplet (species, organ, intensity, count)
-    #if there are fewer samples than the cutoff that we specify (cant trust numbers from 1 sample)
-    #note that there are no transforms in this one, only removals
-    #we assign count_cutoff to be zero to make it so that all triplets are kept
-    #update 2-5-2022 plb 
-    #since we get data from carrot, at this point there should be no counts of zero
-    #so we do not do this as a way to avoid surprising result
-    #count_cutoff=0
-    #transform_count_column(initial_panda,count_cutoff)
-
     #The purpose of this function is to aggregate redundancies after the transforms.
     #redundancies are "multiple intensity values" that have the "same organ and same species"
     #this can occur, for example, after rattus+rattisimus,liver and rattus,liver both become rattus,liver
@@ -324,6 +323,20 @@ if __name__ == "__main__":
     #update 2-5-2022 plb 
     #redid this function
     aggregate_redundancies(initial_panda)
+
+    #like the species and the organs, we remove from the quadruplet (species, organ, intensity, count)
+    #if there are fewer samples than the cutoff that we specify (cant trust numbers from 1 sample)
+    #note that there are no transforms in this one, only removals
+    #we assign count_cutoff to be zero to make it so that all triplets are kept
+    #update 2-5-2022 plb 
+    #since we get data from carrot, at this point there should be no counts of zero
+    #so we do not do this as a way to avoid surprising result
+    #update 2-7-2022 plb
+    #we actually readded this because the statistical tests will need to have a minimum amount of samples
+    #to be valid. 
+    #in order to try to preserve what we can, we do the drop after we aggregate, so this was moved to below
+    #aggregate_redundancies
+    transform_count_column(initial_panda,count_cutoff)
 
     #when calling rest binvestigate, the intensites are aggregates, whereas the GUI renderings are averages
     #so we must make this conversion manaully

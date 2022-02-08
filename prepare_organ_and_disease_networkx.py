@@ -140,6 +140,8 @@ def contract_irrelevant_nodes(temp_nx,temp_binvestigate_entries_set):
 
 
 if __name__ == "__main__":
+    
+    hold=input('hold step 12')
     min_fold_change=sys.argv[1]
     #min_fold_change=10
     #'+str(min_fold_change)+'
