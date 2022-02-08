@@ -114,6 +114,17 @@ def visualize_added_classes(temp_nx):
 
 if __name__ == "__main__":
     
+    #plb 2-7-2022
+    ##honestly, this doesnt do anything, so we are going to defer reworking it
+    #as a note for later, basically will need to replace places with "fold matrix"
+    #with some sort of temp_matrix that iterates over matrices_to_compute
+    
+    matrices_to_compute=[
+        'fold_change_matrix_average',
+        'fold_change_matrix_median',
+        'signifigance_matrix_mannwhitney',
+        'signifigance_matrix_welch'
+    ]
     min_fold_change=int(sys.argv[1] )
     predecessor_count =int(sys.argv[2])
     fold_number=int(sys.argv[3])
@@ -148,12 +159,15 @@ if __name__ == "__main__":
 
     #same as above but have greater than x non null, over y fold absolute value, with z contributors
 
+    #plb 2-7-2022
+    #commented out to move forward for qe
+    # assign_combination_success_status(
+    #     compound_network,
+    #     predecessor_count,
+    #     fold_number,
+    #     count_meeting_fold_number,
+    #     matrix_type
+    # )
 
-    assign_combination_success_status(
-        compound_network,
-        predecessor_count,
-        fold_number,
-        count_meeting_fold_number
-    )
-
-    visualize_added_classes(compound_network)
+    # visualize_added_classes(compound_network)
+    #hold=input('step 9 hold')

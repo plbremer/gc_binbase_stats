@@ -18,7 +18,7 @@ def show_all_organ_species_disease_triplets(temp_panda):
     return set_of_organ_species_disease_tuples
 
 
-def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance):
+def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance_type):
     '''
     asdf
     '''
@@ -31,17 +31,44 @@ def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance
     #we iterate through the rows in the fold change matrix
     #we couldnt do neat .apply or other vectorized approaches because the data required
     #were in lists for each bin (series)
-    for index,series in temp_DataFrame.iterrows():
+    #plb edit 2-7-2022
+    #we put the if statement on the outside so we do it once not 1 billion times
+    if signifigance_type=='mannwhitney':
+        for index,series in temp_DataFrame.iterrows():
+            from_distribution=distribution_dict[series.name]
+            for temp_column in temp_DataFrame.columns:
+                #if we are on a diagonal
+                if index == temp_column:
+                    temp_DataFrame.at[series.name,temp_column]=np.nan
+                    continue
+                else:
+                    #placeholder while scipy is down
+                    _,p=scipy.stats.mannwhitneyu(from_distribution,distribution_dict[temp_column],use_continuity=False,alternative='two-sided')
+                    temp_DataFrame.at[series.name,temp_column]=p
+    elif signifigance_type=='welch':
+        for index,series in temp_DataFrame.iterrows():
+            from_distribution=distribution_dict[series.name]
+            for temp_column in temp_DataFrame.columns:
+                #if we are on a diagonal
+                if index == temp_column:
+                    temp_DataFrame.at[series.name,temp_column]=np.nan
+                    continue
+                else:
+                    #placeholder while scipy is down
+                    _,p=scipy.stats.ttest_ind(from_distribution,distribution_dict[temp_column],equal_var=False,alternative='two-sided')
+                    temp_DataFrame.at[series.name,temp_column]=p
+    
+    #plb 2-7-2022
+    #some of these things are so signifigant that they are numerically incalculable
+    #like, the p value is zero
+    #therefore, we impute the min p value for that dataframe
+    temp=temp_DataFrame.stack().stack().stack()
+    impute_value=temp.loc[temp != 0].min()
+    temp_DataFrame=temp_DataFrame.applymap(lambda x: impute_value if x==0 else x)
+    #print(0 in temp_DataFrame.values)
 
-        from_distribution=distribution_dict[series.name]
-        for temp_column in temp_DataFrame.columns:
-            #if we are on a diagonal
-            if index == temp_column:
-                temp_DataFrame.at[series.name,temp_column]=np.nan
-                continue
-            else:
-                #placeholder while scipy is down
-                temp_DataFrame.at[series.name,temp_column]=1
+
+
 
     return temp_DataFrame
 
