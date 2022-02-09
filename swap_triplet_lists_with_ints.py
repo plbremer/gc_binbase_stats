@@ -20,6 +20,15 @@ def swap_one_results_panda_keys(temp_panda_address_list):
 
 if __name__=="__main__":
 
+    matrices_to_compute=[
+        'fold_change_matrix_average',
+        'fold_change_matrix_median',
+        'signifigance_matrix_mannwhitney',
+        'signifigance_matrix_welch'
+    ]
+
+
+    hold=input('step 20b hold')
     min_fold_change=sys.argv[1]
     num_processes=int(sys.argv[2])
     print(num_processes)
@@ -54,30 +63,35 @@ if __name__=="__main__":
     step_17_panda.to_pickle(step_17_panda_address)
 
     #go to the stp 18 pandas and swap the triplet lists with the integer
-    table_18_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/'
-    simple_file_list=os.listdir(table_18_base_address)
-    simple_file_list.remove('dummy.txt')
-    file_list=[table_18_base_address+i for i in simple_file_list]
+    
+    for temp_matrix_type in matrices_to_compute:
+        table_18_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/all_matrices/'+temp_matrix_type+'/'
+        simple_file_list=os.listdir(table_18_base_address)
+        print(simple_file_list)
+        hold=input('hold')
+        #since multiple matrix types, we no longer put in same directory as dummy
+        #simple_file_list.remove('dummy.txt')
+        file_list=[table_18_base_address+i for i in simple_file_list]
 
 
-    chunk_size=len(file_list)//num_processes
-    file_list_list=list()
-    for i in range(num_processes):
-        if i< num_processes-1:
-            file_list_list.append(file_list[i*chunk_size:(i+1)*chunk_size])
-        elif i ==(num_processes-1):
-            file_list_list.append(file_list[i*chunk_size:])
+        chunk_size=len(file_list)//num_processes
+        file_list_list=list()
+        for i in range(num_processes):
+            if i< num_processes-1:
+                file_list_list.append(file_list[i*chunk_size:(i+1)*chunk_size])
+            elif i ==(num_processes-1):
+                file_list_list.append(file_list[i*chunk_size:])
 
-    pool = multiprocessing.Pool(processes=num_processes)
-    #transformed_chunks=
-    pool.map(swap_one_results_panda_keys,file_list_list)
-    #transform_organ_column(post_species_transform_panda)
-    #recombine_chunks
-    #for i in range(len(transformed_chunks)):
-    #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
-    #post_species_transform_panda=pd.concat(transformed_chunks)
+        pool = multiprocessing.Pool(processes=num_processes)
+        #transformed_chunks=
+        pool.map(swap_one_results_panda_keys,file_list_list)
+        #transform_organ_column(post_species_transform_panda)
+        #recombine_chunks
+        #for i in range(len(transformed_chunks)):
+        #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
+        #post_species_transform_panda=pd.concat(transformed_chunks)
 
-    pool.close()
+        pool.close()
 
 
 

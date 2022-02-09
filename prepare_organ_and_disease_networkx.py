@@ -141,7 +141,7 @@ def contract_irrelevant_nodes(temp_nx,temp_binvestigate_entries_set):
 
 if __name__ == "__main__":
     
-    hold=input('hold step 12')
+    
     min_fold_change=sys.argv[1]
     #min_fold_change=10
     #'+str(min_fold_change)+'
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     organ_networkx.add_edges_from(temp_organ_edges)
     #visualize
     prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
-   
+    
 
 
 

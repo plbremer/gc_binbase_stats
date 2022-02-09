@@ -4,6 +4,7 @@ import time
 import os
 import sys
 import multiprocessing
+from itertools import repeat
 
 def extract_from_and_to_sets(temp_panda):
     from_list=temp_panda.loc[temp_panda['from_to']=='from']['triplets'].to_list()
@@ -11,79 +12,95 @@ def extract_from_and_to_sets(temp_panda):
 
     return from_list,to_list
 
-def one_df_transform(temp_df):
+def one_df_transform_fold(temp_df):
     '''
     given an numpy array, chooses what the aggregate value is
     '''
     conditions=[
-        np.isnan(temp_df).any(),
-        (temp_df==np.inf).all(),
-        (temp_df==-np.inf).all(),
+        #np.isnan(temp_df).any(),
+        #(temp_df==np.inf).all(),
+        #(temp_df==-np.inf).all(),
         (temp_df<0).any() and (temp_df>0).any(),
-        (temp_df==0).any(),
+        #(temp_df==0).any(),
         (temp_df>0).all(),
         (temp_df<0).all()
     ]
     
     choices=[
-        np.nan,
-        np.inf,
-        -np.inf,
+        #np.nan,
+        #np.inf,
+        #-np.inf,
         0,
-        0,
+        #0,
         temp_df.min(),
         temp_df.max()
     ]
     return float(np.select(conditions,choices))
 
 
-def prepare_list_of_results(temp_triplet_panda,temp_fold_panda):
+def one_df_transform_sig(temp_df):
+    '''
+    given an numpy array, chooses what the aggregate value is
+    '''
+    conditions=[
+        #np.isnan(temp_df).any(),
+        #(temp_df==np.inf).all(),
+        #(temp_df==-np.inf).all(),
+        #(temp_df<0).any() and (temp_df>0).any(),
+        #(temp_df==0).any(),
+        (temp_df>0).all()
+        #(temp_df<0).all()
+    ]
+    
+    choices=[
+        #np.nan,
+        #np.inf,
+        #-np.inf,
+        #0,
+        #0,
+        #temp_df.min(),
+        temp_df.max()
+    ]
+    return float(np.select(conditions,choices))
 
-
+def prepare_list_of_results(temp_triplet_panda,temp_fold_panda,temp_matrix_type):
 
     from_list=temp_triplet_panda['from'].to_list()
-
     to_list=temp_triplet_panda['to'].to_list()
-
     temp_results_list=list()
-
-
     current_from_triplets=from_list[0]
     temp_view=temp_fold_panda.loc[temp_fold_panda.index.isin(current_from_triplets),:]
-    for i in range(len(from_list)):
 
-        #if (i%1000==0):
-        #    print(i)
-        ##print(temp_view)
-
-        if (from_list[i] != current_from_triplets):
-            current_from_triplets=from_list[i]
-            temp_view=temp_fold_panda.loc[temp_fold_panda.index.isin(current_from_triplets),:]
-
-        temp_temp_view=temp_view.loc[:,temp_fold_panda.columns.isin(to_list[i])]
-        ##print(temp_temp_view)
-        ##print(one_df_transform(temp_temp_view.values))
-        ##hold=input('hold')
-
-        temp_results_list.append(one_df_transform(temp_temp_view.values))
-        
+    if 'fold' in temp_matrix_type:
+        for i in range(len(from_list)):
+            if (from_list[i] != current_from_triplets):
+                current_from_triplets=from_list[i]
+                temp_view=temp_fold_panda.loc[temp_fold_panda.index.isin(current_from_triplets),:]
+            temp_temp_view=temp_view.loc[:,temp_fold_panda.columns.isin(to_list[i])]
+            temp_results_list.append(one_df_transform_fold(temp_temp_view.values))
+    elif 'signifigance' in temp_matrix_type:
+        for i in range(len(from_list)):
+            if (from_list[i] != current_from_triplets):
+                current_from_triplets=from_list[i]
+                temp_view=temp_fold_panda.loc[temp_fold_panda.index.isin(current_from_triplets),:]
+            temp_temp_view=temp_view.loc[:,temp_fold_panda.columns.isin(to_list[i])]
+            temp_results_list.append(one_df_transform_sig(temp_temp_view.values))
 
     return temp_results_list
 
 
-def perform_fold_analysis(temp_file_list):
+def perform_fold_analysis(temp_file_list,temp_matrix_type):
     for temp_file in temp_file_list:
         start_time=time.time()
         
         #put here because we rename columns at the end of the loop
         triplet_panda=pandas.read_pickle(input_triplet_panda_address)
         
-        input_fold_panda_address=input_base_address+temp_file
-        input_fold_panda=pandas.read_pickle(input_fold_panda_address)
+        input_panda_address=input_base_address+temp_file
+        input_panda=pandas.read_pickle(input_panda_address)
         output_address=output_base_address+'calc_results_'+temp_file
 
-
-        results_list=prepare_list_of_results(triplet_panda,input_fold_panda)
+        results_list=prepare_list_of_results(triplet_panda,input_panda,temp_matrix_type)
         triplet_panda['results']=results_list
         #print(triplet_panda)
         #print(triplet_panda['results'].value_counts())
@@ -116,63 +133,62 @@ def perform_fold_analysis(temp_file_list):
 
 if __name__ == "__main__":
 
-
+    hold=input('step 18 hold')
     min_fold_change=sys.argv[1]
     num_processes=int(sys.argv[2])
-    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_18_compute_fold_results/')
+
+
+
     os.system('touch ../results/'+str(min_fold_change)+'/step_18_compute_fold_results/dummy.txt')
 
-
-
-    #start_time=time.time()
-
-    #input_fold_panda_address='../results/1/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/2.bin'
     input_triplet_panda_address='../results/'+str(min_fold_change)+'/step_17_precompute_comparison_triplets/unique_triplets.bin'
-    #output_address='/home/rictuar/delete_test_bin_calc/calculation_results'
 
-    input_base_address='../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/'
-    output_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/'
 
-    file_list=os.listdir('../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/each_compounds_fold_matrix/')
-    print(file_list)
-    hold=input('hold')
+    matrices_to_compute=[
+        'fold_change_matrix_average',
+        'fold_change_matrix_median',
+        'signifigance_matrix_mannwhitney',
+        'signifigance_matrix_welch'
+    ]
+
+
+    for temp_matrix_type in matrices_to_compute:
+        print(temp_matrix_type)
+
+        os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_18_compute_fold_results/all_matrices/'+temp_matrix_type+'/')
+        input_base_address='../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/all_matrices/'+temp_matrix_type+'/'
+        output_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/all_matrices/'+temp_matrix_type+'/'
+        file_list=os.listdir('../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/all_matrices/'+temp_matrix_type+'/')
+
+        #get the list of compounds that we keep
+        compounds_to_keep=pandas.read_csv('../resources/species_organ_maps/networkx_shrink_compound.txt')
+        compounds_to_keep_list=compounds_to_keep['nodes_to_keep'].to_list()
+        shortened_file_list=[i for i in file_list if i[:-4] in compounds_to_keep_list]
+        file_list=shortened_file_list
+        print(file_list)
+
+
+        #print(file_list)
+        #hold=input('hold')
     
-    compounds_to_keep=pandas.read_csv('../resources/species_organ_maps/networkx_shrink_compound.txt')
-    compounds_to_keep_list=compounds_to_keep['nodes_to_keep'].to_list()
-    shortened_file_list=[i for i in file_list if i[:-4] in compounds_to_keep_list]
-    file_list=shortened_file_list
-    #triplet_panda=pandas.read_pickle(input_triplet_panda_address)
-    #input_fold_panda=pandas.read_pickle(input_fold_panda_address)
-    print(file_list)
+        chunk_size=len(file_list)//num_processes
+        file_list_list=list()
+        for i in range(num_processes):
+            if i< num_processes-1:
+                file_list_list.append(file_list[i*chunk_size:(i+1)*chunk_size])
+            elif i ==(num_processes-1):
+                file_list_list.append(file_list[i*chunk_size:])
 
-
-    #print(input_fold_panda)
-    #hold=input('hold')
-
-    
-    chunk_size=len(file_list)//num_processes
-    file_list_list=list()
-    for i in range(num_processes):
-        if i< num_processes-1:
-            file_list_list.append(file_list[i*chunk_size:(i+1)*chunk_size])
-        elif i ==(num_processes-1):
-            file_list_list.append(file_list[i*chunk_size:])
-
-
-    #print(file_list_list)
-    #hold=input('hold')
-
-
-    pool = multiprocessing.Pool(processes=num_processes)
-    #transformed_chunks=
-    pool.map(perform_fold_analysis,file_list_list)
-    #transform_organ_column(post_species_transform_panda)
-    #recombine_chunks
-    #for i in range(len(transformed_chunks)):
-    #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
-    #post_species_transform_panda=pd.concat(transformed_chunks)
-
-    pool.close()
+        temp_iterable=list(zip(file_list_list,repeat(temp_matrix_type)))
+        pool = multiprocessing.Pool(processes=num_processes)
+        #transformed_chunks=
+        pool.starmap(perform_fold_analysis,temp_iterable)
+        #transform_organ_column(post_species_transform_panda)
+        #recombine_chunks
+        #for i in range(len(transformed_chunks)):
+        #    post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
+        #post_species_transform_panda=pd.concat(transformed_chunks)
+        pool.close()
 
 
 

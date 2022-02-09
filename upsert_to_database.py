@@ -6,6 +6,9 @@ from pprint import pprint
 import os
 import sys
 import psycopg2
+import numpy as np
+#https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
+from psycopg2.extensions import register_adapter, AsIs
 
 from sqlalchemy.sql.sqltypes import TEXT
 
@@ -186,14 +189,22 @@ def make_update_table_from_panda(
             if_exists='append'
         )
 
-
-
+#https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
+def adapt_numpy_int64(numpy_int64):
+    return AsIs(numpy_int64)
 
 if __name__ == "__main__":
 
 
 
+    matrices_to_compute=[
+        'fold_change_matrix_average',
+        'fold_change_matrix_median',
+        'signifigance_matrix_mannwhitney',
+        'signifigance_matrix_welch'
+    ]
 
+    hold=input('hold step 22')
 
     min_fold_change=sys.argv[1]
     use_aws=(sys.argv[2])
@@ -273,54 +284,57 @@ if __name__ == "__main__":
 
     print('17 done')    
 
-    table_18_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/'
-    file_list=os.listdir(table_18_base_address)
-    file_list.remove('dummy.txt')
-    print(file_list)
-    #hold=input('hold')
 
-
-
-    for i,temp_file in enumerate(file_list):
-        print(temp_file)
-        #if this is the first "fold result", then we want to 
-        #drop the previous table. otherwise, just append
-        if i == 0:
-            make_update_table_from_panda(
-                table_18_base_address+temp_file,
-                engine,
-                'fold_results',
-                [],
-                ('from_triplets', 'to_triplets', 'compound'),
-                [],
-                True,
-                temp_dtype_dict={
-                    'from_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
-                    'to_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
-                    'compound': postgresql.TEXT,
-                    'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-                },
-                temp_append_antisymmetric_result=18
-            )
-        elif i != 0:
-            make_update_table_from_panda(
-                table_18_base_address+temp_file,
-                engine,
-                'fold_results',
-                [],
-                ('from_triplets', 'to_triplets', 'compound'),
-                [],
-                False,
-                temp_dtype_dict={
-                    'from_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
-                    'to_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
-                    'compound': postgresql.TEXT,
-                    'to_triplets_inter_removed_if_nec': postgresql.FLOAT
-                },
-                temp_append_antisymmetric_result=18
-            )            
-
+    for temp_matrix_type in matrices_to_compute:
+        print(temp_matrix_type)
+        table_18_base_address='../results/'+str(min_fold_change)+'/step_18_compute_fold_results/all_matrices/'+temp_matrix_type+'/'
+        file_list=os.listdir(table_18_base_address)
+        #file_list.remove('dummy.txt')
+        #print(file_list)
+        #hold=input('hold')
+        for i,temp_file in enumerate(file_list):
+            print(temp_file)
+            #if this is the first "fold result", then we want to 
+            #drop the previous table. otherwise, just append
+            if i == 0:
+                make_update_table_from_panda(
+                    table_18_base_address+temp_file,
+                    engine,
+                    'fold_results_'+temp_matrix_type,
+                    [],
+                    ('from_triplets', 'to_triplets', 'compound'),
+                    [],
+                    True,
+                    temp_dtype_dict={
+                        'from_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
+                        'to_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
+                        'compound': postgresql.TEXT,
+                        'to_triplets_inter_removed_if_nec': postgresql.FLOAT
+                    },
+                    temp_append_antisymmetric_result=18
+                )
+            elif i != 0:
+                make_update_table_from_panda(
+                    table_18_base_address+temp_file,
+                    engine,
+                    'fold_results_'+temp_matrix_type,
+                    [],
+                    ('from_triplets', 'to_triplets', 'compound'),
+                    [],
+                    False,
+                    temp_dtype_dict={
+                        'from_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT), 
+                        'to_triplets': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
+                        'compound': postgresql.TEXT,
+                        'to_triplets_inter_removed_if_nec': postgresql.FLOAT
+                    },
+                    temp_append_antisymmetric_result=18
+                )            
     print('18 done')
+
+    #https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
+    register_adapter(np.int64, adapt_numpy_int64)
+
     table_19_address='../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
     make_update_table_from_panda(
         table_19_address,
@@ -360,6 +374,8 @@ if __name__ == "__main__":
     print(file_list)
     #hold=input('hold')
     
+
+
     for temp_file in file_list:
         make_update_table_from_panda(
             table_20_base_address+temp_file,

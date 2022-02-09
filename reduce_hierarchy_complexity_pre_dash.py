@@ -13,7 +13,6 @@ import sys
 
 '''
 The main purpose of this script is to take the four hierarchies and reduce them to somthing human useable
-
 '''
 
 
@@ -151,7 +150,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         temp_panda.to_csv(output_base_address+'compound_list.csv',sep='¬')
         #print(temp_panda)
         ##hold=input('letting you put nodes to keep text file in directory')
-        convert_networkx(temp_nx_address,temp_output_address,True)
+        convert_networkx(temp_nx_address,temp_output_address,True,matrices_to_compute)
 
 
 
@@ -164,7 +163,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         #print(temp_panda)
         temp_panda.to_csv(output_base_address+'species_list.csv',sep='¬')
         ##hold=input('letting you put nodes to keep text file in directory')
-        convert_networkx(temp_nx_address,temp_output_address,False)
+        convert_networkx(temp_nx_address,temp_output_address,False,matrices_to_compute)
 
 
     elif temp_hierarchy_type=='organ':
@@ -176,7 +175,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         #print(temp_panda)
         temp_panda.to_csv(output_base_address+'organ_list.csv',sep='¬')
         ##hold=input('letting you put nodes to keep text file in directory')
-        convert_networkx(temp_nx_address,temp_output_address,False)
+        convert_networkx(temp_nx_address,temp_output_address,False,matrices_to_compute)
 
     elif temp_hierarchy_type=='disease':
         temp_nx=nx.readwrite.gpickle.read_gpickle(temp_nx_address)
@@ -187,7 +186,7 @@ def do_everything(temp_nx_address,temp_node_keep_address,temp_output_address,tem
         #print(temp_panda)
         temp_panda.to_csv(output_base_address+'disease_list.csv',sep='¬')
         ##hold=input('letting you put nodes to keep text file in directory')
-        convert_networkx(temp_nx_address,temp_output_address,False)
+        convert_networkx(temp_nx_address,temp_output_address,False,matrices_to_compute)
 
 
 
@@ -254,6 +253,15 @@ def create_text_for_keep_files(temp_nx,temp_hierarchy_type,set_of_binvestigate_n
 
 if __name__=="__main__":
     
+    #plb 2-8-2022
+    #dont think anything changes here
+
+    matrices_to_compute=[
+        'fold_change_matrix_average',
+        'fold_change_matrix_median',
+        'signifigance_matrix_mannwhitney',
+        'signifigance_matrix_welch'
+    ]
 
     #min_fold_change=int(snakemake.params.min_fold_change)
     min_fold_change=sys.argv[1]
@@ -306,4 +314,9 @@ if __name__=="__main__":
     # print('if you have the reductions that you want already, then you can continue')
     # hold=input('kill now')
     # hold=input('ignoring us, eh?')
-    hold=input('kill before next step starts and perform hierarchy complexity reduction')
+    hold=input('''
+    kill before next step starts and perform hierarchy complexity reduction\n
+    to do this, run the dash app, click on nodes that you dont want
+    they will disappear
+    at the end, copy and paste the list of nodes that you want and those will
+    be the input files''')
