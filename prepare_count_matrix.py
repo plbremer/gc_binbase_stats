@@ -7,6 +7,14 @@ from itertools import chain
 import os
 import sys
 
+#plb 2-8-2022
+#see comments on prepare_count_matrix_2
+#so, basically, what this does is somewhat obsolete
+#but, removing it and reworking the pipeline is a low-priority
+#to verify this, one can crack open the result of step_15 and
+#see that the entries in the amtrix do not depend on compound
+
+
 def prepare_empty_count_panda(temp_triplet_set,temp_nx):
     '''
     Receives a list of triplets and a compound nx and builds something that looks like

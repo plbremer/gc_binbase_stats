@@ -43,6 +43,7 @@ def get_sum_sample_count(temp_sample_count_list):
 
 if __name__ == "__main__":
 
+    hold=input('hold step 19')
     min_fold_change=sys.argv[1]
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/dummy.txt')

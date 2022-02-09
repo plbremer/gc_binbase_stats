@@ -101,7 +101,7 @@ def write_each_compound_fold_change_matrix_to_file(temp_nx,temp_address_base, te
     '''
     '''
     #if you get here then you should can the directory that existed previously
-    total_address=temp_address_base+temp_matrix+'all_matrices/'
+    total_address=temp_address_base+temp_matrix+'/'
     os.system('trash '+total_address)
     os.system('mkdir '+total_address)
 
@@ -266,8 +266,8 @@ if __name__ == "__main__":
     cores_available=int(sys.argv[2])
     input_graph_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     output_graph_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
-    individual_fold_matrix_directory_base='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/'
-    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/each_compounds_fold_matrix/')
+    individual_fold_matrix_directory_base='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/dummy.txt')
 
     #read in network

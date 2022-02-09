@@ -228,6 +228,7 @@ def evaluate_headnode_combinations(temp_species_traversal_list):
 
 if __name__ == "__main__":
 
+    hold=input('step 16 hold')
 
     min_fold_change=sys.argv[1]
     num_processes=int(sys.argv[2])
