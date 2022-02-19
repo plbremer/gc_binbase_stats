@@ -57,17 +57,26 @@ def calculate_one_fold_change_matrix_trip(temp_bin,temp_MultiIndex,fold_change_t
                 if index == temp_column:
                     temp_DataFrame.at[series.name,temp_column]=np.nan
                     continue
-                try:
-                    if intensity_dict[temp_column]>from_intensity:
-                        temp_DataFrame.at[series.name,temp_column]=intensity_dict[temp_column]/from_intensity
-                    else:
-                        temp_DataFrame.at[series.name,temp_column]=-from_intensity/intensity_dict[temp_column]
-                #plb edit 2-6-2022
-                #i dont think that we will ever see key errors at this point
-                #because every sod has a distribution because data come form carrot
-                #i think that this applies to all key errors here
-                except KeyError:
-                    temp_DataFrame.at[series.name,temp_column]=-np.inf
+                
+                #plb edit 2-18-2022
+                #we are going to make this all a lot faster i think and switch to the superior fold change approach
+                #which is simply the log of the dividing
+                #ok after taking a look at this it might not be faster. it could be vectorized fairly easily probably
+                #but i have better things to do
+                else:
+                    temp_DataFrame.at[series.name,temp_column]=np.log2(intensity_dict[temp_column]/from_intensity)
+
+                # try:
+                #     if intensity_dict[temp_column]>from_intensity:
+                #         temp_DataFrame.at[series.name,temp_column]=intensity_dict[temp_column]/from_intensity
+                #     else:
+                #         temp_DataFrame.at[series.name,temp_column]=-from_intensity/intensity_dict[temp_column]
+                # #plb edit 2-6-2022
+                # #i dont think that we will ever see key errors at this point
+                # #because every sod has a distribution because data come form carrot
+                # #i think that this applies to all key errors here
+                # except KeyError:
+                #     temp_DataFrame.at[series.name,temp_column]=-np.inf
 
         except KeyError:
             for temp_column in temp_DataFrame.columns:
@@ -100,6 +109,8 @@ def calculate_all_fold_change_matrices_trip(temp_panda,fold_change_type):
         print(index)
         print(series['name'])
         temp_panda.at[index,'fold_change_'+fold_change_type]=calculate_one_fold_change_matrix_trip(series,my_MultiIndex,fold_change_type)    
+
+
 
     return temp_panda
 

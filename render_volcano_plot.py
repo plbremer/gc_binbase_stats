@@ -42,8 +42,9 @@ def coerce_our_structure_to_plotly_volcano(temp_fold_panda,temp_signifigance_pan
     temp_signifigance_panda=temp_signifigance_panda.drop(['organ_from', 'species_from', 'disease_from','disease_to','species_to','organ_to'],axis='columns')
     temp_signifigance_panda.rename({0:'signifigance'},axis='columns',inplace=True)
 
-
-    temp_fold_panda['fold']=temp_fold_panda['fold'].apply(convert_fold_to_log_fold)
+    #2-18-22 plb
+    ##we used to conver this, but now we are putting this conversion in the original pipeline
+    ##temp_fold_panda['fold']=temp_fold_panda['fold'].apply(convert_fold_to_log_fold)
     temp_fold_panda['signifigance']=temp_signifigance_panda['signifigance']
     #snap from dash plotly docs. idk what it is. something genomics.
     temp_fold_panda['snap']='from: '+temp_fold_panda['from'].astype(str)+' to: '+temp_fold_panda['to'].astype(str)

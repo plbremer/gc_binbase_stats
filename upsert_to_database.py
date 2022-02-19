@@ -78,6 +78,14 @@ def make_update_table_from_panda(
                 [('from_triplets','to_triplets')],
                 ['results']
             )
+            #plb 2-18-2022
+            #basically noticed that we should not be flipping the significance values
+            #so we just mul them by -1
+            if 'signifigance' in temp_table_name:
+                lower_diagonal_panda['results']=lower_diagonal_panda['results'].mul(-1)
+                # print(lower_diagonal_panda.loc[lower_diagonal_panda['results']<0])
+                # print(temp_panda.loc[temp_panda['results']<0])
+                # hold=input('hold')
             temp_panda=pandas.concat(objs=[temp_panda,lower_diagonal_panda],axis='index',join='outer',ignore_index=True)
             temp_panda.drop_duplicates(subset=['from_triplets','to_triplets','compound'],keep='first',inplace=True)
 
