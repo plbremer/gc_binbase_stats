@@ -55,6 +55,9 @@ def coerce_our_structure_to_plotly_volcano(temp_fold_panda,temp_signifigance_pan
 
 
 def create_volcano_plot(temp_panda):
+    print(temp_panda)
+    hold=input('hold')
+    
     my_plot=dashbio.VolcanoPlot(
         dataframe=temp_panda,
         p='signifigance',
