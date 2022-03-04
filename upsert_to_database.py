@@ -404,7 +404,34 @@ if __name__ == "__main__":
 
 
 
+    table_21_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_property_table/compound_property_table.bin'
+    make_update_table_from_panda(
+        table_21_address,
+        engine,
+        'compound_properties',
+        [],
+        (['identifier']),
+        [],
+        True,
+        temp_dtype_dict={
+            'identifier': postgresql.TEXT,
+            'english_name': postgresql.TEXT
+        }
+    )
 
+    print('21 done')
+
+    # def make_update_table_from_panda(
+    #     temp_panda_address,
+    #     temp_engine,
+    #     temp_table_name,
+    #     temp_columns_to_drop,
+    #     temp_columns_for_primary_key,
+    #     temp_columns_that_are_lists,
+    #     temp_dtype_dict=None
+    # ):
+
+    print('19 done')
 
 
 
