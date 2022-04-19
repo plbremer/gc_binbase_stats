@@ -285,7 +285,8 @@ if __name__ == "__main__":
             'organ_headnode_to': postgresql.TEXT,
             'disease_headnode_to': postgresql.TEXT,
             'from_triplets_inter_removed_if_nec': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT),
-            'to_triplets_inter_removed_if_nec': postgresql.INTEGER#postgresql.ARRAY(postgresql.TEXT)
+            'to_triplets_inter_removed_if_nec': postgresql.INTEGER,#postgresql.ARRAY(postgresql.TEXT)
+            'basic_vs_basic': postgresql.BOOLEAN
         },
         temp_append_antisymmetric_result=17
     )
@@ -342,7 +343,8 @@ if __name__ == "__main__":
 
     #https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
     register_adapter(np.int64, adapt_numpy_int64)
-
+    
+    print('19 starting')
     table_19_address='../results/'+str(min_fold_change)+'/step_19_prepare_count_matrix_2/count_matrix.bin'
     make_update_table_from_panda(
         table_19_address,
