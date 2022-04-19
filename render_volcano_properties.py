@@ -202,7 +202,7 @@ if __name__ == "__main__":
     image = ax.imshow(
         my_histogram.T, extent=extent, origin="lower", aspect="auto", cmap="magma"
     )
-    fig.colorbar(image, cax=cax, orientation="vertical")
+    fig.colorbar(image, cax=cax, orientation="vertical",label='hello')
     plt.savefig("./median.png")
 
     # after creation of the figure

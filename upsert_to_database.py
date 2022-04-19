@@ -212,7 +212,7 @@ if __name__ == "__main__":
         'signifigance_matrix_welch'
     ]
 
-    hold=input('hold step 22')
+    #hold=input('hold step 22')
 
     min_fold_change=sys.argv[1]
     use_aws=(sys.argv[2])
@@ -404,11 +404,54 @@ if __name__ == "__main__":
 
 
 
-    table_21_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_property_table/compound_property_table.bin'
+    table_21_a_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_sod_property_tables/compound_property_table.bin'
     make_update_table_from_panda(
-        table_21_address,
+        table_21_a_address,
         engine,
         'compound_properties',
+        [],
+        (['identifier']),
+        [],
+        True,
+        temp_dtype_dict={
+            'identifier': postgresql.TEXT,
+            'english_name': postgresql.TEXT
+        }
+    )
+
+    table_21_b_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_sod_property_tables/compound_property_table.bin'
+    make_update_table_from_panda(
+        table_21_b_address,
+        engine,
+        'species_properties',
+        [],
+        (['identifier']),
+        [],
+        True,
+        temp_dtype_dict={
+            'identifier': postgresql.TEXT,
+            'english_name': postgresql.TEXT
+        }
+    )
+    table_21_c_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_sod_property_tables/organ_property_table.bin'
+    make_update_table_from_panda(
+        table_21_c_address,
+        engine,
+        'organ_properties',
+        [],
+        (['identifier']),
+        [],
+        True,
+        temp_dtype_dict={
+            'identifier': postgresql.TEXT,
+            'english_name': postgresql.TEXT
+        }
+    )
+    table_21_d_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_sod_property_tables/disease_property_table.bin'
+    make_update_table_from_panda(
+        table_21_d_address,
+        engine,
+        'disease_properties',
         [],
         (['identifier']),
         [],
@@ -431,7 +474,7 @@ if __name__ == "__main__":
     #     temp_dtype_dict=None
     # ):
 
-    print('19 done')
+    #print('19 done')
 
 
 
