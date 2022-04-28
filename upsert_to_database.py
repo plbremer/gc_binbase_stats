@@ -421,7 +421,7 @@ if __name__ == "__main__":
         }
     )
 
-    table_21_b_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_sod_property_tables/compound_property_table.bin'
+    table_21_b_address='../results/'+str(min_fold_change)+'/step_21_b_create_compound_sod_property_tables/species_property_table.bin'
     make_update_table_from_panda(
         table_21_b_address,
         engine,
