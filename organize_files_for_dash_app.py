@@ -2,6 +2,7 @@ import sys
 import pandas
 import os
 import itertools
+import networkx as nx
 
 if __name__ == "__main__":
 
@@ -59,4 +60,26 @@ if __name__ == "__main__":
     
 
 
+    compound_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
+    compound_networkx_address_output='../results/'+str(min_fold_change)+'/step_23_organize_files_for_dash_app/compounds_networkx.bin'
+    #convert_networkx(compound_networkx_address,compound_networkx_address_output,True,matrices_to_compute)
+    compound_networkx=nx.readwrite.read_gpickle(compound_networkx_address)
+    for temp_node in compound_networkx.nodes:
+        compound_networkx.nodes[temp_node].pop('signifigance_matrix_welch')
+        compound_networkx.nodes[temp_node].pop('signifigance_matrix_mannwhitney')
+        compound_networkx.nodes[temp_node].pop('fold_change_matrix_average')
+        compound_networkx.nodes[temp_node].pop('fold_change_matrix_median')
+    nx.readwrite.write_gpickle(compound_networkx,compound_networkx_address_output)
 
+    species_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/species_networkx.bin'
+    species_networkx_address_output='../results/'+str(min_fold_change)+'/step_23_organize_files_for_dash_app/species_networkx.bin'    
+    os.system(f'cp {species_networkx_address} {species_networkx_address_output}')
+    #convert_networkx(species_networkx_address,species_networkx_address_output,False,matrices_to_compute)
+
+    organ_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/organ_networkx.bin'
+    organ_networkx_address_output='../results/'+str(min_fold_change)+'/step_23_organize_files_for_dash_app/organ_networkx.bin'    
+    os.system(f'cp {organ_networkx_address} {organ_networkx_address_output}')    #convert_networkx(organ_networkx_address,organ_networkx_address_output,False,matrices_to_compute)
+
+    disease_networkx_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/disease_networkx.bin'
+    disease_networkx_address_output='../results/'+str(min_fold_change)+'/step_23_organize_files_for_dash_app/disease_networkx.bin'    
+    os.system(f'cp {disease_networkx_address} {disease_networkx_address_output}')    #convert_networkx(disease_networkx_address,disease_networkx_address_output,False,matrices_to_compute)
