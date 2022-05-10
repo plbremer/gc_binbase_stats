@@ -140,6 +140,7 @@ def transform_organ_column(temp_bin_panda):
                 count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
                 special_property_list_with_indices_removed=list(np.delete(bin_series['special_property_list'],indices_to_drop))
                 annotation_distribution_list_with_indices_removed=list(np.delete(bin_series['annotation_distribution'],indices_to_drop))
+                percent_present_list_with_indices_removed=list(np.delete(bin_series['percent_present'],indices_to_drop))
 
                 temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
@@ -148,6 +149,7 @@ def transform_organ_column(temp_bin_panda):
                 temp_bin_panda.at[bin_index,'count']=count_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'special_property_list']=special_property_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'percent_present']=percent_present_list_with_indices_removed
 
 #                if mapping_series['species']=='Sus scrofa domesticus' and mapping_series['organ_final']=='Drop':
 #                    #print(bin_series['organ'])

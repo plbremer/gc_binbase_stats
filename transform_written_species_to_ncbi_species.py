@@ -94,6 +94,7 @@ def transform_species_column(temp_bin_panda):
                 median_intensity_list_with_indices_removed=list(np.delete(bin_series['median_intensity'],indices_to_drop))
                 count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
                 annotation_distribution_list_with_indices_removed=list(np.delete(bin_series['annotation_distribution'],indices_to_drop))
+                percent_present_list_with_indices_removed=list(np.delete(bin_series['percent_present'],indices_to_drop))
 
                 temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
@@ -101,6 +102,8 @@ def transform_species_column(temp_bin_panda):
                 temp_bin_panda.at[bin_index,'median_intensity']=median_intensity_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'count']=count_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
+                temp_bin_panda.at[bin_index,'percent_present']=percent_present_list_with_indices_removed
+
 
         #if we have a transformation
         elif mapping_series['most_specific'] != 'drop':

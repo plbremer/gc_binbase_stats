@@ -123,7 +123,7 @@ def aquire_normalized_log_intensities_for_species_organ_compound_wrapper(temp_pa
         )
         #print(temp_results)
 
-        temp_file_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/'+series['species']+'¬'+series['organ']+'¬'+str(series['target_id'])+'.bin'
+        temp_file_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'+series['species']+'¬'+series['organ']+'¬'+str(series['target_id'])+'.bin'
 
         temp_results.to_pickle(temp_file_address)
 

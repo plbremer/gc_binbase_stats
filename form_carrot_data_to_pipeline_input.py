@@ -47,6 +47,7 @@ def make_empty_input_panda(pipeline_input_panda_columns,bin_and_name_list):
     temp_dict_of_list['annotation_distribution']=[list() for temp in bin_and_name_list]
     temp_dict_of_list['count']=[list() for temp in bin_and_name_list]
     temp_dict_of_list['total_intensity']=[list() for temp in bin_and_name_list]
+    temp_dict_of_list['percent_present']=[list() for temp in bin_and_name_list]
 
     pipeline_input_panda=pd.DataFrame.from_dict(temp_dict_of_list)
 
@@ -59,7 +60,7 @@ def insert_combination(species,organ,compound):
 def impute_annotations_at_least_one_found(temp_annotations_list,temp_so_count):
     percent_present=len(temp_annotations_list)/temp_so_count
     imputed_value=percent_present*min(temp_annotations_list)
-    return temp_annotations_list+[imputed_value for i in range(temp_so_count-len(temp_annotations_list))]
+    return percent_present,temp_annotations_list+[imputed_value for i in range(temp_so_count-len(temp_annotations_list))]
 
 def impute_annotations_zero_found(temp_average_fame_intensity,temp_so_count):
     imputed_value=noise_intensity/temp_average_fame_intensity
@@ -97,13 +98,17 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                         (species_organ_properties_panda.organ==temp_species_organ_pair[1])
                     ]['average_fame_intensity'].item()
                     temp_imputed_annotations_list=impute_annotations_zero_found(this_species_organ_average_fame_intensity,this_species_organ_count)
+                    temp_percent_present=0
+                    print('option a')
 
                 else:
                     #in general, the lists can have the property where some annotation has a magnitude of zero
                     #the "all zero"        strategy is different, so we keep it by itself above'
                     temp_panda.drop(labels=temp_panda.index[temp_panda.normalized_intensity==0], axis='index',inplace=True)
                     temp_panda.reset_index(inplace=True,drop=True)
-                    temp_imputed_annotations_list=impute_annotations_at_least_one_found(temp_panda['normalized_intensity'].to_list(),this_species_organ_count)
+                    temp_percent_present,temp_imputed_annotations_list=impute_annotations_at_least_one_found(temp_panda['normalized_intensity'].to_list(),this_species_organ_count)
+                    print('option b')
+                    print(temp_percent_present)
 
 
 
@@ -120,7 +125,8 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                 ]['average_fame_intensity'].item()
 
                 temp_imputed_annotations_list=impute_annotations_zero_found(this_species_organ_average_fame_intensity,this_species_organ_count)
-
+                temp_percent_present=0
+                print('option c')
                 
                 # print(temp_imputed_annotations_list)
                 # print(this_species_organ_count)
@@ -133,6 +139,7 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
             pipeline_input_panda.at[temp_bin_and_name[0],'median_intensity'].append(np.median(temp_imputed_annotations_list))
             pipeline_input_panda.at[temp_bin_and_name[0],'annotation_distribution'].append(temp_imputed_annotations_list)
             pipeline_input_panda.at[temp_bin_and_name[0],'total_intensity'].append(sum(temp_imputed_annotations_list))
+            pipeline_input_panda.at[temp_bin_and_name[0],'percent_present'].append(temp_percent_present)
 
 
     return pipeline_input_panda            
@@ -152,8 +159,8 @@ if __name__=="__main__":
     #this file tells us how to skip systematic bias
     so_to_skip_csv_address='../resources/so_to_skip.csv'
     noise_intensity=200
-    data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data'
-    pipeline_input_panda_columns=['id','name','species','organ','count','total_intensity','median_intensity','group','inchikey','annotation_distribution']
+    data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'
+    pipeline_input_panda_columns=['id','name','species','organ','count','total_intensity','median_intensity','group','inchikey','annotation_distribution','percent_present']
     compound_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/all_species_organs_compounds_panda.bin'
     species_organ_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/species_organ_sample_count_and_average_fame.bin'
     output_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
@@ -191,4 +198,5 @@ if __name__=="__main__":
     ##################################################################################
 
     print(pipeline_input_panda)
+    hold=input('end')
     pipeline_input_panda.to_pickle(output_address)

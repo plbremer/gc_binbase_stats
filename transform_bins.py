@@ -134,6 +134,7 @@ def transform_count_column(temp_bin_panda,temp_count_cutoff):
 
     for bin_index, bin_series in temp_bin_panda.iterrows():
         print(bin_index)
+        bin_series['percent_present']
         indices_to_drop=[i for i in range(0,len(bin_series['count'])) if bin_series['count'][i] < temp_count_cutoff]
         species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
         organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
@@ -144,6 +145,7 @@ def transform_count_column(temp_bin_panda,temp_count_cutoff):
         #without the typecast
         #VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated.
         annotation_distribution_list_with_indices_removed=list(np.delete(np.array(bin_series['annotation_distribution'],dtype=object),indices_to_drop))
+        percent_present_list_with_indices_removed=list(np.delete(bin_series['percent_present'],indices_to_drop))
 
         temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
         temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
@@ -152,8 +154,9 @@ def transform_count_column(temp_bin_panda,temp_count_cutoff):
         temp_bin_panda.at[bin_index,'total_intensity']=total_intensity_list_with_indices_removed
         temp_bin_panda.at[bin_index,'median_intensity']=median_intensity_list_with_indices_removed
         temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
+        temp_bin_panda.at[bin_index,'percent_present']=percent_present_list_with_indices_removed
 
-    hold=input('hold')
+    #hold=input('hold')
 
 def transform_intensity_column(temp_bin_panda):
     '''
@@ -219,6 +222,7 @@ def aggregate_redundancies(temp_panda):
         temp_total_intensity_list=list()
         temp_annotation_distribution_list=list()
         temp_special_property_list=list()
+        temp_percent_present_list=list()
 
 
         for temp_triplet in redundancy_dict.keys():
@@ -232,6 +236,7 @@ def aggregate_redundancies(temp_panda):
                 temp_total_intensity_list.append(series['total_intensity'][redundancy_dict[temp_triplet][0]])
                 temp_annotation_distribution_list.append(series['annotation_distribution'][redundancy_dict[temp_triplet][0]])
                 temp_special_property_list.append(series['special_property_list'][redundancy_dict[temp_triplet][0]])
+                temp_percent_present_list.append(series['percent_present'][redundancy_dict[temp_triplet][0]])
                 continue
 
             elif len(redundancy_dict[temp_triplet])>1:
@@ -244,8 +249,8 @@ def aggregate_redundancies(temp_panda):
                 #sum the total intensity
                 #do whatever with the median intensity - we will have to recalculate this with a new function in thsi script
                 #append the annotation distributions "sub"lists
-
-                aggregate_count=sum([series['count'][i] for i in redundancy_dict[temp_triplet]])
+                temp_counts=np.array([series['count'][i] for i in redundancy_dict[temp_triplet]])
+                aggregate_count=sum(temp_counts)
                 aggregate_intensity=sum([series['total_intensity'][i] for i in redundancy_dict[temp_triplet]])                
                 #for the annotation distribution, first make a lisft of the sublists, then "flatten" it
                 aggregate_annotation_distribution=list()
@@ -253,7 +258,8 @@ def aggregate_redundancies(temp_panda):
                 aggregate_annotation_distribution=list(itertools.chain.from_iterable(aggregate_annotation_distribution))
                 #for the median, we get the numpy median of the new total aggregate distribution
                 aggregate_median_intensity=np.median(aggregate_annotation_distribution)
-
+                temp_percents_present=np.array([series['percent_present'][i] for i in redundancy_dict[temp_triplet]])
+                new_percent_present=sum((temp_percents_present*temp_counts))/aggregate_count
 
                 temp_species_list.append(temp_triplet[1])
                 temp_organ_list.append(temp_triplet[0])
@@ -262,6 +268,7 @@ def aggregate_redundancies(temp_panda):
                 temp_total_intensity_list.append(aggregate_intensity)
                 temp_median_intensity_list.append(aggregate_median_intensity)
                 temp_annotation_distribution_list.append(aggregate_annotation_distribution)
+                temp_percent_present_list.append(new_percent_present)
 
 
 
@@ -272,6 +279,7 @@ def aggregate_redundancies(temp_panda):
         temp_panda.at[index,'special_property_list']=temp_special_property_list
         temp_panda.at[index,'median_intensity']=temp_median_intensity_list
         temp_panda.at[index,'annotation_distribution']=temp_annotation_distribution_list
+        temp_panda.at[index,'percent_present']=temp_percent_present_list
 
 
 if __name__ == "__main__":
