@@ -245,6 +245,13 @@ if __name__ == "__main__":
     engine=create_engine(my_connection)#,echo=True)
     connection=engine.connect()
 
+
+    connection.execute(
+        f'''
+        drop view combined_results;
+        '''
+    )
+
     table_16_address='../results/'+str(min_fold_change)+'/step_16_calculate_fraction_triplets/triplet_count_panda.bin'
     make_update_table_from_panda(
         table_16_address,
@@ -465,6 +472,34 @@ if __name__ == "__main__":
     )
 
     print('21 done')
+
+    connection.execute(
+        f'''
+        CREATE OR REPLACE VIEW public.combined_results
+        AS SELECT foo_2.compound,
+            foo_2.from_triplets,
+            foo_2.to_triplets,
+            foo_2.fold_average,
+            foo_2.fold_median,
+            foo_2.sig_mannwhit,
+            frsmw.results AS sig_welch
+        FROM ( SELECT foo_1.compound,
+                    foo_1.from_triplets,
+                    foo_1.to_triplets,
+                    foo_1.fold_average,
+                    foo_1.fold_median,
+                    frsmm.results AS sig_mannwhit
+                FROM ( SELECT frfcma.compound,
+                            frfcma.from_triplets,
+                            frfcma.to_triplets,
+                            frfcma.results AS fold_average,
+                            frfcmm.results AS fold_median
+                        FROM fold_results_fold_change_matrix_average frfcma
+                            JOIN fold_results_fold_change_matrix_median frfcmm ON frfcma.compound = frfcmm.compound AND frfcma.from_triplets = frfcmm.from_triplets AND frfcma.to_triplets = frfcmm.to_triplets) foo_1
+                    JOIN fold_results_signifigance_matrix_mannwhitney frsmm ON foo_1.compound = frsmm.compound AND foo_1.from_triplets = frsmm.from_triplets AND foo_1.to_triplets = frsmm.to_triplets) foo_2
+            JOIN fold_results_signifigance_matrix_welch frsmw ON foo_2.compound = frsmw.compound AND foo_2.from_triplets = frsmw.from_triplets AND foo_2.to_triplets = frsmw.to_triplets;
+        '''
+    )
 
     # def make_update_table_from_panda(
     #     temp_panda_address,

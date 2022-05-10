@@ -124,8 +124,9 @@ if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    start_from_aws=(sys.argv[3])
-    binvestigate_pickle_address='../resources/pipeline_input_2.bin'
+    #start_from_aws=(sys.argv[3])
+    start_from_aws='False'
+    binvestigate_pickle_address='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/pipeline_input_group_properties_added.bin'
     #binvestigate_pickle_address='../resources/binvestigate_pull/shortened_file_for_test.bin'
     species_mapping_address='../resources/species_organ_maps/species_map.txt'
     output_pickle_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'

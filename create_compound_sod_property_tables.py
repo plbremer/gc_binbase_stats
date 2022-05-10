@@ -36,7 +36,14 @@ def get_one_name(temp_row,temp_nx,hierarchy_type):
         if 'CHEMONTID' in temp_row['identifier']:
             return temp_nx.nodes[temp_row['identifier']]['name']
         else:
-            return temp_nx.nodes[int(temp_row['identifier'])]['common_name']        
+            #return temp_nx.nodes[int(temp_row['identifier'])]['common_name']      
+            #     ##################################################################################
+            #temporarily here for testing - leaves us with only 1 compound
+            try:
+                return temp_nx.nodes[int(temp_row['identifier'])]['common_name']
+            except KeyError:
+                return 'we_didnt_keep_this_compound'
+            ##################################################################################  
     elif hierarchy_type=='species':
         return temp_nx.nodes[str(temp_row['identifier'])]['scientific_name']
     elif hierarchy_type=='organ':
