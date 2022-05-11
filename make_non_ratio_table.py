@@ -37,3 +37,10 @@ if __name__ == "__main__":
 
     temp_2=pd.DataFrame.from_dict(output_dict)
     temp_2.to_pickle(output_panda_address)
+
+    temp_2['combined_sod']=temp_2.species+' - '+temp_2.organ+' - '+temp_2.disease
+    temp_2.combined_sod.value_counts().to_pickle(
+        '../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/unique_sod_combinations.bin'
+    )
+
+
