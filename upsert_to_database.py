@@ -473,6 +473,29 @@ if __name__ == "__main__":
 
     print('21 done')
 
+
+    table_5_address='../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/non_ratio_table.bin'
+    make_update_table_from_panda(
+        table_5_address,
+        engine,
+        'non_ratio_table',
+        [],
+        (['species,organ,disease,compound']),
+        [],
+        True,
+        temp_dtype_dict={
+            'bin':postgresql.INTEGER,
+            'compound':postgresql.TEXT,
+            'species':postgresql.TEXT,
+            'organ':postgresql.TEXT,
+            'disease':postgresql.TEXT,
+            'intensity_average':postgresql.FLOAT,
+            'intensity_median':postgresql.FLOAT,
+            'percent_present':postgresql.FLOAT
+        }
+    )
+    print('5 done')
+
     connection.execute(
         f'''
         CREATE OR REPLACE VIEW public.combined_results
