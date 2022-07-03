@@ -248,7 +248,7 @@ if __name__ == "__main__":
 
     connection.execute(
         f'''
-        drop view combined_results;
+        drop view if exists combined_results;
         '''
     )
 
@@ -480,7 +480,7 @@ if __name__ == "__main__":
         engine,
         'non_ratio_table',
         [],
-        (['species,organ,disease,compound']),
+        (['bin','species','organ','disease']),
         [],
         True,
         temp_dtype_dict={

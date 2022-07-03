@@ -77,7 +77,7 @@ def obtain_all_species_organ_sample_count_and_average_fames():
     #my_engine.dispose()
     return species_organ_sample_count_and_average_fame_panda
 
-def aquire_normalized_log_intensities_for_species_organ_compound(temp_species,temp_organ,temp_compound):
+def aquire_normalized_intensities_for_species_organ_compound(temp_species,temp_organ,temp_compound):
     #connection=my_engine.connect()
     all_samples_for_soc_cursor=connection.execute(
         f'''
@@ -102,13 +102,13 @@ def aquire_normalized_log_intensities_for_species_organ_compound(temp_species,te
     #my_engine.dispose()
     return all_samples_for_soc_panda
 
-def aquire_normalized_log_intensities_for_species_organ_compound_wrapper(temp_panda):
+def aquire_normalized_intensities_for_species_organ_compound_wrapper(temp_panda):
 
-    ##################################################################################
-    #temporarily here for testing - leaves us with only 1 compound
-    temp_panda=temp_panda.loc[temp_panda.name=='alanine']
-    temp_panda.reset_index(inplace=True,drop=True)
-    ##################################################################################
+    # ##################################################################################
+    # #temporarily here for testing - leaves us with only 1 compound
+    # temp_panda=temp_panda.loc[temp_panda.name=='alanine']
+    # temp_panda.reset_index(inplace=True,drop=True)
+    # ##################################################################################
     print(temp_panda)
 
     for index,series in temp_panda.iterrows():
@@ -116,7 +116,7 @@ def aquire_normalized_log_intensities_for_species_organ_compound_wrapper(temp_pa
             print(index)
         #print(series)
         #hold=input('hold')
-        temp_results=aquire_normalized_log_intensities_for_species_organ_compound(
+        temp_results=aquire_normalized_intensities_for_species_organ_compound(
             series['species'],
             series['organ'],
             series['target_id']
@@ -151,7 +151,7 @@ if __name__=="__main__":
 
 
     #hold=input('hold')
-    aquire_normalized_log_intensities_for_species_organ_compound_wrapper(all_species_organs_compounds_panda)
+    aquire_normalized_intensities_for_species_organ_compound_wrapper(all_species_organs_compounds_panda)
 
 
     connection.close()

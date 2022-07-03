@@ -13,12 +13,14 @@ import os
 
 def get_compound_properties(compound_properties_panda):
 
-    a=list(zip(
+    a=set(zip(
             compound_properties_panda.loc[compound_properties_panda.target_type=='CONFIRMED'].target_id.astype(int),
             compound_properties_panda.loc[compound_properties_panda.target_type=='CONFIRMED'].name
     ))
-    unique_bin_and_name=list()
-    [unique_bin_and_name.append(x) for x in a if x not in unique_bin_and_name]
+    #unique_bin_and_name=list()
+    #[unique_bin_and_name.append(x) for x in a if x not in unique_bin_and_name]
+    #[print(x) for x in a if x not in unique_bin_and_name]
+    unique_bin_and_name=list(a)
 
     return unique_bin_and_name
 
@@ -68,9 +70,18 @@ def impute_annotations_zero_found(temp_average_fame_intensity,temp_so_count):
 
 def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set):
     #
+    bins_to_remove=list()
 
+    #all_group_bins=os.listdir(data_base_address)
+    #print(all_group_bins)
     for temp_bin_and_name in bin_and_name_list:
+        print('some row in the input panda')
         print(temp_bin_and_name)
+        #we add this to avoid checking groups.
+        if len(os.listdir(data_base_address+str(temp_bin_and_name[0])))==0:
+        #str(temp_bin_and_name[0]) not in all_group_bins:
+            bins_to_remove.append(temp_bin_and_name[0])
+            continue
 
         for temp_species_organ_pair in species_organ_pair_list:
 
@@ -82,11 +93,11 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                 (species_organ_properties_panda.species==temp_species_organ_pair[0]) &
                 (species_organ_properties_panda.organ==temp_species_organ_pair[1])
             ]['count'].item()
-
+            print(data_base_address+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
             try:
-                temp_panda=pd.read_pickle(data_base_address+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
-                
-
+                temp_panda=pd.read_pickle(data_base_address+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
+                #print(data_base_address+'/'+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
+                temp_panda=temp_panda.to_frame()
 
 
                 #there is a special case where the annotation is made but the value is still zero
@@ -119,6 +130,8 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                 # print(len(temp_imputed_annotations_list))
                 
             except FileNotFoundError:
+                
+                
                 this_species_organ_average_fame_intensity=species_organ_properties_panda.loc[
                     (species_organ_properties_panda.species==temp_species_organ_pair[0]) &
                     (species_organ_properties_panda.organ==temp_species_organ_pair[1])
@@ -142,7 +155,7 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
             pipeline_input_panda.at[temp_bin_and_name[0],'percent_present'].append(temp_percent_present)
 
 
-    return pipeline_input_panda            
+    return pipeline_input_panda,bins_to_remove      
 
 
 if __name__=="__main__":
@@ -157,12 +170,17 @@ if __name__=="__main__":
     #that is, for whatever reason, the fames only appeared like 50 percent of the time
     #these are the things in the "elbow plot"
     #this file tells us how to skip systematic bias
-    so_to_skip_csv_address='../resources/so_to_skip.csv'
+    so_to_skip_csv_address='../resources/pull_from_carrot/so_to_skip.csv'
     noise_intensity=200
-    data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'
+    ##data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'
+    ##we are not making the pull from carrot part of the chain anymore
+    data_base_address='../resources/pull_from_carrot/pipeline_input/soc_data/'
     pipeline_input_panda_columns=['id','name','species','organ','count','total_intensity','median_intensity','group','inchikey','annotation_distribution','percent_present']
-    compound_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/all_species_organs_compounds_panda.bin'
-    species_organ_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/species_organ_sample_count_and_average_fame.bin'
+    ##compound_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/all_species_organs_compounds_panda.bin'
+    ##species_organ_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/species_organ_sample_count_and_average_fame.bin'
+    compound_properties_panda_address='../resources/pull_from_carrot/all_species_organs_compounds_panda/all_species_organs_compounds_panda.tsv'
+    species_organ_properties_panda_address='../resources/pull_from_carrot/species_organ_sample_count_and_average_fame/species_organ_sample_count_and_average_fame.tsv'
+
     output_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
     
 
@@ -170,32 +188,47 @@ if __name__=="__main__":
     so_to_skip_set=set(zip(so_to_skip_panda['species'],so_to_skip_panda['organ']))
 
 
-    compound_properties_panda=pd.read_pickle(compound_properties_panda_address)
-    species_organ_properties_panda=pd.read_pickle(species_organ_properties_panda_address)
-    
+    ##compound_properties_panda=pd.read_pickle(compound_properties_panda_address)
+    ##species_organ_properties_panda=pd.read_pickle(species_organ_properties_panda_address)
+    compound_properties_panda=pd.read_csv(compound_properties_panda_address,sep='\t')
+    species_organ_properties_panda=pd.read_csv(species_organ_properties_panda_address,sep='\t')    
 
     #bin_list=get_all_bins()
     #species_organ_list=get_all_species_organs()
 
     bin_and_name_list=get_compound_properties(compound_properties_panda)
-
+    # ##################################################################################
+    # #temporarily here for testing - only read in a few compounds
+    # pipeline_input_panda=pipeline_input_panda.iloc[pipeline_input_panda.name=='alanine']
+    # pipeline_input_panda.reset_index(inplace=True,drop=True)
+    bin_and_name_list=[a for a in bin_and_name_list if a[1]=='alanine']
+    print(bin_and_name_list)
+    hold=input('hold')
+    # ##################################################################################
 
     species_organ_pair_list=list(zip(species_organ_properties_panda.species,species_organ_properties_panda.organ))
     # print(species_organ_pair_list)
 
+
+
+
+
     pipeline_input_panda=make_empty_input_panda(pipeline_input_panda_columns,bin_and_name_list)
+
     pipeline_input_panda.set_index(keys='id',drop=False,inplace=True)
     # print(pipeline_input_panda)
     # hold=input('hold')
     
-    pipeline_input_panda=insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set)
+    pipeline_input_panda,bins_to_remove=insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set)
     pipeline_input_panda.reset_index(inplace=True,drop=True)
 
-    ##################################################################################
-    #temporarily here for testing - leaves us with only 1 compound
-    pipeline_input_panda=pipeline_input_panda.loc[pipeline_input_panda.name=='alanine']
-    pipeline_input_panda.reset_index(inplace=True,drop=True)
-    ##################################################################################
+    print(pipeline_input_panda)
+    # pipeline_input_panda.drop(
+    #     labels=bins_to_remove,
+    #     axis='index',
+    #     inplace=True
+    # )
+    pipeline_input_panda=pipeline_input_panda.loc[~pipeline_input_panda.id.isin(bins_to_remove),:]
 
     print(pipeline_input_panda)
     hold=input('end')
