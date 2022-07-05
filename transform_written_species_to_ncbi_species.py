@@ -76,7 +76,7 @@ def transform_species_column(temp_bin_panda):
     in transfomrs, we take the original text and map it to the most specific thing that we can that is in the ncbi database
     '''
     temp_mapping_address=species_mapping_address
-    mapping_panda=pandas.read_csv(temp_mapping_address,sep='\t')
+    mapping_panda=pandas.read_csv(temp_mapping_address,sep='@')
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():

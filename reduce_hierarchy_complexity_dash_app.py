@@ -164,26 +164,28 @@ app.layout=html.Div(
             ),
             justify='center'
         ),
-        dbc.Row(
-            dbc.Col(
-                dbc.Card(
-                    children=[
+        #dbc.Row(
+            #dbc.Col(
+            #    dbc.Card(
+            #        children=[
                         #compounds
-                        cyto.Cytoscape(
-                            id='cytoscape',
-                            layout={'name':'dagre'},
-                            elements=network_dict['elements'],
-                            stylesheet=basic_stylesheet,
-                            minZoom=0.3,
-                            maxZoom=5
-                        )
-                    ]
-                ),
-                width=12,
-                align='center'
-            ),
-            justify='center'
+        cyto.Cytoscape(
+            id='cytoscape',
+            layout={'name':'dagre'},
+            elements=network_dict['elements'],
+            stylesheet=basic_stylesheet,
+            minZoom=0.3,
+            maxZoom=5,
+            autoRefreshLayout=False,
+            style={'width': '2000px', 'height': '1000px'}
         ),
+            #        ]
+            #    ),
+            #    width=12,
+            #    align='center'
+            #),
+            #justify='center'
+        #),
         dbc.Row(
             dbc.Col(
                 html.Div(

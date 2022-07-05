@@ -122,18 +122,26 @@ if __name__ == "__main__":
     hold=input('hold')
     
 
+    #update 7-4-22 plb
+    #basically, we are only going to do the volcano plot stuff for knowns.
+    #so we grab a subset of the entire panda, those with inchikeys, do the comparison for them
+    #and then merge
+    input_panda_only_identified=input_panda.loc[
+        input_panda.inchikey!='@@@@@@@',:
+    ]
+
     
     ####
     #num_processes = multiprocessing.cpu_count()
     temp_signifigance_type='mannwhitney'
     num_processes=cores_available
-    chunk_size = len(input_panda.index)//num_processes
+    chunk_size = len(input_panda_only_identified.index)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):
         if i<(num_processes-1):
-            panda_chunks.append(input_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
         elif i==(num_processes-1):
-            panda_chunks.append(input_panda.iloc[i*chunk_size:])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
     print(panda_chunks)
     hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
@@ -143,21 +151,21 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
     for i in range(len(transformed_chunks)):
-        input_panda.loc[transformed_chunks[i].index]=transformed_chunks[i]
-    input_panda=pandas.concat(transformed_chunks)
+        input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+    input_panda_only_identified=pandas.concat(transformed_chunks)
     ####
 
     ####
     #num_processes = multiprocessing.cpu_count()
     temp_signifigance_type='welch'
     num_processes=cores_available
-    chunk_size = len(input_panda.index)//num_processes
+    chunk_size = len(input_panda_only_identified.index)//num_processes
     panda_chunks=list()
     for i in range(0,num_processes):
         if i<(num_processes-1):
-            panda_chunks.append(input_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
         elif i==(num_processes-1):
-            panda_chunks.append(input_panda.iloc[i*chunk_size:])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
     print(panda_chunks)
     hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
@@ -167,10 +175,20 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
     for i in range(len(transformed_chunks)):
-        input_panda.loc[transformed_chunks[i].index]=transformed_chunks[i]
-    input_panda=pandas.concat(transformed_chunks)
+        input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+    input_panda_only_identified=pandas.concat(transformed_chunks)
     ####
 
+    input_panda_only_identified=input_panda_only_identified.loc[
+        :,['inchikey','signifigance_mannwhitney','signifigance_welch']
+    ]
+
+    input_panda=input_panda.merge(
+        right=input_panda_only_identified,
+        left_on='inchikey',
+        right_on='inchikey',
+        how='left'
+    )
 
 
     #output as pickle

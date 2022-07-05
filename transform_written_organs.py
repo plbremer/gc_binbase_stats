@@ -79,7 +79,7 @@ def add_special_property_column(temp_panda,temp_mapping_address):
     temp_panda['special_property_list']='pre_special_property_workup'
 
     #we read the organ mapping csv which will contain our transforms
-    organ_mapping_panda=pandas.read_csv(temp_mapping_address,sep='\t')
+    organ_mapping_panda=pandas.read_csv(temp_mapping_address,sep='@',index_col=0)
 
     #we create a mapping dictionary that basically looks like (species,organ): disease
     special_property_mapping_dict=dict(zip(zip(organ_mapping_panda['species'],organ_mapping_panda['organ_initial']),organ_mapping_panda['special_property']))
@@ -106,7 +106,7 @@ def transform_organ_column(temp_bin_panda):
     in transfomrs, we take the original text and map it to the specified organ
     '''
     temp_mapping_address=organ_mapping_address
-    mapping_panda=pandas.read_csv(temp_mapping_address,sep='\t')
+    mapping_panda=pandas.pandas.read_csv(temp_mapping_address,sep='@',index_col=0)
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     for pair in organ_specis_pair_list:
         print(pair[0]+'@'+pair[1])
     print('we have '+str(len(organ_specis_pair_list))+' pairs')
-    hold=input('copy and paste species organ pairs if necessary')
+    #hold=input('copy and paste species organ pairs if necessary')
     
     #using the same file, we add an "is cancer" column so that we can do cancer-centered analysis
     #because this is dont last we dont need to delete things in parallel like we do with

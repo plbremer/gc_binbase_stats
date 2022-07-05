@@ -308,14 +308,26 @@ if __name__ == "__main__":
     #we instead update with this single line from that method
     ##print_all_bin_identifiers(initial_panda)
     initial_panda.fillna(value='@@@@@@@',inplace=True)
+    #one of the provided inchikeys is a bunch of spaces '                           '
+    initial_panda.replace(
+        to_replace={
+            '                           ':'@@@@@@@',
+            'HUYHGEVLJRTFIB-CRSCSNDXSA-N':'@@@@@@@',
+            'CLDHNWUVRZNQBD-GSVOUGTGSA-N':'@@@@@@@',
+            'ADGFNXYXROZUOG-VKHMYHEASA-N':'@@@@@@@'
+        },
+        inplace=True
+    )
 
     #just like the species and organs, based on some external txt
     #we update the inchikeys
     #update 2-5-2022 plb 
     #we simplified the formatting of the input file to just 3 columns, id, inchikey, and inchikey_curated
-    update_inchikey_from_mapping(initial_panda,inchikey_mapping_address)
-    print(initial_panda)
-    hold=input('hold')
+    ##update 7-5-2022 plb
+    ##the inchikey mapping does literally nothing. 
+    ##update_inchikey_from_mapping(initial_panda,inchikey_mapping_address)
+    ##print(initial_panda)
+    ##hold=input('hold')
 
     #sometimes the binvestigate rest calls provided species/organs with intensities of zero
     #this causes nonsense runtime/divide-by-zero errors
