@@ -30,7 +30,7 @@ if __name__=="__main__":
 
     hold=input('step 20b hold')
     min_fold_change=sys.argv[1]
-    num_processes=int(sys.argv[2])
+    num_processes=2 ##int(sys.argv[2])
     print(num_processes)
 
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_20b_swap_triplet_lists_with_ints/')
