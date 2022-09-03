@@ -10,6 +10,7 @@ import sys
 import pandas as pd
 import numpy as np
 import os
+import random
 
 def get_compound_properties(compound_properties_panda):
 
@@ -59,19 +60,21 @@ def make_empty_input_panda(pipeline_input_panda_columns,bin_and_name_list):
 def insert_combination(species,organ,compound):
     pass
 
-def impute_annotations_at_least_one_found(temp_annotations_list,temp_so_count):
+def impute_annotations_at_least_one_found(temp_annotations_list,temp_so_count,temp_average_fame_intensity):
     percent_present=len(temp_annotations_list)/temp_so_count
-    imputed_value=percent_present*min(temp_annotations_list)
-    return percent_present,temp_annotations_list+[imputed_value for i in range(temp_so_count-len(temp_annotations_list))]
+    imputed_value_base=percent_present*min(temp_annotations_list)
+    return percent_present,temp_annotations_list+[
+        imputed_value_base+(((random.gauss(0,gauss_sigma))/temp_average_fame_intensity)) for i in range(temp_so_count-len(temp_annotations_list))
+    ]
 
 def impute_annotations_zero_found(temp_average_fame_intensity,temp_so_count):
-    imputed_value=noise_intensity/temp_average_fame_intensity
-    return [imputed_value for i in range(temp_so_count)]
+    #imputed_value=noise_intensity/temp_average_fame_intensity
+    return [((noise_intensity+random.gauss(0,gauss_sigma))/temp_average_fame_intensity) for i in range(temp_so_count)]
 
 def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set):
     #
     bins_to_remove=list()
-
+    print('inside combination wrapper')
     #all_group_bins=os.listdir(data_base_address)
     #print(all_group_bins)
     for temp_bin_and_name in bin_and_name_list:
@@ -80,6 +83,8 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
         #we add this to avoid checking groups.
         if len(os.listdir(data_base_address+str(temp_bin_and_name[0])))==0:
         #str(temp_bin_and_name[0]) not in all_group_bins:
+            print(data_base_address+str(temp_bin_and_name[0]))
+            print('the length was zero')
             bins_to_remove.append(temp_bin_and_name[0])
             continue
 
@@ -115,9 +120,15 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                 else:
                     #in general, the lists can have the property where some annotation has a magnitude of zero
                     #the "all zero"        strategy is different, so we keep it by itself above'
+
+                    this_species_organ_average_fame_intensity=species_organ_properties_panda.loc[
+                        (species_organ_properties_panda.species==temp_species_organ_pair[0]) &
+                        (species_organ_properties_panda.organ==temp_species_organ_pair[1])
+                    ]['average_fame_intensity'].item()
+
                     temp_panda.drop(labels=temp_panda.index[temp_panda.normalized_intensity==0], axis='index',inplace=True)
                     temp_panda.reset_index(inplace=True,drop=True)
-                    temp_percent_present,temp_imputed_annotations_list=impute_annotations_at_least_one_found(temp_panda['normalized_intensity'].to_list(),this_species_organ_count)
+                    temp_percent_present,temp_imputed_annotations_list=impute_annotations_at_least_one_found(temp_panda['normalized_intensity'].to_list(),this_species_organ_count,this_species_organ_average_fame_intensity)
                     print('option b')
                     print(temp_percent_present)
 
@@ -170,16 +181,17 @@ if __name__=="__main__":
     #that is, for whatever reason, the fames only appeared like 50 percent of the time
     #these are the things in the "elbow plot"
     #this file tells us how to skip systematic bias
-    so_to_skip_csv_address='../resources/pull_from_carrot/so_to_skip.csv'
+    so_to_skip_csv_address='../resources/pull_from_carrot/intermediates/so_to_skip.csv'
     noise_intensity=200
+    gauss_sigma=10
     ##data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'
     ##we are not making the pull from carrot part of the chain anymore
-    data_base_address='../resources/pull_from_carrot/pipeline_input/soc_data/'
+    data_base_address='../resources/pull_from_carrot/intermediates/soc_data/'
     pipeline_input_panda_columns=['id','name','species','organ','count','total_intensity','median_intensity','group','inchikey','annotation_distribution','percent_present']
     ##compound_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/all_species_organs_compounds_panda.bin'
     ##species_organ_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/species_organ_sample_count_and_average_fame.bin'
-    compound_properties_panda_address='../resources/pull_from_carrot/all_species_organs_compounds_panda/all_species_organs_compounds_panda.tsv'
-    species_organ_properties_panda_address='../resources/pull_from_carrot/species_organ_sample_count_and_average_fame/species_organ_sample_count_and_average_fame.tsv'
+    compound_properties_panda_address='../resources/pull_from_carrot/original_from_carrot_input/all_species_organs_compounds_panda.tsv'
+    species_organ_properties_panda_address='../resources/pull_from_carrot/original_from_carrot_input/species_organ_sample_count_and_average_fame.tsv'
 
     output_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
     
@@ -197,23 +209,33 @@ if __name__=="__main__":
     #species_organ_list=get_all_species_organs()
 
     bin_and_name_list=get_compound_properties(compound_properties_panda)
+    print(bin_and_name_list)
+    print('---------------------')
     # ##################################################################################
     # #temporarily here for testing - only read in a few compounds
     # pipeline_input_panda=pipeline_input_panda.iloc[pipeline_input_panda.name=='alanine']
     # pipeline_input_panda.reset_index(inplace=True,drop=True)
-    bin_and_name_list=[a for a in bin_and_name_list if a[1]=='alanine']
+    #taken from the gert harmonized file. all the bins related to QNAYBMKLOCPYGJ-REOHCLBHSA-N
+    ############bin_and_name_list=[a for a in bin_and_name_list if a[0] in [172163,172626,1965,171967,18223,34178,2] ]
+    #bin_and_name_list=[a for a in bin_and_name_list ]
+    bin_and_name_list=[a for a in bin_and_name_list if a[0] in [4754,171969,84921,88421,1794,453,9] ]
     print(bin_and_name_list)
-    hold=input('hold')
+    #hold=input('hold')
     # ##################################################################################
 
     species_organ_pair_list=list(zip(species_organ_properties_panda.species,species_organ_properties_panda.organ))
-    # print(species_organ_pair_list)
-
+    #print(species_organ_pair_list)
+    hold=input('hold')
 
 
 
 
     pipeline_input_panda=make_empty_input_panda(pipeline_input_panda_columns,bin_and_name_list)
+
+
+    #basically, we discvoered (see notebook step 3) that some groups dont have a bin assocaited with the group name
+    #therefore, we made some directories 
+
 
     pipeline_input_panda.set_index(keys='id',drop=False,inplace=True)
     # print(pipeline_input_panda)
@@ -231,5 +253,5 @@ if __name__=="__main__":
     pipeline_input_panda=pipeline_input_panda.loc[~pipeline_input_panda.id.isin(bins_to_remove),:]
 
     print(pipeline_input_panda)
-    hold=input('end')
+    #hold=input('end')
     pipeline_input_panda.to_pickle(output_address)

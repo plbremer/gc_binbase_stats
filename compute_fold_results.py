@@ -179,6 +179,7 @@ if __name__ == "__main__":
             elif i ==(num_processes-1):
                 file_list_list.append(file_list[i*chunk_size:])
 
+        print(file_list_list)
         temp_iterable=list(zip(file_list_list,repeat(temp_matrix_type)))
         pool = multiprocessing.Pool(processes=num_processes)
         #transformed_chunks=

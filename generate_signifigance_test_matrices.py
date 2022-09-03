@@ -55,7 +55,7 @@ def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance
                     continue
                 else:
                     #placeholder while scipy is down
-                    _,p=scipy.stats.ttest_ind(from_distribution,distribution_dict[temp_column],equal_var=False,alternative='two-sided')
+                    _,p=scipy.stats.ttest_ind(np.log10(np.array(from_distribution)),np.log10(np.array(distribution_dict[temp_column])),equal_var=False,alternative='two-sided')
                     temp_DataFrame.at[series.name,temp_column]=p
     
     #plb 2-7-2022

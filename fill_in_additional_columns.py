@@ -45,7 +45,7 @@ if __name__ == "__main__":
     os.system('touch ../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/dummy.txt')
 
     ##addtional_property_csv_address='../resources/bin_to_inchikey_map.csv'
-    addtional_property_csv_address='../resources/pull_from_carrot/bins_groups_inchi_from_gert.txt'
+    addtional_property_csv_address='../resources/pull_from_carrot/intermediates/bins_groups_inchi_from_gert_inchikey_group_harmonized.csv'
     pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
     pipeline_input_panda_output_address='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/pipeline_input_group_properties_added.bin'
 
