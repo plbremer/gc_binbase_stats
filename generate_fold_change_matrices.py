@@ -219,5 +219,8 @@ if __name__ == "__main__":
         how='left'
     )
 
+
     #output as pickle
-    input_panda.to_pickle(output_panda_address)
+    input_panda.loc[
+        input_panda.inchikey!='@@@@@@@',:
+    ].to_pickle(output_panda_address)

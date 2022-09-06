@@ -77,7 +77,8 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
     print('inside combination wrapper')
     #all_group_bins=os.listdir(data_base_address)
     #print(all_group_bins)
-    for temp_bin_and_name in bin_and_name_list:
+    for temp_counter,temp_bin_and_name in enumerate(bin_and_name_list):
+        print(f'we are on directory {temp_counter}')
         print('some row in the input panda')
         print(temp_bin_and_name)
         #we add this to avoid checking groups.
@@ -98,7 +99,7 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                 (species_organ_properties_panda.species==temp_species_organ_pair[0]) &
                 (species_organ_properties_panda.organ==temp_species_organ_pair[1])
             ]['count'].item()
-            print(data_base_address+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
+            #print(data_base_address+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
             try:
                 temp_panda=pd.read_pickle(data_base_address+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
                 #print(data_base_address+'/'+str(temp_bin_and_name[0])+'/'+temp_species_organ_pair[0]+'¬'+temp_species_organ_pair[1]+'¬'+str(temp_bin_and_name[0])+'.bin')
@@ -115,7 +116,7 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                     ]['average_fame_intensity'].item()
                     temp_imputed_annotations_list=impute_annotations_zero_found(this_species_organ_average_fame_intensity,this_species_organ_count)
                     temp_percent_present=0
-                    print('option a')
+                    #print('option a')
 
                 else:
                     #in general, the lists can have the property where some annotation has a magnitude of zero
@@ -129,8 +130,8 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
                     temp_panda.drop(labels=temp_panda.index[temp_panda.normalized_intensity==0], axis='index',inplace=True)
                     temp_panda.reset_index(inplace=True,drop=True)
                     temp_percent_present,temp_imputed_annotations_list=impute_annotations_at_least_one_found(temp_panda['normalized_intensity'].to_list(),this_species_organ_count,this_species_organ_average_fame_intensity)
-                    print('option b')
-                    print(temp_percent_present)
+                    # print('option b')
+                    #print(temp_percent_present)
 
 
 
@@ -150,7 +151,7 @@ def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_or
 
                 temp_imputed_annotations_list=impute_annotations_zero_found(this_species_organ_average_fame_intensity,this_species_organ_count)
                 temp_percent_present=0
-                print('option c')
+                #print('option c')
                 
                 # print(temp_imputed_annotations_list)
                 # print(this_species_organ_count)
@@ -193,7 +194,7 @@ if __name__=="__main__":
     compound_properties_panda_address='../resources/pull_from_carrot/original_from_carrot_input/all_species_organs_compounds_panda.tsv'
     species_organ_properties_panda_address='../resources/pull_from_carrot/original_from_carrot_input/species_organ_sample_count_and_average_fame.tsv'
 
-    output_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
+    output_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input'
     
 
     so_to_skip_panda=pd.read_csv(so_to_skip_csv_address,sep='¬')
@@ -208,8 +209,9 @@ if __name__=="__main__":
     #bin_list=get_all_bins()
     #species_organ_list=get_all_species_organs()
 
-    bin_and_name_list=get_compound_properties(compound_properties_panda)
-    print(bin_and_name_list)
+    bin_and_name_list_full=get_compound_properties(compound_properties_panda)
+    bin_and_name_list_full=sorted(bin_and_name_list_full)
+    print(bin_and_name_list_full)
     print('---------------------')
     # ##################################################################################
     # #temporarily here for testing - only read in a few compounds
@@ -218,40 +220,38 @@ if __name__=="__main__":
     #taken from the gert harmonized file. all the bins related to QNAYBMKLOCPYGJ-REOHCLBHSA-N
     ############bin_and_name_list=[a for a in bin_and_name_list if a[0] in [172163,172626,1965,171967,18223,34178,2] ]
     #bin_and_name_list=[a for a in bin_and_name_list ]
-    bin_and_name_list=[a for a in bin_and_name_list if a[0] in [4754,171969,84921,88421,1794,453,9] ]
-    print(bin_and_name_list)
+    #bin_and_name_list=[a for a in bin_and_name_list if a[0] in [4754,171969,84921,88421,1794,453,9] ]
+    #bin_and_name_list=[a for a in bin_and_name_list if a[0] in [3502, 133588, 390397, 227158, 111728,31609, 31559, 20281, 20283] ]
+    #print(bin_and_name_list)
     #hold=input('hold')
     # ##################################################################################
 
-    species_organ_pair_list=list(zip(species_organ_properties_panda.species,species_organ_properties_panda.organ))
-    #print(species_organ_pair_list)
-    hold=input('hold')
+    bin_and_name_list_list=[bin_and_name_list_full[x:x+500] for x in range(0, len(bin_and_name_list_full), 500)]
 
+    for bin_and_name_list_counter,bin_and_name_list in enumerate(bin_and_name_list_list):
+        species_organ_pair_list=list(zip(species_organ_properties_panda.species,species_organ_properties_panda.organ))
+        #print(species_organ_pair_list)
+        #hold=input('hold')
 
+        pipeline_input_panda=make_empty_input_panda(pipeline_input_panda_columns,bin_and_name_list)
+        #basically, we discvoered (see notebook step 3) that some groups dont have a bin assocaited with the group name
+        #therefore, we made some directories 
 
+        pipeline_input_panda.set_index(keys='id',drop=False,inplace=True)
+        # print(pipeline_input_panda)
+        # hold=input('hold')
+        
+        pipeline_input_panda,bins_to_remove=insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set)
+        pipeline_input_panda.reset_index(inplace=True,drop=True)
 
-    pipeline_input_panda=make_empty_input_panda(pipeline_input_panda_columns,bin_and_name_list)
+        print(pipeline_input_panda)
+        # pipeline_input_panda.drop(
+        #     labels=bins_to_remove,
+        #     axis='index',
+        #     inplace=True
+        # )
+        pipeline_input_panda=pipeline_input_panda.loc[~pipeline_input_panda.id.isin(bins_to_remove),:]
 
-
-    #basically, we discvoered (see notebook step 3) that some groups dont have a bin assocaited with the group name
-    #therefore, we made some directories 
-
-
-    pipeline_input_panda.set_index(keys='id',drop=False,inplace=True)
-    # print(pipeline_input_panda)
-    # hold=input('hold')
-    
-    pipeline_input_panda,bins_to_remove=insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set)
-    pipeline_input_panda.reset_index(inplace=True,drop=True)
-
-    print(pipeline_input_panda)
-    # pipeline_input_panda.drop(
-    #     labels=bins_to_remove,
-    #     axis='index',
-    #     inplace=True
-    # )
-    pipeline_input_panda=pipeline_input_panda.loc[~pipeline_input_panda.id.isin(bins_to_remove),:]
-
-    print(pipeline_input_panda)
-    #hold=input('end')
-    pipeline_input_panda.to_pickle(output_address)
+        print(pipeline_input_panda)
+        #hold=input('end')
+        pipeline_input_panda.to_pickle(output_address+'_'+str(bin_and_name_list_counter)+'.bin')

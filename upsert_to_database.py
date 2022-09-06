@@ -178,7 +178,9 @@ def make_update_table_from_panda(
             engine,
             index=False,
             dtype=temp_dtype_dict,
-            if_exists='replace'
+            if_exists='replace',
+            method='multi',
+            chunksize=100000
         )
         temp_big_string=', '.join(temp_columns_for_primary_key)
         temp_big_string='('+temp_big_string+')'
@@ -194,7 +196,9 @@ def make_update_table_from_panda(
             engine,
             index=False,
             dtype=temp_dtype_dict,
-            if_exists='append'
+            if_exists='append',
+            method='multi',
+            chunksize=100000
         )
 
 #https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64

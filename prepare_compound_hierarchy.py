@@ -71,10 +71,10 @@ def obtain_deepest_classyfire_class_per_bin(temp_panda):
         'direct_parent_3',
         'direct_parent_2',
         'direct_parent_1',
-        'subclass',
-        'class',
-        'superclass',
-        'kingdom'
+        'Subclass',
+        'Class',
+        'Superclass',
+        'Kingdom'
     ]
 
     for index, series in temp_panda.iterrows():
