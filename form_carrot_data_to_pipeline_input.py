@@ -63,13 +63,18 @@ def insert_combination(species,organ,compound):
 def impute_annotations_at_least_one_found(temp_annotations_list,temp_so_count,temp_average_fame_intensity):
     percent_present=len(temp_annotations_list)/temp_so_count
     imputed_value_base=percent_present*min(temp_annotations_list)
+    imputed_value_sigma=0.05*imputed_value_base
     return percent_present,temp_annotations_list+[
-        imputed_value_base+(((random.gauss(0,gauss_sigma))/temp_average_fame_intensity)) for i in range(temp_so_count-len(temp_annotations_list))
+        (imputed_value_base+random.gauss(0,imputed_value_sigma))/temp_average_fame_intensity for i in range(temp_so_count-len(temp_annotations_list))
     ]
 
 def impute_annotations_zero_found(temp_average_fame_intensity,temp_so_count):
-    #imputed_value=noise_intensity/temp_average_fame_intensity
-    return [((noise_intensity+random.gauss(0,gauss_sigma))/temp_average_fame_intensity) for i in range(temp_so_count)]
+    #what we impute results from normalizing the imputed value
+    #(noise_intensity/1e6)=(imputed/avg fame intensity)
+    #by avg fame intensity
+    #indeed, what we get is invariant to the fame, which is what we want
+    #we want all 0% annotations to have basically the same intensities
+    return [((noise_intensity+random.gauss(0,gauss_sigma))/mid_fame_intensity) for i in range(temp_so_count)]
 
 def insert_combination_wrapper(pipeline_input_panda,bin_and_name_list,species_organ_pair_list,data_base_address,species_organ_properties_panda,so_to_skip_set):
     #
@@ -183,8 +188,14 @@ if __name__=="__main__":
     #these are the things in the "elbow plot"
     #this file tells us how to skip systematic bias
     so_to_skip_csv_address='../resources/pull_from_carrot/intermediates/so_to_skip.csv'
-    noise_intensity=200
-    gauss_sigma=10
+    noise_intensity=1
+    gauss_sigma=0.05
+    #if we dont do this, then we will create artifacts based on the variations in fame intensity
+    #histogram the ave fame intensities to see how we got 1M
+    #so the imputed value for none found is (noise_intensity/1e6)=(imputed/avg fame intensity)
+    #the values of 1 and e6 were chosen by looking at intensities less than 1e6 for bin 4 (valine?)
+    #200/1e6, or 1e4, was too big of a signal
+    mid_fame_intensity=1e6
     ##data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'
     ##we are not making the pull from carrot part of the chain anymore
     data_base_address='../resources/pull_from_carrot/intermediates/soc_data/'

@@ -171,8 +171,8 @@ if __name__ == "__main__":
     #recombine_chunks
     pool.close()
     pool.join()
-    for i in range(len(transformed_chunks)):
-        input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+    # for i in range(len(transformed_chunks)):
+    #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
     input_panda_only_identified=pandas.concat(transformed_chunks)
     ####
 
@@ -196,8 +196,8 @@ if __name__ == "__main__":
     #recombine_chunks
     pool.close()
     pool.join()
-    for i in range(len(transformed_chunks)):
-        input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+    # for i in range(len(transformed_chunks)):
+    #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
     input_panda_only_identified=pandas.concat(transformed_chunks)
     ####
 

@@ -88,13 +88,13 @@ def transform_species_column(temp_bin_panda):
             
             for bin_index, bin_series in temp_bin_panda.iterrows():
                 indices_to_drop=[i for i in range(0,len(bin_series['species'])) if bin_series['species'][i] == mapping_series['list_of_species_that_had_zero_ncbi_id']]
-                species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
-                organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
-                total_intensity_list_with_indices_removed=list(np.delete(bin_series['total_intensity'],indices_to_drop))
-                median_intensity_list_with_indices_removed=list(np.delete(bin_series['median_intensity'],indices_to_drop))
-                count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
-                annotation_distribution_list_with_indices_removed=list(np.delete(bin_series['annotation_distribution'],indices_to_drop))
-                percent_present_list_with_indices_removed=list(np.delete(bin_series['percent_present'],indices_to_drop))
+                species_list_with_indices_removed=list(np.delete(np.array(bin_series['species'],dtype=object),indices_to_drop))
+                organ_list_with_indices_removed=list(np.delete(np.array(bin_series['organ'],dtype=object),indices_to_drop))
+                total_intensity_list_with_indices_removed=list(np.delete(np.array(bin_series['total_intensity'],dtype=object),indices_to_drop))
+                median_intensity_list_with_indices_removed=list(np.delete(np.array(bin_series['median_intensity'],dtype=object),indices_to_drop))
+                count_list_with_indices_removed=list(np.delete(np.array(bin_series['count'],dtype=object),indices_to_drop))
+                annotation_distribution_list_with_indices_removed=list(np.delete(np.array(bin_series['annotation_distribution'],dtype=object),indices_to_drop))
+                percent_present_list_with_indices_removed=list(np.delete(np.array(bin_series['percent_present'],dtype=object),indices_to_drop))
 
                 temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed

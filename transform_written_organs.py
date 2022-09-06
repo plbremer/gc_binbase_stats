@@ -133,14 +133,14 @@ def transform_organ_column(temp_bin_panda):
 #                    hold=input('hold in drop with sus')
                 #the way that organs map is a function of the species, so we include a second condition in the if statement
                 indices_to_drop=[i for i in range(0,len(bin_series['organ'])) if (bin_series['organ'][i] == mapping_series['organ_initial']) and (bin_series['species'][i] == mapping_series['species'])]
-                organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
-                species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
-                total_intensity_list_with_indices_removed=list(np.delete(bin_series['total_intensity'],indices_to_drop))
-                median_intensity_list_with_indices_removed=list(np.delete(bin_series['median_intensity'],indices_to_drop))
-                count_list_with_indices_removed=list(np.delete(bin_series['count'],indices_to_drop))
-                special_property_list_with_indices_removed=list(np.delete(bin_series['special_property_list'],indices_to_drop))
-                annotation_distribution_list_with_indices_removed=list(np.delete(bin_series['annotation_distribution'],indices_to_drop))
-                percent_present_list_with_indices_removed=list(np.delete(bin_series['percent_present'],indices_to_drop))
+                organ_list_with_indices_removed=list(np.delete(np.array(bin_series['organ'],dtype=object),indices_to_drop))
+                species_list_with_indices_removed=list(np.delete(np.array(bin_series['species'],dtype=object),indices_to_drop))
+                total_intensity_list_with_indices_removed=list(np.delete(np.array(bin_series['total_intensity'],dtype=object),indices_to_drop))
+                median_intensity_list_with_indices_removed=list(np.delete(np.array(bin_series['median_intensity'],dtype=object),indices_to_drop))
+                count_list_with_indices_removed=list(np.delete(np.array(bin_series['count'],dtype=object),indices_to_drop))
+                special_property_list_with_indices_removed=list(np.delete(np.array(bin_series['special_property_list'],dtype=object),indices_to_drop))
+                annotation_distribution_list_with_indices_removed=list(np.delete(np.array(bin_series['annotation_distribution'],dtype=object),indices_to_drop))
+                percent_present_list_with_indices_removed=list(np.delete(np.array(bin_series['percent_present'],dtype=object),indices_to_drop))
 
                 temp_bin_panda.at[bin_index,'organ']=organ_list_with_indices_removed
                 temp_bin_panda.at[bin_index,'species']=species_list_with_indices_removed
