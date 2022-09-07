@@ -20,7 +20,8 @@ if __name__ == "__main__":
     os.system('cp ../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_organ_dash.bin ../results/'+str(min_fold_change)+'/step_23_organize_files_for_dash_app/')
     os.system('cp ../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease_dash.bin ../results/'+str(min_fold_change)+'/step_23_organize_files_for_dash_app/')
 
-    random_fold_matrix_for_index_address='../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/all_matrices/fold_change_matrix_average/2.bin'
+    random_fold_matrix_for_index_directory_file_list=os.listdir('../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/all_matrices/fold_change_matrix_average/')
+    random_fold_matrix_for_index_address='../results/'+str(min_fold_change)+'/step_13_swap_fold_matrix_multiindex/all_matrices/fold_change_matrix_average/'+random_fold_matrix_for_index_directory_file_list[0]
     temp=pandas.read_pickle(random_fold_matrix_for_index_address)
     output_panda=temp.index.to_frame()
     index_panda=output_panda.copy()

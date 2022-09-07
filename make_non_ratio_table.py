@@ -35,7 +35,14 @@ if __name__ == "__main__":
         output_dict['percent_present']+=series['percent_present']
 
 
+
+
     temp_2=pd.DataFrame.from_dict(output_dict)
+    
+    #added because oliver says that very small decimals will freak people out
+    temp_2['intensity_average']=1e7*temp_2['intensity_average']
+    temp_2['intensity_median']=1e7*temp_2['intensity_median']
+    
     temp_2.to_pickle(output_panda_address)
 
     temp_2['combined_sod']=temp_2.species+' - '+temp_2.organ+' - '+temp_2.disease
