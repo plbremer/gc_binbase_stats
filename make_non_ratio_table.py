@@ -43,6 +43,10 @@ if __name__ == "__main__":
     temp_2['intensity_average']=1e7*temp_2['intensity_average']
     temp_2['intensity_median']=1e7*temp_2['intensity_median']
     
+    #for some reason bin 13110 was appearing twice
+    #hotfix    
+    temp_2.drop_duplicates(subset=['bin','species','organ','disease'],keep='first',inplace=True,ignore_index=True)
+
     temp_2.to_pickle(output_panda_address)
 
     temp_2['combined_sod']=temp_2.species+' - '+temp_2.organ+' - '+temp_2.disease

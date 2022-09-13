@@ -65,7 +65,7 @@ def impute_annotations_at_least_one_found(temp_annotations_list,temp_so_count,te
     imputed_value_base=percent_present*min(temp_annotations_list)
     imputed_value_sigma=0.05*imputed_value_base
     return percent_present,temp_annotations_list+[
-        (imputed_value_base+random.gauss(0,imputed_value_sigma))/temp_average_fame_intensity for i in range(temp_so_count-len(temp_annotations_list))
+        (imputed_value_base+random.gauss(0,imputed_value_sigma)) for i in range(temp_so_count-len(temp_annotations_list))
     ]
 
 def impute_annotations_zero_found(temp_average_fame_intensity,temp_so_count):
@@ -195,6 +195,12 @@ if __name__=="__main__":
     #so the imputed value for none found is (noise_intensity/1e6)=(imputed/avg fame intensity)
     #the values of 1 and e6 were chosen by looking at intensities less than 1e6 for bin 4 (valine?)
     #200/1e6, or 1e4, was too big of a signal
+    #when we plotted the median intensities of urea, biphenyl, and hexose, 1e6 looked too big.
+    #instead now gong with e13
+    #then we saw that the total intensity divided by the count didnt have this bimodalityy, and that 1e6
+    #was appropriate. so we are going to get rid of median
+    #no, before, we were erroneously dividng the already normalized imputed value by the fame intensity, but this was unnecessary
+    #everything seems good now
     mid_fame_intensity=1e6
     ##data_base_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'
     ##we are not making the pull from carrot part of the chain anymore
@@ -202,7 +208,7 @@ if __name__=="__main__":
     pipeline_input_panda_columns=['id','name','species','organ','count','total_intensity','median_intensity','group','inchikey','annotation_distribution','percent_present']
     ##compound_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/all_species_organs_compounds_panda.bin'
     ##species_organ_properties_panda_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/species_organ_sample_count_and_average_fame.bin'
-    compound_properties_panda_address='../resources/pull_from_carrot/original_from_carrot_input/all_species_organs_compounds_panda.tsv'
+    compound_properties_panda_address='../resources/pull_from_carrot/intermediates/all_species_organs_compounds_panda_2.tsv'
     species_organ_properties_panda_address='../resources/pull_from_carrot/original_from_carrot_input/species_organ_sample_count_and_average_fame.tsv'
 
     output_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input'
@@ -232,16 +238,16 @@ if __name__=="__main__":
     ############bin_and_name_list=[a for a in bin_and_name_list if a[0] in [172163,172626,1965,171967,18223,34178,2] ]
     #bin_and_name_list=[a for a in bin_and_name_list ]
     #bin_and_name_list=[a for a in bin_and_name_list if a[0] in [4754,171969,84921,88421,1794,453,9] ]
-    bin_and_name_list_full=[a for a in bin_and_name_list_full if a[0] in [  5271,   5485,  62272,  62319,   4949,      1,      7,     24,
-           44,     51,    133,    135,    155,    156,    252,    441,
-          454,    456,  23629,  23647, 145496,  33457,  33986,  33995,
-        48416,  13922,  22329,  17101, 390386,  42224,  42622,  34050,
-        34052,  34130,  34140,  34165,  34186, 104956,  31081,   1856,
-         1876,   1881,   1885,   1894,   1895,   1899,  29162,  29641,
-        29935, 171589, 108402, 108403, 108404,  21698,  21717,   2364,
-         2862,  47184,  68719,   3084,   3088,   3179,   3184,   3256,
-         3268,   3624,  20287,  14367,  14441,  14737,  46316,  16106,
-        16545, 372463,  92321,  24222,  24722,  24733] ]
+    # bin_and_name_list_full=[a for a in bin_and_name_list_full if a[0] in [  5271,   5485,  62272,  62319,   4949,      1,      7,     24,
+    #       44,     51,    133,    135,    155,    156,    252,    441,
+    #      454,    456,  23629,  23647, 145496,  33457,  33986,  33995,
+    #    48416,  13922,  22329,  17101, 390386,  42224,  42622,  34050,
+    #    34052,  34130,  34140,  34165,  34186, 104956,  31081,   1856,
+    #     1876,   1881,   1885,   1894,   1895,   1899,  29162,  29641,
+    #    29935, 171589, 108402, 108403, 108404,  21698,  21717,   2364,
+    #     2862,  47184,  68719,   3084,   3088,   3179,   3184,   3256,
+    #     3268,   3624,  20287,  14367,  14441,  14737,  46316,  16106,
+    #    16545, 372463,  92321,  24222,  24722,  24733, 2,4] ]
     #print(bin_and_name_list)
     #hold=input('hold')
     # ##################################################################################
