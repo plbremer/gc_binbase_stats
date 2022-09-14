@@ -37,6 +37,40 @@ def input_addtional_properties(pipeline_input_panda, additional_property_panda):
 
     return
 
+def concat_many_pipeline_inputs(pipeline_input_panda_directory,named,addtional_property_csv_address):
+    '''
+    takes the output of step 0_b and concats it into one big file
+    local desktop cant handle ram of all compounds, hence named property
+    so if named property is true, read in all the pandas, and maintain only those with inchikeys 
+    in the harmonized bin group inchi pandas
+    '''
+
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+
+
+    if named=='only_named':
+        additional_property_panda=pd.read_csv(addtional_property_csv_address)
+        bins_of_interest=additional_property_panda.loc[additional_property_panda.inchi_key.isnull()==False].bin_id.tolist()
+        pandas_list=list()        
+        for temp_file in file_list:
+            temp_panda=pd.read_pickle(pipeline_input_panda_directory+temp_file)
+            temp_panda=temp_panda.loc[
+                temp_panda['id'].isin(bins_of_interest)
+            ]
+            pandas_list.append(temp_panda)
+
+    elif named=='all':
+        pandas_list=list()        
+        for temp_file in file_list:
+            temp_panda=pd.read_pickle(pipeline_input_panda_directory+temp_file)
+            pandas_list.append(temp_panda)       
+
+
+    total_pipeline_input_panda=pd.concat(pandas_list,axis='index',ignore_index=True)
+    total_pipeline_input_panda.to_pickle('../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/overall_pipeline_input.bin')
+
+
 if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
@@ -48,7 +82,10 @@ if __name__ == "__main__":
     addtional_property_csv_address='../resources/pull_from_carrot/intermediates/bins_groups_inchi_from_gert_inchikey_group_harmonized.csv'
     ####temp for getting compound curation
     ####pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
-    pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/only_bins_with_inchikeys.bin'
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/'
+    concat_many_pipeline_inputs(pipeline_input_panda_directory,'only_named',addtional_property_csv_address)
+
+    pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/overall_pipeline_input.bin'
     pipeline_input_panda_output_address='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/pipeline_input_group_properties_added.bin'
 
     additional_property_panda=pd.read_csv(addtional_property_csv_address,sep=',')##,index_col=0)
