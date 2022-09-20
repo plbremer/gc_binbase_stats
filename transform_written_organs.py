@@ -80,6 +80,18 @@ def add_special_property_column(temp_panda,temp_mapping_address):
 
     #we read the organ mapping csv which will contain our transforms
     organ_mapping_panda=pandas.read_csv(temp_mapping_address,sep='@',index_col=0)
+    #quick fix to get cases straight
+    # organ_mapping_panda['species']=organ_mapping_panda['species'].str.lower().str.strip()
+    # organ_mapping_panda['organ_initial']=organ_mapping_panda['organ_initial'].str.lower().str.strip()
+    # organ_mapping_panda['organ_final']=organ_mapping_panda['organ_final'].str.lower().str.strip()
+    organ_mapping_panda['species']=[element.lower().strip() for element in organ_mapping_panda['species']]
+    organ_mapping_panda['organ_initial']=[element.lower().strip() for element in organ_mapping_panda['organ_initial']]
+    #organ_mapping_panda['organ_final']=[element.lower().strip() for element in organ_mapping_panda['organ_final']]
+    #organ_mapping_panda['special_property']=[element.lower().strip() if element!='No' else element for element in organ_mapping_panda['special_property'] ]
+
+    print(organ_mapping_panda.loc[organ_mapping_panda.species=='dehalococcoides mccartyi'])
+    print(organ_mapping_panda)
+
 
     #we create a mapping dictionary that basically looks like (species,organ): disease
     special_property_mapping_dict=dict(zip(zip(organ_mapping_panda['species'],organ_mapping_panda['organ_initial']),organ_mapping_panda['special_property']))
@@ -88,7 +100,8 @@ def add_special_property_column(temp_panda,temp_mapping_address):
         print(index)
         #applying out transform dict as a lambda on the list of organs
         #could have chosen organ, intensity, or species 
-        temp_key_list=zip(series['species'],series['organ'])
+        temp_key_list=zip([element.strip().lower() for element in series['species']],[element.strip().lower() for element in series['organ']])
+        #temp_key_list=zip([element.strip().lower() for element in series['species']],series['organ'])
         temp_panda.at[index,'special_property_list']=list(map(lambda x: special_property_mapping_dict[x], temp_key_list))
      
 def transform_organ_column(temp_bin_panda):
@@ -107,6 +120,9 @@ def transform_organ_column(temp_bin_panda):
     '''
     temp_mapping_address=organ_mapping_address
     mapping_panda=pandas.pandas.read_csv(temp_mapping_address,sep='@',index_col=0)
+
+    mapping_panda['species']=[element.lower().strip() for element in mapping_panda['species']]
+    mapping_panda['organ_initial']=[element.lower().strip() for element in mapping_panda['organ_initial']]
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
@@ -132,7 +148,7 @@ def transform_organ_column(temp_bin_panda):
                 #print(temp_bin_panda.at[bin_index,'species'].index(mapping_series['species']))
 #                    hold=input('hold in drop with sus')
                 #the way that organs map is a function of the species, so we include a second condition in the if statement
-                indices_to_drop=[i for i in range(0,len(bin_series['organ'])) if (bin_series['organ'][i] == mapping_series['organ_initial']) and (bin_series['species'][i] == mapping_series['species'])]
+                indices_to_drop=[i for i in range(0,len(bin_series['organ'])) if (bin_series['organ'][i].lower().strip() == mapping_series['organ_initial'].lower().strip()) and (bin_series['species'][i].lower().strip() == mapping_series['species'].lower().strip())]
                 organ_list_with_indices_removed=list(np.delete(np.array(bin_series['organ'],dtype=object),indices_to_drop))
                 species_list_with_indices_removed=list(np.delete(np.array(bin_series['species'],dtype=object),indices_to_drop))
                 total_intensity_list_with_indices_removed=list(np.delete(np.array(bin_series['total_intensity'],dtype=object),indices_to_drop))
@@ -163,8 +179,8 @@ def transform_organ_column(temp_bin_panda):
 
             for bin_index, bin_series in temp_bin_panda.iterrows():
                 for i in range(0,len(bin_series['organ'])):
-                    if (bin_series['organ'][i] == mapping_series['organ_initial']) and (bin_series['species'][i] == mapping_series['species']):
-                        bin_series['organ'][i] = mapping_series['organ_final']
+                    if (bin_series['organ'][i].lower().strip() == mapping_series['organ_initial'].lower().strip()) and (bin_series['species'][i].lower().strip() == mapping_series['species'].lower().strip()):
+                        bin_series['organ'][i] = mapping_series['organ_final'].strip()
 
                 temp_bin_panda.at[bin_index,'organ']=bin_series['organ']
 

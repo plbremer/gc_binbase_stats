@@ -50,21 +50,21 @@ def calculate_one_fold_change_matrix_trip(temp_bin,temp_MultiIndex,fold_change_t
     #were in lists for each bin (series)
     for index,series in temp_DataFrame.iterrows():
 
-        try:
-            from_intensity=intensity_dict[series.name]
-            for temp_column in temp_DataFrame.columns:
-                #if we are on a diagonal
-                if index == temp_column:
-                    temp_DataFrame.at[series.name,temp_column]=np.nan
-                    continue
-                
-                #plb edit 2-18-2022
-                #we are going to make this all a lot faster i think and switch to the superior fold change approach
-                #which is simply the log of the dividing
-                #ok after taking a look at this it might not be faster. it could be vectorized fairly easily probably
-                #but i have better things to do
-                else:
-                    temp_DataFrame.at[series.name,temp_column]=np.log2(intensity_dict[temp_column]/from_intensity)
+        #try:
+        from_intensity=intensity_dict[series.name]
+        for temp_column in temp_DataFrame.columns:
+            #if we are on a diagonal
+            if index == temp_column:
+                temp_DataFrame.at[series.name,temp_column]=np.nan
+                continue
+            
+            #plb edit 2-18-2022
+            #we are going to make this all a lot faster i think and switch to the superior fold change approach
+            #which is simply the log of the dividing
+            #ok after taking a look at this it might not be faster. it could be vectorized fairly easily probably
+            #but i have better things to do
+            else:
+                temp_DataFrame.at[series.name,temp_column]=np.log2(intensity_dict[temp_column]/from_intensity)
 
                 # try:
                 #     if intensity_dict[temp_column]>from_intensity:
@@ -78,17 +78,17 @@ def calculate_one_fold_change_matrix_trip(temp_bin,temp_MultiIndex,fold_change_t
                 # except KeyError:
                 #     temp_DataFrame.at[series.name,temp_column]=-np.inf
 
-        except KeyError:
-            for temp_column in temp_DataFrame.columns:
-                #if we are on a diagonal
-                if index == temp_column:
-                    temp_DataFrame.at[series.name,temp_column]=np.nan
-                    continue
-                try:
-                    if (intensity_dict[temp_column]):
-                        temp_DataFrame.at[series.name,temp_column]=np.inf
-                except KeyError:
-                    continue
+        # except KeyError:
+        #     for temp_column in temp_DataFrame.columns:
+        #         #if we are on a diagonal
+        #         if index == temp_column:
+        #             temp_DataFrame.at[series.name,temp_column]=np.nan
+        #             continue
+        #         try:
+        #             if (intensity_dict[temp_column]):
+        #                 temp_DataFrame.at[series.name,temp_column]=np.inf
+        #         except KeyError:
+        #             continue
 
     return temp_DataFrame
 

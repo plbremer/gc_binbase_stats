@@ -84,7 +84,7 @@ def transform_species_column(temp_bin_panda):
 
         #declare mapping rule
         #drop rules work differently. must get all indices and then drop from mapping as well as organs
-        if mapping_series['most_specific'] == 'drop':
+        if mapping_series['most_specific'] == 'drop' or mapping_series['most_specific'] == 'Drop':
             
             for bin_index, bin_series in temp_bin_panda.iterrows():
                 indices_to_drop=[i for i in range(0,len(bin_series['species'])) if bin_series['species'][i] == mapping_series['list_of_species_that_had_zero_ncbi_id']]
@@ -106,15 +106,23 @@ def transform_species_column(temp_bin_panda):
 
 
         #if we have a transformation
-        elif mapping_series['most_specific'] != 'drop':
+        elif mapping_series['most_specific'] != 'drop' or mapping_series['most_specific'] != 'Drop':
 
             for bin_index, bin_series in temp_bin_panda.iterrows():
 
                 for i in range(0,len(bin_series['species'])):
-                    if (bin_series['species'][i] == mapping_series['list_of_species_that_had_zero_ncbi_id']):
-                        bin_series['species'][i] = mapping_series['most_specific']
+                    #print(bin_series['species'][i].lower()+' and '+mapping_series['list_of_species_that_had_zero_ncbi_id'].lower())
+                    if (bin_series['species'][i].lower()) == (mapping_series['list_of_species_that_had_zero_ncbi_id'].lower()):
+                        bin_series['species'][i] = mapping_series['most_specific'].lower()
+                    #print(mapping_series['most_specific'].lower())
 
                 temp_bin_panda.at[bin_index,'species']=bin_series['species']
+                
+                #temp_bin_panda.at[bin_index,'species']=[element.lower() for element in temp_bin_panda.at[bin_index,'species']]
+
+    #quick fix to make everythin the same case
+    for index,series in temp_bin_panda.iterrows():
+        temp_bin_panda.at[index,'species']=[element.lower() for element in temp_bin_panda.at[index,'species']]
 
     return temp_bin_panda
 
