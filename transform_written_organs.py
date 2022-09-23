@@ -199,7 +199,7 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
         mesh_organ_name_set.add(temp_nx.nodes[temp_node]['mesh_label'])
 
     print(mesh_organ_name_set)
-    hold=input('mesh organ name set')
+    #hold=input('mesh organ name set')
     not_in_mesh_set=set()
     in_mesh_set=set()
     for temp_organ in temp_organ_set:
@@ -209,10 +209,10 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
             in_mesh_set.add(temp_organ)
 
     print(in_mesh_set)
-    hold=input('in mesh_set')
+    #hold=input('in mesh_set')
 
     print(not_in_mesh_set)
-    hold=input('not_in_mesh_set')
+    #hold=input('not_in_mesh_set')
     return in_mesh_set,not_in_mesh_set
 
 if __name__ == "__main__":
@@ -257,7 +257,7 @@ if __name__ == "__main__":
         elif i==(num_processes-1):
             panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:])
     print(panda_chunks)
-    hold=input('check chunks')
+    #hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
     transformed_chunks=pool.map(transform_organ_column,panda_chunks)
     #transform_organ_column(post_species_transform_panda)

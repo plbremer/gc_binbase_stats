@@ -178,10 +178,10 @@ if __name__ == "__main__":
     for temp in organ_networkx.nodes:
         if 'C' in temp:
             print('theres still a disease ehre')
-    hold=input('check diseases gone')
+    #hold=input('check diseases gone')
     print(disease_networkx.nodes)
     #prove that the disease hierarchy is filled with nodes (albeit not showing edges)
-    hold=input('check diesases')
+    #hold=input('check diesases')
 
     nx.readwrite.gpickle.write_gpickle(organ_networkx,output_organ_networkx_address)
     nx.readwrite.gpickle.write_gpickle(disease_networkx,output_disease_networkx_address)

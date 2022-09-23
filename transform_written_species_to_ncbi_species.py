@@ -170,11 +170,11 @@ if __name__ == "__main__":
     has_0_id_set,has_more_than_1_id_set=identify_elements_not_in_ncbi(all_species_set)
 
     print_some_set(all_species_set)
-    hold=input('copy and paste the all species set if necessary')
+    #hold=input('copy and paste the all species set if necessary')
     print_some_set(has_0_id_set)
-    hold=input('copy and paste the has 0 id if necessary')
+    #hold=input('copy and paste the has 0 id if necessary')
     print_some_set(has_more_than_1_id_set)
-    hold=input('copy and paste the has multiple id if necessary')
+    #hold=input('copy and paste the has multiple id if necessary')
 
     
     #later, after doing a curatin of this list, we put the transform file in the 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
         elif i==(num_processes-1):
             panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
     print(panda_chunks)
-    hold=input('check chunks')
+    #hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
     transformed_chunks=pool.map(transform_species_column,panda_chunks)
     #recombine_chunks
@@ -204,9 +204,9 @@ if __name__ == "__main__":
     all_species_set=get_all_strings_in_list_across_panda_column(binvestigate_panda,'species')
     has_0_id_set,has_more_than_1_id_set=identify_elements_not_in_ncbi(all_species_set)
     print_some_set(has_0_id_set)
-    hold=input('confirm 0 set empty')
+    #hold=input('confirm 0 set empty')
     print_some_set(has_more_than_1_id_set)
-    hold=input('confirm multiple set empty')
+    #hold=input('confirm multiple set empty')
 
     #output the result
     binvestigate_panda.to_pickle(output_pickle_address)

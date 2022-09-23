@@ -102,12 +102,12 @@ if __name__ == "__main__":
     #the input panda here is the taxid<->species mapping.
     #we do not need to get a taxonomy mapping because metagenompy prepares that automatically
     #from a local database
-    input_mapping_panda_address='../results/'+str(min_fold_change)+'/step_10_create_species_taxid_mapping/species_tax_id_mapping.bin'
+    input_mapping_panda_address='../results/'+str(min_fold_change)+'/step_8_a_create_species_taxid_mapping/species_tax_id_mapping.bin'
     input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    output_networkx_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/species_networkx.bin'
-    output_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
-    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/')
-    os.system('touch ../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/dummy.txt')
+    output_networkx_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin'
+    output_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/dummy.txt')
 
     #read in things or make the species network from databse
     #plb edit 2-6-2022
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     hold=input('confirm that those mapped were swapped')
 
     #cut the networkx to branches and meaningful inputs
-    contract_irrelevant_nodes(binvestigate_species_networkx,taxid_for_this_binvestigate_panda_list)
+    #contract_irrelevant_nodes(binvestigate_species_networkx,taxid_for_this_binvestigate_panda_list)
 
     #print('check that the ncbi number was added')
     for temp_node in binvestigate_species_networkx.nodes:

@@ -110,16 +110,16 @@ if __name__ == "__main__":
     input_panda=pandas.read_pickle(input_panda_address)
     print(input_panda)
     print(input_panda.index)
-    hold=input('hold')
+    #hold=input('hold')
     #obtain total organ-species list
     #organ_species_tuple_list=list(transform_written_organs.show_all_organ_species_pairs(input_panda))
     organ_species_disease_tuple_list=list(show_all_organ_species_disease_triplets(input_panda))
     pprint(organ_species_disease_tuple_list)
-    hold=input('hold')
+    #hold=input('hold')
     #all fold change matrices have the same row/column labels (see single for further logic)
     organ_species_disease_tuple_list.sort(key=lambda temp_tup: (temp_tup[0],temp_tup[1],temp_tup[2]))
     pprint(organ_species_disease_tuple_list)
-    hold=input('hold')
+    #hold=input('hold')
     
 
     #update 7-4-22 plb
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         elif i==(num_processes-1):
             panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
     print(panda_chunks)
-    hold=input('check chunks')
+    #hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
     temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type)))
     transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         elif i==(num_processes-1):
             panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
     print(panda_chunks)
-    hold=input('check chunks')
+    #hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
     temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type)))
     transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)

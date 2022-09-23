@@ -238,7 +238,7 @@ if __name__=="__main__":
     ############bin_and_name_list=[a for a in bin_and_name_list if a[0] in [172163,172626,1965,171967,18223,34178,2] ]
     #bin_and_name_list=[a for a in bin_and_name_list ]
     #bin_and_name_list=[a for a in bin_and_name_list if a[0] in [4754,171969,84921,88421,1794,453,9] ]
-    bin_and_name_list_full=[a for a in bin_and_name_list_full if a[0] in [26754,106699,84922,426961] ]
+    bin_and_name_list_full=[a for a in bin_and_name_list_full if a[0] in [26754,106699,84922,426961,2,4] ]
     # bin_and_name_list_full=[a for a in bin_and_name_list_full if a[0] in [  5271,   5485,  62272,  62319,   4949,      1,      7,     24,
     #       44,     51,    133,    135,    155,    156,    252,    441,
     #      454,    456,  23629,  23647, 145496,  33457,  33986,  33995,

@@ -168,7 +168,7 @@ if __name__ == "__main__":
     #and get the nodes that they connect to with this dict
     class_to_node_dict=make_class_to_node_name_dict(parsed_obo)
     print(class_to_node_dict)
-    hold=input('dict')
+    #hold=input('dict')
 
     #make a column with the deepest classyfire class possible - in this way we can 
     #find the class to use on the above dict 
