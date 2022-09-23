@@ -182,26 +182,26 @@ if __name__ == "__main__":
 
 
 
-    #upload the fold change matrices
-    #get list of compounds and classes (listdir on one) (basically just bins)
-    full_list=choose_all_bins('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
-    #for each bin, prepare each then upload each
-    for i,temp_bin in enumerate(full_list):
-        start_time=time.time()
+    # #upload the fold change matrices
+    # #get list of compounds and classes (listdir on one) (basically just bins)
+    # full_list=choose_all_bins('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
+    # #for each bin, prepare each then upload each
+    # for i,temp_bin in enumerate(full_list):
+    #     start_time=time.time()
         
-        temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin)
-        upload_fold_change_panda(temp_panda_for_upload,i,connection)
+    #     temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin)
+    #     upload_fold_change_panda(temp_panda_for_upload,i,connection)
         
-        end_time=time.time()
-        print(temp_bin+': '+str(end_time-start_time))
+    #     end_time=time.time()
+    #     print(temp_bin+': '+str(end_time-start_time))
 
 
-    start_time=time.time()
-    #create our index
-    connection.execute(
-        f'''
-        ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, species_from, organ_from, disease_from, species_to, organ_to, disease_to);
-        '''
-    )      
-    end_time=time.time()
-    print('time to create complete differential analysis index: '+str(end_time-start_time))
+    # start_time=time.time()
+    # #create our index
+    # connection.execute(
+    #     f'''
+    #     ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, species_from, organ_from, disease_from, species_to, organ_to, disease_to);
+    #     '''
+    # )      
+    # end_time=time.time()
+    # print('time to create complete differential analysis index: '+str(end_time-start_time))
