@@ -37,13 +37,13 @@ if __name__ == "__main__":
 
     #make compound translation panda
     compound_translation_panda=create_translation_panda_for_compounds('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
-    #compound_translation_panda.to_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')
+    compound_translation_panda.to_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')
     print(compound_translation_panda)
 
     #make triplet translation panda
     any_file=os.listdir('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average/')[0]
     triplet_translation_panda=create_translation_dict_for_triplets(
-        f'../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average/'+any_file
+        '../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average/'+any_file
     )
-    #triplet_translation_panda.to_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/triplet_translation_panda.bin')
+    triplet_translation_panda.to_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/triplet_translation_panda.bin')
     print(triplet_translation_panda)

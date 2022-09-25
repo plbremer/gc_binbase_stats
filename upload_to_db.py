@@ -17,7 +17,7 @@ def choose_all_bins(directory_address):
     full_list=os.listdir(directory_address)
     return full_list
 
-def prepare_one_bin_for_upload(temp_bin):
+def prepare_one_bin_for_upload(temp_bin,mapping_dict,compound_mapping_dict):
     '''
     prepares one bin/class entry for the database
     we open all 4 fold/sig for one compund, stack them, typecast to dataframe, concat, change header names, change header order
@@ -35,12 +35,25 @@ def prepare_one_bin_for_upload(temp_bin):
     ]
     
     for i,panda in enumerate(pandas_list):
-        #panda.index.set_names(names=['organ_from','species_from','disease_from'],inplace=True)
-        #panda.columns.set_names(names=['organ_to','species_to','disease_to'],inplace=True)
-        #print(panda)
-        pandas_list[i]=pd.DataFrame(panda.stack().stack().stack())
-        pandas_list[i].index.set_names(['organ_from','species_from','disease_from','disease_to','species_to','organ_to'],inplace=True)
-    
+
+        pandas_list[i].columns=pandas_list[i].columns.to_flat_index()
+        pandas_list[i].index=pandas_list[i].index.to_flat_index()
+        pandas_list[i].rename(columns=mapping_dict,inplace=True,errors='raise')
+        pandas_list[i].rename(index=mapping_dict,inplace=True)
+        #print(pandas_list[i])
+        #hold=input('hold')
+        #pandas_list[i]=pd.DataFrame(panda.stack().stack().stack())
+        
+        pandas_list[i].values[np.triu_indices_from(pandas_list[i], 0)] = np.nan
+        
+        pandas_list[i]=pd.DataFrame(panda.stack())
+        #print(pandas_list[i])
+        #hold=input('hold2')
+        #pandas_list[i].index.set_names(['organ_from','species_from','disease_from','disease_to','species_to','organ_to'],inplace=True)
+        pandas_list[i].index.set_names(['triplet_from','triplet_to'],inplace=True)
+        #print(pandas_list[i])
+        #print(pandas_list[i].index)
+        
     pandas_list[0].rename({0:'fold_change_average'},inplace=True,axis='columns')
     pandas_list[1].rename({0:'fold_change_median'},inplace=True,axis='columns')
     pandas_list[2].rename({0:'significance_mwu'},inplace=True,axis='columns')
@@ -50,11 +63,11 @@ def prepare_one_bin_for_upload(temp_bin):
     
     total_panda.reset_index(inplace=True)
     
-    total_panda.insert(loc=0,column='compound_id',value=temp_bin[:-4])
-    
+    total_panda.insert(loc=0,column='compound_id',value=compound_mapping_dict[temp_bin[:-4]])
+    #print(total_panda)
     total_panda=total_panda[[
-        'compound_id','species_from', 'organ_from', 'disease_from', 
-        'species_to', 'organ_to', 'disease_to','fold_change_average', 'fold_change_median',
+        'compound_id','triplet_from', 
+        'triplet_to','fold_change_average', 'fold_change_median',
         'significance_mwu', 'significance_welch'
     ]]
     
@@ -69,15 +82,11 @@ def upload_fold_change_panda(temp_panda_for_upload,bin_iteration,connection):
             connection,
             index=False,
             dtype={
-                'compound_id':postgresql.TEXT,
-                'species_from':postgresql.TEXT,
-                'organ_from':postgresql.TEXT,
-                'disease_from':postgresql.TEXT,
-                'species_to':postgresql.TEXT,
-                'organ_to':postgresql.TEXT,
-                'disease_to':postgresql.TEXT,
-                'fold_change_average':postgresql.FLOAT,
-                'fold_change_median':postgresql.FLOAT,
+                'compound_id':postgresql.SMALLINT,
+                'triplet_from':postgresql.SMALLINT,
+                'triplet_to':postgresql.SMALLINT,
+                'fold_change_average':postgresql.REAL,
+                'fold_change_median':postgresql.REAL,
                 'significance_mwu':postgresql.FLOAT,
                 'significance_welch':postgresql.FLOAT,
             },
@@ -92,21 +101,17 @@ def upload_fold_change_panda(temp_panda_for_upload,bin_iteration,connection):
             connection,
             index=False,
             dtype={
-                'compound_id':postgresql.TEXT,
-                'species_from':postgresql.TEXT,
-                'organ_from':postgresql.TEXT,
-                'disease_from':postgresql.TEXT,
-                'species_to':postgresql.TEXT,
-                'organ_to':postgresql.TEXT,
-                'disease_to':postgresql.TEXT,
-                'fold_change_average':postgresql.FLOAT,
-                'fold_change_median':postgresql.FLOAT,
+                'compound_id':postgresql.SMALLINT,
+                'triplet_from':postgresql.SMALLINT,
+                'triplet_to':postgresql.SMALLINT,
+                'fold_change_average':postgresql.REAL,
+                'fold_change_median':postgresql.REAL,
                 'significance_mwu':postgresql.FLOAT,
                 'significance_welch':postgresql.FLOAT,
             },
             if_exists='append',
             method='multi',
-            chunksize=90000
+            chunksize=70000
         )
 
 def upload_non_ratio_table(temp_panda,connection):
@@ -129,7 +134,33 @@ def upload_non_ratio_table(temp_panda,connection):
         chunksize=90000
     )    
     
+def upload_compound_translation_table(temp_panda,connection):
+    temp_panda.to_sql(
+        'compound_translation_table',
+        connection,
+        index=True,
+        dtype={
+            'compound_identifier':postgresql.TEXT,
+            'integer_representation':postgresql.INTEGER
+        },
+        if_exists='replace',
+        method='multi',
+        chunksize=90000
+    )    
 
+def upload_triplet_translation_table(temp_panda,connection):
+    temp_panda.to_sql(
+        'compound_translation_table',
+        connection,
+        index=True,
+        dtype={
+            'triplet_identifier':postgresql.TEXT,
+            'integer_representation':postgresql.INTEGER
+        },
+        if_exists='replace',
+        method='multi',
+        chunksize=90000
+    )  
 
 
 if __name__ == "__main__":
@@ -185,15 +216,23 @@ if __name__ == "__main__":
     #upload the fold change matrices
     #get list of compounds and classes (listdir on one) (basically just bins)
     full_list=choose_all_bins('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
+    triplet_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/triplet_translation_panda.bin')
+    triplet_mapping_dict={
+        triplet_mapping_panda.at[i,'triplet_identifier']:triplet_mapping_panda.at[i,'integer_representation'] for i in triplet_mapping_panda.index
+    }
+    compound_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')
+    compound_mapping_dict={
+        compound_mapping_panda.at[i,'compound_identifier']:compound_mapping_panda.at[i,'integer_representation'] for i in compound_mapping_panda.index
+    }    
     #for each bin, prepare each then upload each
     for i,temp_bin in enumerate(full_list):
         start_time=time.time()
-        
-        temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin)
+
+        temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin,triplet_mapping_dict,compound_mapping_dict)
         upload_fold_change_panda(temp_panda_for_upload,i,connection)
-        
+
         end_time=time.time()
-        print(temp_bin+': '+str(end_time-start_time))
+        print(temp_bin+', iteration '+str(i)+': '+str(end_time-start_time))
 
 
     start_time=time.time()
@@ -205,3 +244,15 @@ if __name__ == "__main__":
     )      
     end_time=time.time()
     print('time to create complete differential analysis index: '+str(end_time-start_time))
+
+
+
+
+
+
+
+    #upload mapping pandas
+    upload_compound_translation_table(compound_mapping_panda,connection)
+ 
+
+    upload_triplet_translation_table(triplet_mapping_panda,connection)
