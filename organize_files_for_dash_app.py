@@ -47,3 +47,11 @@ if __name__ == "__main__":
     print(output_panda)
     output_panda.to_pickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/sod_combo.bin')
     #index_panda=output_panda.copy()
+
+    triplet_mapping_address='../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/triplet_translation_panda.bin'
+    triplet_mapping_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/triplet_translation_panda.bin' 
+    os.system(f'cp {triplet_mapping_address} {triplet_mapping_output}')
+
+    compound_mapping_address='../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin'
+    compound_mapping_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/compound_translation_panda.bin' 
+    os.system(f'cp {compound_mapping_address} {compound_mapping_output}')

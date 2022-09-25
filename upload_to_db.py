@@ -223,7 +223,24 @@ if __name__ == "__main__":
     compound_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')
     compound_mapping_dict={
         compound_mapping_panda.at[i,'compound_identifier']:compound_mapping_panda.at[i,'integer_representation'] for i in compound_mapping_panda.index
-    }    
+    }  
+
+
+
+
+
+
+
+    #upload mapping pandas
+    upload_compound_translation_table(compound_mapping_panda,connection)
+    upload_triplet_translation_table(triplet_mapping_panda,connection)
+
+
+
+
+
+
+
     #for each bin, prepare each then upload each
     for i,temp_bin in enumerate(full_list):
         start_time=time.time()
@@ -239,7 +256,7 @@ if __name__ == "__main__":
     #create our index
     connection.execute(
         f'''
-        ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, species_from, organ_from, disease_from, species_to, organ_to, disease_to);
+        ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
         '''
     )      
     end_time=time.time()
