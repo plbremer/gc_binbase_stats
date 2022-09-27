@@ -126,9 +126,12 @@ if __name__ == "__main__":
     #basically, we are only going to do the volcano plot stuff for knowns.
     #so we grab a subset of the entire panda, those with inchikeys, do the comparison for them
     #and then merge
-    input_panda_only_identified=input_panda.loc[
-        input_panda.inchikey!='@@@@@@@',:
-    ]
+    #update 220926 we are going to try for all of the bins
+    # input_panda_only_identified=input_panda.loc[
+    #     input_panda.inchikey!='@@@@@@@',:
+    # ]
+    #so now, only_identified is a misnomer. felt easier than rewriting everything
+    input_panda_only_identified=input_panda.copy()
 
     
     ####
@@ -179,19 +182,32 @@ if __name__ == "__main__":
     input_panda_only_identified=pandas.concat(transformed_chunks)
     ####
 
-    input_panda_only_identified=input_panda_only_identified.loc[
-        :,['inchikey','signifigance_mannwhitney','signifigance_welch']
-    ]
 
-    input_panda=input_panda.merge(
-        right=input_panda_only_identified,
-        left_on='inchikey',
-        right_on='inchikey',
-        how='left'
-    )
+    #220926 plb
+    # input_panda_only_identified=input_panda_only_identified.loc[
+    #     :,['inchikey','signifigance_mannwhitney','signifigance_welch']
+    # ]
+
+    #     #220926 plb
+    # input_panda=input_panda.merge(
+    #     right=input_panda_only_identified,
+    #     left_on='inchikey',
+    #     right_on='inchikey',
+    #     how='left'
+    # )
+    # input_panda=input_panda.merge(
+    #     right=input_panda_only_identified,
+    #     left_on='inchikey',
+    #     right_on='inchikey',
+    #     #220926 plb
+    #     #how='left'
+    #     how='inner'
+    # )
 
 
-    #output as pickle
-    input_panda.loc[
-        input_panda.inchikey!='@@@@@@@',:
-    ].to_pickle(output_panda_address)
+    # #output as pickle
+    # #220926 we are keepin eerything
+    # # input_panda.loc[
+    # #     input_panda.inchikey!='@@@@@@@',:
+    # # ].to_pickle(output_panda_address)
+    input_panda_only_identified.to_pickle(output_panda_address)

@@ -261,16 +261,22 @@ def write_each_unknown_to_file(binvestigate_panda,temp_address_base):
         'signifigance_matrix_mannwhitney',
         'signifigance_matrix_welch'
     ]
+    binvestigate_panda_column_names=[
+        'fold_change_total_intensity', 
+        'fold_change_median_intensity',
+        'signifigance_mannwhitney', 
+        'signifigance_welch'
+    ]
 
     print('now outputting unknown bins')
     for index,series in binvestigate_panda.iterrows():
         if series['inchikey']!='@@@@@@@':
             continue
-        print('printing unknown '+str(series['id'])+' iteration number '+str(index))
         else:
-            for temp_matrix in matrices_to_compute:
-                total_address=temp_address_base+temp_matrix+'/'
-                series[temp_matrix].to_pickle(total_address+str(series['id'])+'.bin')
+            print('printing unknown '+str(series['id'])+' iteration number '+str(index))
+            for i in range(len(matrices_to_compute)):
+                total_address=temp_address_base+matrices_to_compute[i]+'/'
+                series[binvestigate_panda_column_names[i]].to_pickle(total_address+str(series['id'])+'.bin')
 
 
 
@@ -279,10 +285,11 @@ def do_everything(temp_nx,temp_node_keep_address,temp_hierarchy_type):
     if temp_hierarchy_type=='compound':
         
         temp_nx=nx.DiGraph.reverse(temp_nx)
-
+        #draw_nx_for_analysis(temp_nx,'compound')
         compounds_to_keep_panda=pandas.read_csv(temp_node_keep_address)
         keep_list=compounds_to_keep_panda['nodes_to_keep'].to_list()    
         remove_unwanted_nodes(temp_nx,keep_list,temp_hierarchy_type)
+        #draw_nx_for_analysis(temp_nx,'compound')
 
     return temp_nx
 
@@ -315,6 +322,93 @@ def remove_unwanted_nodes(temp_nx,temp_nodes_to_keep,temp_hierarchy_type):
         temp_nx.remove_node(temp_node)
 
     return temp_nx
+
+def draw_nx_for_analysis(temp_nx,temp_hierarchy_type,set_of_binvestigate_nodes=None):
+    '''
+
+    '''
+    #for compound matrix, it is obvious that bins => source of data
+    #for species matrix, we put that information into an attribute called "type of node" where the values
+    #   are "from binvestigate" or "combination"
+   
+
+    total_color_list=list()
+    
+    if temp_hierarchy_type=='compound':
+        label_dict=get_labels_for_drawing(temp_nx,'compound')
+        for i,temp_node in enumerate(temp_nx.nodes):
+            if temp_nx.nodes[temp_node]['type_of_node']=='combination':
+                total_color_list.append('#ff0000')
+            elif temp_nx.nodes[temp_node]['type_of_node']=='from_binvestigate':
+                total_color_list.append('#32cd32')
+    
+    elif temp_hierarchy_type=='species':
+        label_dict=get_labels_for_drawing(temp_nx,'species')
+        for i,temp_node in enumerate(temp_nx.nodes):
+            if temp_node in set_of_binvestigate_nodes:
+                total_color_list.append('#32cd32')
+            else:
+                total_color_list.append('#ff0000')
+    
+    elif temp_hierarchy_type=='organ':
+        label_dict=get_labels_for_drawing(temp_nx,'organ')
+        for i,temp_node in enumerate(temp_nx.nodes):
+            if temp_nx.nodes[temp_node]['mesh_label'] in set_of_binvestigate_nodes:
+                total_color_list.append('#32cd32')
+            else:
+                total_color_list.append('#ff0000')
+
+    elif temp_hierarchy_type=='disease':
+        label_dict=get_labels_for_drawing(temp_nx,'disease')
+        for i,temp_node in enumerate(temp_nx.nodes):
+            if temp_nx.nodes[temp_node]['mesh_label'] in set_of_binvestigate_nodes:
+                total_color_list.append('#32cd32')
+            else:
+                total_color_list.append('#ff0000')
+
+
+
+
+    pos = nx.nx_agraph.pygraphviz_layout(temp_nx, prog='dot')
+    nx.draw(temp_nx, pos,labels=label_dict,node_color=total_color_list)
+    plt.show()
+
+
+def get_labels_for_drawing(temp_nx,temp_hierarchy_type):
+
+    label_dict=dict()
+    if temp_hierarchy_type=='compound':
+        for temp_node in temp_nx.nodes:
+            try:
+                label_dict[temp_node]=(temp_node+'\n'+temp_nx.nodes[temp_node]['name'])
+            except TypeError:
+                label_dict[temp_node]=(str(temp_node))
+
+    elif temp_hierarchy_type=='species':
+        for temp_node in temp_nx.nodes:
+            pprint(temp_nx.nodes[temp_node])
+            try:
+                temp_sci_name=temp_nx.nodes[temp_node]['scientific_name']
+            except KeyError:
+                temp_sci_name='no scientific name found'
+
+            try:
+                if type(temp_nx.nodes[temp_node]['common_name']) == list:
+                    temp_common_name=temp_nx.nodes[temp_node]['common_name'][0]
+                else:
+                    temp_common_name=temp_nx.nodes[temp_node]['common_name']
+            except KeyError:
+                temp_common_name='no common name found' 
+
+            label_dict[temp_node]=(temp_node+'\n'+temp_sci_name+'\n'+temp_common_name)
+
+    elif temp_hierarchy_type=='organ' or temp_hierarchy_type=='disease':
+        for temp_node in temp_nx.nodes:
+            print(temp_node)
+            label_dict[temp_node]=temp_node+'\n'+temp_nx.nodes[temp_node]['mesh_label']
+
+    return label_dict
+
 
 if __name__ == "__main__":
     
@@ -389,6 +483,6 @@ if __name__ == "__main__":
     #update 220926 plb
     #we also want the unknowns for the final database, but not in the compound analysis
     #so we just copy them over from the binvestigate pickle
-    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
     binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
     write_each_unknown_to_file(binvestigate_panda,individual_fold_matrix_directory_base)

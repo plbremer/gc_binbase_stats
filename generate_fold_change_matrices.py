@@ -209,19 +209,22 @@ if __name__ == "__main__":
     print(input_panda_only_identified.columns)
     print('---------------------------------------')    
 
-    input_panda_only_identified=input_panda_only_identified.loc[
-        :,['inchikey','fold_change_total_intensity','fold_change_median_intensity']
-    ]
+
+    #220926 plb
+    # input_panda_only_identified=input_panda_only_identified.loc[
+    #     :,['inchikey','fold_change_total_intensity','fold_change_median_intensity']
+    # ]
 
     
-    print(input_panda_only_identified)
+    # print(input_panda_only_identified)
 
-    input_panda=input_panda.merge(
-        right=input_panda_only_identified,
-        left_on='inchikey',
-        right_on='inchikey',
-        how='left'
-    )
+
+    # input_panda=input_panda.merge(
+    #     right=input_panda_only_identified,
+    #     left_on='inchikey',
+    #     right_on='inchikey',
+    #     how='left'
+    # )
 
 
     #output as pickle
@@ -229,4 +232,4 @@ if __name__ == "__main__":
     # input_panda.loc[
     #     input_panda.inchikey!='@@@@@@@',:
     # ].to_pickle(output_panda_address)
-    input_panda.to_pickle(output_panda_address)
+    input_panda_only_identified.to_pickle(output_panda_address)

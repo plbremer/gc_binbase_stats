@@ -109,9 +109,10 @@ def add_one_node_to_classyfire_network(temp_nx,temp_bin,temp_class_to_node_dict)
     #basically, if the compound is unknown, then we connect directly to the root node
     ##update 7-4-2022
     ##too much data to do this analysis for unknowns
-    ##try:
-    node_to_connect_to=temp_class_to_node_dict[current_bin_name]
-    ##except KeyError:
+    try:
+        node_to_connect_to=temp_class_to_node_dict[current_bin_name]
+    except KeyError:
+        return
     ##    node_to_connect_to='CHEMONTID:9999999'
 
 

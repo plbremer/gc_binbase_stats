@@ -74,6 +74,7 @@ def concat_many_pipeline_inputs(pipeline_input_panda_directory,named,addtional_p
 if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
+    named_or_all=sys.argv[2]
     #output_pickle_address='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/binvestigate_species_transformed.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/dummy.txt')
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     ####temp for getting compound curation
     ####pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/'
-    concat_many_pipeline_inputs(pipeline_input_panda_directory,'only_named',addtional_property_csv_address)
+    concat_many_pipeline_inputs(pipeline_input_panda_directory,named_or_all,addtional_property_csv_address)
 
     pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/overall_pipeline_input.bin'
     pipeline_input_panda_output_address='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/pipeline_input_group_properties_added.bin'
