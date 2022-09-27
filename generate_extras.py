@@ -20,6 +20,7 @@ def create_translation_panda_for_compounds(networkx_address,directory_address):
             'integer_representation':[i for i,element in enumerate(full_list)]
         }
     )
+    [print(compound_translation_panda)]
 
     bin_type=list()
     for temp_identifier in compound_translation_panda.compound_identifier.to_list():
@@ -36,9 +37,35 @@ def create_translation_panda_for_compounds(networkx_address,directory_address):
                 if compound_networkx.nodes[(temp_identifier)]['type_of_node']=='from_binvestigate':
                     bin_type.append('known')
                 else:
-                    bin_type.append('class')                
+                    bin_type.append('class')         
+
+    english_name=list()
+    for temp_identifier in compound_translation_panda.compound_identifier.to_list():    
+        if temp_identifier not in compound_networkx_nodes_as_str:
+            english_name.append('unknown')
+        else:
+            if 'CHEMONTID' in temp_identifier:
+                english_name.append(compound_networkx.nodes[temp_identifier]['name'])
+            else:
+                english_name.append(compound_networkx.nodes[int(temp_identifier)]['common_name'])
+
+    print(english_name)
+
+    identifier=list()
+    for temp_identifier in compound_translation_panda.compound_identifier.to_list():    
+        if temp_identifier not in compound_networkx_nodes_as_str:
+            identifier.append('unknown')
+        else:
+            if 'CHEMONTID' in temp_identifier:
+                identifier.append(temp_identifier)
+            else:
+                identifier.append(compound_networkx.nodes[int(temp_identifier)]['inchikey'])
+
+
 
     compound_translation_panda['bin_type']=bin_type
+    compound_translation_panda['english_name']=english_name
+    compound_translation_panda['identifier']=identifier
     print(compound_translation_panda)
     return compound_translation_panda
     #return {element[:-4]:i for i,element in enumerate(full_list)}
@@ -49,10 +76,12 @@ def create_translation_dict_for_triplets(temp_bin_address):
     #print(temp.index[0])
     compound_translation_panda=pd.DataFrame.from_dict(
         {
-            'triplet_identifier':[temp.index[i] for i in range(len(temp.index))],
+            'triplet_identifier_tuple':[temp.index[i] for i in range(len(temp.index))],
+            'triplet_identifier_string':[temp.index[i][1]+' - '+temp.index[i][0]+' - '+temp.index[i][2] for i in range(len(temp.index))],
             'integer_representation':[i for i in range(len(temp.index))]
         }
     )    
+    compound_translation_panda.set_index('triplet_identifier_string',inplace=True,drop=False)
     return compound_translation_panda
 
 if __name__ == "__main__":
