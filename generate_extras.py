@@ -1,12 +1,16 @@
 import sys
 import os
 import pandas as pd
+import networkx as nx
 
 def choose_all_bins(directory_address):
     full_list=os.listdir(directory_address)
     return full_list
 
-def create_translation_panda_for_compounds(directory_address):
+def create_translation_panda_for_compounds(networkx_address,directory_address):
+    
+    compound_networkx=nx.read_gpickle(networkx_address)
+    
     full_list=choose_all_bins(directory_address)
     compound_translation_panda=pd.DataFrame.from_dict(
         {
@@ -14,6 +18,19 @@ def create_translation_panda_for_compounds(directory_address):
             'integer_representation':[i for i,element in enumerate(full_list)]
         }
     )
+
+    bin_type=list()
+    for temp_identifier in compound_translation_panda.compound_identifier.to_list():
+        if temp_identifier not in compound_networkx.nodes:
+            bin_type.append('unknown')
+        else:
+            if compound_networkx.nodes[temp_identifier]['type_of_node']=='from_binvestigate':
+                bin_type.append('known')
+            else:
+                bin_type.append('class')
+
+    compound_translation_panda['bin_type']=bin_type
+
     return compound_translation_panda
     #return {element[:-4]:i for i,element in enumerate(full_list)}
 
@@ -36,7 +53,9 @@ if __name__ == "__main__":
     os.system('touch ../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/dummy.txt')
 
     #make compound translation panda
-    compound_translation_panda=create_translation_panda_for_compounds('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
+    compound_networkx_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    compound_panda_directory_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average'
+    compound_translation_panda=create_translation_panda_for_compounds(compound_networkx_address,compound_panda_directory_address)
     compound_translation_panda.to_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')
     print(compound_translation_panda)
 

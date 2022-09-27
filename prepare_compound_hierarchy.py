@@ -193,6 +193,10 @@ if __name__ == "__main__":
     #for each bin assign as a child node of the deepest node that is possible
 
 
+
+
+
+
     #nx.draw(parsed_obo)
     #plt.show()    
     #visualize_added_classes(parsed_obo,original_classyfire_node_count)

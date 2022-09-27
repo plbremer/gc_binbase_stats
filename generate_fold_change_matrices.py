@@ -142,13 +142,17 @@ if __name__ == "__main__":
     pprint(organ_species_disease_tuple_list)
     #hold=input('hold')
     
+
     #update 7-4-22 plb
     #basically, we are only going to do the volcano plot stuff for knowns.
     #so we grab a subset of the entire panda, those with inchikeys, do the comparison for them
     #and then merge
-    input_panda_only_identified=input_panda.loc[
-        input_panda.inchikey!='@@@@@@@',:
-    ]
+    #update 220926 we are going to try for all of the bins
+    # input_panda_only_identified=input_panda.loc[
+    #     input_panda.inchikey!='@@@@@@@',:
+    # ]
+    #so now, only_identified is a misnomer. felt easier than rewriting everything
+    input_panda_only_identified=input_panda.copy()
 
 
     
@@ -221,6 +225,8 @@ if __name__ == "__main__":
 
 
     #output as pickle
-    input_panda.loc[
-        input_panda.inchikey!='@@@@@@@',:
-    ].to_pickle(output_panda_address)
+    #220926 we are keepin eerything
+    # input_panda.loc[
+    #     input_panda.inchikey!='@@@@@@@',:
+    # ].to_pickle(output_panda_address)
+    input_panda.to_pickle(output_panda_address)

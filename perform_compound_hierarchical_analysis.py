@@ -253,6 +253,69 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
         temp_nx.nodes[temp_bottom_node]['type_of_node']='combination'
 
 
+def write_each_unknown_to_file(binvestigate_panda,temp_address_base):
+
+    matrices_to_compute=[
+        'fold_change_matrix_average',
+        'fold_change_matrix_median',
+        'signifigance_matrix_mannwhitney',
+        'signifigance_matrix_welch'
+    ]
+
+    print('now outputting unknown bins')
+    for index,series in binvestigate_panda.iterrows():
+        if series['inchikey']!='@@@@@@@':
+            continue
+        print('printing unknown '+str(series['id'])+' iteration number '+str(index))
+        else:
+            for temp_matrix in matrices_to_compute:
+                total_address=temp_address_base+temp_matrix+'/'
+                series[temp_matrix].to_pickle(total_address+str(series['id'])+'.bin')
+
+
+
+def do_everything(temp_nx,temp_node_keep_address,temp_hierarchy_type):
+    
+    if temp_hierarchy_type=='compound':
+        
+        temp_nx=nx.DiGraph.reverse(temp_nx)
+
+        compounds_to_keep_panda=pandas.read_csv(temp_node_keep_address)
+        keep_list=compounds_to_keep_panda['nodes_to_keep'].to_list()    
+        remove_unwanted_nodes(temp_nx,keep_list,temp_hierarchy_type)
+
+    return temp_nx
+
+def remove_unwanted_nodes(temp_nx,temp_nodes_to_keep,temp_hierarchy_type):
+    '''
+    for species and compounds, we automatically keep a node if it is a leaf
+    for organs and diseases, we require that a node be explicitly listed to be kept
+    '''
+    
+    nodes_to_drop=list()
+    if temp_hierarchy_type=='compound' or temp_hierarchy_type=='species':
+        for temp_node in temp_nx.nodes:
+            if (temp_node not in temp_nodes_to_keep) and (len(list(temp_nx.successors(temp_node)))>0):
+                nodes_to_drop.append(temp_node)
+    elif temp_hierarchy_type=='organ' or temp_hierarchy_type=='disease':
+        for temp_node in temp_nx.nodes:
+            if (temp_node not in temp_nodes_to_keep):
+                nodes_to_drop.append(temp_node)
+
+
+    for temp_node in nodes_to_drop:
+
+        list_of_predecessors=list(temp_nx.predecessors(temp_node))
+        list_of_successors=list(temp_nx.successors(temp_node))
+        for temp_predecessor in list_of_predecessors:
+            print(temp_predecessor)
+            for temp_successor in list_of_successors:
+                print(temp_successor)
+                temp_nx.add_edge(temp_predecessor,temp_successor)
+        temp_nx.remove_node(temp_node)
+
+    return temp_nx
+
 if __name__ == "__main__":
     
     
@@ -312,5 +375,20 @@ if __name__ == "__main__":
     hold=input('2')
     '''
 
+
+    #update 220926 plb
+    #originally from "reduce hierarchy complexity post dash"
+    #compound_nx_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    compound_node_keep_address='../resources/species_organ_maps/networkx_shrink_compound.txt'
+    #compound_nx_output_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
+    compound_network=do_everything(compound_network,compound_node_keep_address,'compound')
+
+
     nx.readwrite.gpickle.write_gpickle(compound_network,output_graph_address,protocol=0)
 
+    #update 220926 plb
+    #we also want the unknowns for the final database, but not in the compound analysis
+    #so we just copy them over from the binvestigate pickle
+    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
+    write_each_unknown_to_file(binvestigate_panda,individual_fold_matrix_directory_base)

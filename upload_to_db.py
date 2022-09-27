@@ -230,10 +230,10 @@ if __name__ == "__main__":
 
 
 
-
-    #upload mapping pandas
-    upload_compound_translation_table(compound_mapping_panda,connection)
-    upload_triplet_translation_table(triplet_mapping_panda,connection)
+    #220926 plb dont upload these, do the "math" in the api
+    # #upload mapping pandas
+    # upload_compound_translation_table(compound_mapping_panda,connection)
+    # upload_triplet_translation_table(triplet_mapping_panda,connection)
 
 
 
