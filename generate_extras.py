@@ -74,15 +74,35 @@ def create_translation_dict_for_triplets(temp_bin_address):
     temp=pd.read_pickle(temp_bin_address)
     #print(temp.index)
     #print(temp.index[0])
-    compound_translation_panda=pd.DataFrame.from_dict(
+    triplet_translation_panda=pd.DataFrame.from_dict(
         {
             'triplet_identifier_tuple':[temp.index[i] for i in range(len(temp.index))],
             'triplet_identifier_string':[temp.index[i][1]+' - '+temp.index[i][0]+' - '+temp.index[i][2] for i in range(len(temp.index))],
             'integer_representation':[i for i in range(len(temp.index))]
         }
     )    
-    compound_translation_panda.set_index('triplet_identifier_string',inplace=True,drop=False)
-    return compound_translation_panda
+
+    triplet_translation_panda.set_index('triplet_identifier_string',inplace=True,drop=False)
+
+    #add the count column
+    binvestigate_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin')
+    organ_list=binvestigate_panda.at[0,'organ']
+    species_list=binvestigate_panda.at[0,'species']
+    disease_list=binvestigate_panda.at[0,'special_property_list']
+    count_list=binvestigate_panda.at[0,'count']
+    count_list_dict=dict()
+    for i in range(len(count_list)):
+        count_list_dict[species_list[i]+' - '+organ_list[i]+' - '+disease_list[i]]=count_list[i]
+    #count_list_dict=dict(zip())
+
+    print(count_list_dict)
+    triplet_translation_panda['count']=triplet_translation_panda['triplet_identifier_string']
+    print(triplet_translation_panda)
+    triplet_translation_panda['count']=triplet_translation_panda['count'].map(count_list_dict.get)
+    print(triplet_translation_panda)
+    print('*'*50)
+
+    return triplet_translation_panda
 
 if __name__ == "__main__":
 

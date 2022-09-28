@@ -44,7 +44,7 @@ def prepare_one_bin_for_upload(temp_bin,mapping_dict,compound_mapping_dict):
         #hold=input('hold')
         #pandas_list[i]=pd.DataFrame(panda.stack().stack().stack())
         
-        pandas_list[i].values[np.triu_indices_from(pandas_list[i], 0)] = np.nan
+        pandas_list[i].values[np.tril_indices_from(pandas_list[i], 0)] = np.nan
         
         pandas_list[i]=pd.DataFrame(panda.stack())
         #print(pandas_list[i])
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     full_list=choose_all_bins('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
     triplet_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/triplet_translation_panda.bin')
     triplet_mapping_dict={
-        triplet_mapping_panda.at[i,'triplet_identifier']:triplet_mapping_panda.at[i,'integer_representation'] for i in triplet_mapping_panda.index
+        triplet_mapping_panda.at[i,'triplet_identifier_tuple']:triplet_mapping_panda.at[i,'integer_representation'] for i in triplet_mapping_panda.index
     }
     compound_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')
     compound_mapping_dict={
@@ -268,8 +268,8 @@ if __name__ == "__main__":
 
 
 
-    #upload mapping pandas
-    upload_compound_translation_table(compound_mapping_panda,connection)
+    # #upload mapping pandas
+    # upload_compound_translation_table(compound_mapping_panda,connection)
  
 
-    upload_triplet_translation_table(triplet_mapping_panda,connection)
+    # upload_triplet_translation_table(triplet_mapping_panda,connection)
