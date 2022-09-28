@@ -172,11 +172,11 @@ if __name__ == "__main__":
     #remove branches that are totally unrelated
     remove_branches_unrelated_to_binvestigate_set(organ_networkx,organ_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     #contract nodes
     contract_irrelevant_nodes(organ_networkx,organ_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     #add custom connection from each head node to a master headnode
     #for custom subset
     ###seems like we use this one in toy datasets atm
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     temp_organ_edges=[('organ',temp_node) for temp_node in organ_headnodes_list]
     organ_networkx.add_edges_from(temp_organ_edges)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     
 
 
@@ -216,14 +216,14 @@ if __name__ == "__main__":
     #remove branches that are totally unrelated
     remove_branches_unrelated_to_binvestigate_set(disease_networkx,disease_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     #contract nodes
     #contract_irrelevant_nodes(disease_networkx,disease_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     #add a node for "no" to disease
     disease_networkx.add_node('No', mesh_label='No')
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     ###disease_headnodes_list=['C06','C04','C14','C19','C08','C15','C13','C18','C16','C20','C17','C12','C10','No']
     ###seems like we use this one in toy datasets atm
     disease_headnodes_list=['C04','C08','C17','No']

@@ -122,11 +122,19 @@ if __name__ == "__main__":
     #shrinkt the total possibel list to those that appear in this particular binvestigate panda
     species_in_this_binvestigate_panda_set=get_all_strings_in_list_across_panda_column(binvestigate_panda,'species')
     taxid_for_this_binvestigate_panda_list=list()
+    
+    output_for_species_translation={
+        'english':[],
+        'ncbi_id':[]
+    }
     for temp_species in species_in_this_binvestigate_panda_set:
         print(temp_species)
         print(species_taxid_panda.loc[species_taxid_panda['species']==temp_species,'tax_id'].values[0])
         taxid_for_this_binvestigate_panda_list.append(str(species_taxid_panda.loc[species_taxid_panda['species']==temp_species,'tax_id'].values[0]))
+        output_for_species_translation['english'].append(temp_species)
+        output_for_species_translation['ncbi_id'].append(species_taxid_panda.loc[species_taxid_panda['species']==temp_species,'tax_id'].values[0])
 
+    pandas.DataFrame.from_dict(output_for_species_translation).to_pickle('../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/for_index_panda_for_dash_species_translation.bin')
     #shrink the entire ncbi networkx according to the sublist of nodes 
     #create a copy that we work with
     binvestigate_species_networkx_view=metagenompy.highlight_nodes(total_ncbi_networkx,taxid_for_this_binvestigate_panda_list)
@@ -140,10 +148,10 @@ if __name__ == "__main__":
     #metagenompy.condense_taxonomy(binvestigate_species_networkx)
 
     #render the networkx before further work is done
-    fig, ax = plt.subplots(figsize=(10, 10))
-    metagenompy.plot_network(binvestigate_species_networkx, ax=ax, labels_kws=dict(font_size=10))
-    fig.tight_layout()
-    plt.show()
+    # fig, ax = plt.subplots(figsize=(10, 10))
+    # metagenompy.plot_network(binvestigate_species_networkx, ax=ax, labels_kws=dict(font_size=10))
+    # fig.tight_layout()
+    # plt.show()
     
     print('------------------------------------------------')
     for temp_taxid in taxid_for_this_binvestigate_panda_list:
@@ -168,7 +176,7 @@ if __name__ == "__main__":
         if temp_species not in binvestigate_species_networkx.nodes:
             print(type(temp_species))
             print(temp_species)
-    hold=input('confirm that those mapped were swapped')
+    #hold=input('confirm that those mapped were swapped')
 
     #cut the networkx to branches and meaningful inputs
     #contract_irrelevant_nodes(binvestigate_species_networkx,taxid_for_this_binvestigate_panda_list)
@@ -187,14 +195,14 @@ if __name__ == "__main__":
     node_labels = {
         n: data.get('scientific_name', '') for n, data in binvestigate_species_networkx.nodes(data=True)
     }
-    fig, ax = plt.subplots(figsize=(10, 10))
-    metagenompy.plot_network(binvestigate_species_networkx, ax=ax, labels_kws=dict(font_size=10))
-    fig.tight_layout()
-    plt.show()
+    # fig, ax = plt.subplots(figsize=(10, 10))
+    # metagenompy.plot_network(binvestigate_species_networkx, ax=ax, labels_kws=dict(font_size=10))
+    # fig.tight_layout()
+    # plt.show()
     
     #render the network with the "binvestigate nodes" being a special color
     species_id_set=get_all_strings_in_list_across_panda_column(binvestigate_panda,'species')
-    visualize_nodes_on_a_list(binvestigate_species_networkx,species_id_set,None)
+    # visualize_nodes_on_a_list(binvestigate_species_networkx,species_id_set,None)
 
     #print the network and the binvestigate panda with the species as taxid
     nx.readwrite.gpickle.write_gpickle(binvestigate_species_networkx,output_networkx_address)

@@ -24,7 +24,7 @@ def return_taxid_panda_for_species_set(temp_species_set):
 
     species_taxid_mapping_panda=pandas.DataFrame.from_dict(dict_to_make_panda)
     print(species_taxid_mapping_panda)
-    hold=input('check output panda')
+    #hold=input('check output panda')
 
     return species_taxid_mapping_panda
 
