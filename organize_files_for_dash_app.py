@@ -6,7 +6,9 @@ import pandas as pd
 
 def make_index_panda_for_dash_app():
     starting_point=pd.read_pickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/sod_combo.bin')
-    
+    starting_point['species_english']=starting_point['species']
+    starting_point['organ_english']=starting_point['organ']
+    starting_point['disease_english']=starting_point['disease']
     #species_networkx=nx.read_gpickle('../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin')
     species_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/for_index_panda_for_dash_species_translation.bin')
 
@@ -108,14 +110,16 @@ if __name__ == "__main__":
 
     triplet_mapping_address='../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/triplet_translation_panda.bin'
     triplet_mapping_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/triplet_translation_panda.bin' 
-    # os.system(f'cp {triplet_mapping_address} {triplet_mapping_output}')
+    os.system(f'cp {triplet_mapping_address} {triplet_mapping_output}')
 
     compound_mapping_address='../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin'
     compound_mapping_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/compound_translation_panda.bin' 
-    # os.system(f'cp {compound_mapping_address} {compound_mapping_output}')
+    os.system(f'cp {compound_mapping_address} {compound_mapping_output}')
 
 
     index_panda=make_index_panda_for_dash_app()
 
 
-
+    species_translation_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/for_index_panda_for_dash_species_translation.bin'
+    species_translation_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/for_index_panda_for_dash_species_translation.bin'
+    os.system(f'cp {species_translation_address} {species_translation_output}')
