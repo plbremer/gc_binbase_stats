@@ -42,7 +42,7 @@ def create_translation_panda_for_compounds(networkx_address,directory_address):
     english_name=list()
     for temp_identifier in compound_translation_panda.compound_identifier.to_list():    
         if temp_identifier not in compound_networkx_nodes_as_str:
-            english_name.append('unknown')
+            english_name.append('Unknown: Bin '+str(temp_identifier))
         else:
             if 'CHEMONTID' in temp_identifier:
                 english_name.append(compound_networkx.nodes[temp_identifier]['name'])

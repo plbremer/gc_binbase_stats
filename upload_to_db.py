@@ -162,6 +162,28 @@ def upload_triplet_translation_table(temp_panda,connection):
         chunksize=90000
     )  
 
+def upload_spectral_bin_table(spectral_bin_panda,connection):
+    spectral_bin_panda.to_sql(
+        'compound_translation_table',
+        connection,
+        index=True,
+        index_label='compound_identifier',
+        dtype={
+            'retentionIndex':postgresql.FLOAT, 
+            'kovats':postgresql.FLOAT, 
+            'quantMass':postgresql.FLOAT, 
+            'splash':postgresql.TEXT, 
+            'purity':postgresql.FLOAT, 
+            'uniqueMass':postgresql.FLOAT, 
+            'spectrum':postgresql.TEXT, 
+            'compound_identifier':postgresql.INTEGER, 
+            'english_name':postgresql.TEXT
+        },
+        if_exists='replace',
+        method='multi',
+        chunksize=90000,
+    )      
+
 
 if __name__ == "__main__":
 
@@ -273,3 +295,18 @@ if __name__ == "__main__":
  
 
     # upload_triplet_translation_table(triplet_mapping_panda,connection)
+
+
+    #upload non-ratio table
+    table_9b_address='../results/'+str(min_fold_change)+'/step_9_b_generate_bin_spectral_panda/bin_spectral_panda.bin'
+    spectral_bin_panda=pd.read_pickle(table_5_address)
+    upload_spectral_bin_table(spectral_bin_panda,connection)
+    # start_time=time.time()
+    # #create our index
+    # connection.execute(
+    #     f'''
+    #     ALTER TABLE non_ratio_table ADD PRIMARY KEY (bin,species,organ,disease);
+    #     '''
+    # )      
+    # end_time=time.time()
+    # print('time to create non ratio index: '+str(end_time-start_time))
