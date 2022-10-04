@@ -30,7 +30,10 @@ if __name__ == "__main__":
         temp_intensities=[float(x) for x in series['spectra_intensity'][0]]
         temp_max_intensity=max(temp_intensities)
         temp_intensities_normalized=[x/temp_max_intensity for x in temp_intensities]
-        spectrum_list.append([str(temp_mzs[x])+':'+str(temp_intensities_normalized[x]) for x in range(len(temp_mzs))])
+        normalized_spectrum=[str(temp_mzs[x])+':'+str(temp_intensities_normalized[x]) for x in range(len(temp_mzs))]
+        uploaded_string=' '.join(normalized_spectrum)
+        #[uploaded_string:=uploaded_string+str(temp_mzs[x])+':'+str(temp_intensities_normalized[x])+' ' for x in range(len(temp_mzs))]
+        spectrum_list.append(uploaded_string)
     ##normalize spectrum intensity
     binvestigate_spectral_panda['spectrum']=spectrum_list
     

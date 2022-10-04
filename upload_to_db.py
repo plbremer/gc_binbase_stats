@@ -164,10 +164,10 @@ def upload_triplet_translation_table(temp_panda,connection):
 
 def upload_spectral_bin_table(spectral_bin_panda,connection):
     spectral_bin_panda.to_sql(
-        'compound_translation_table',
+        'bin_table',
         connection,
-        index=True,
-        index_label='compound_identifier',
+        index=False,
+        #index_label='compound_identifier',
         dtype={
             'retentionIndex':postgresql.FLOAT, 
             'kovats':postgresql.FLOAT, 
@@ -263,26 +263,26 @@ if __name__ == "__main__":
 
 
 
-    #for each bin, prepare each then upload each
-    for i,temp_bin in enumerate(full_list):
-        start_time=time.time()
+    # #for each bin, prepare each then upload each
+    # for i,temp_bin in enumerate(full_list):
+    #     start_time=time.time()
 
-        temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin,triplet_mapping_dict,compound_mapping_dict)
-        upload_fold_change_panda(temp_panda_for_upload,i,connection)
+    #     temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin,triplet_mapping_dict,compound_mapping_dict)
+    #     upload_fold_change_panda(temp_panda_for_upload,i,connection)
 
-        end_time=time.time()
-        print(temp_bin+', iteration '+str(i)+': '+str(end_time-start_time))
+    #     end_time=time.time()
+    #     print(temp_bin+', iteration '+str(i)+': '+str(end_time-start_time))
 
 
-    start_time=time.time()
-    #create our index
-    connection.execute(
-        f'''
-        ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
-        '''
-    )      
-    end_time=time.time()
-    print('time to create complete differential analysis index: '+str(end_time-start_time))
+    # start_time=time.time()
+    # #create our index
+    # connection.execute(
+    #     f'''
+    #     ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
+    #     '''
+    # )      
+    # end_time=time.time()
+    # print('time to create complete differential analysis index: '+str(end_time-start_time))
 
 
 
@@ -299,14 +299,14 @@ if __name__ == "__main__":
 
     #upload non-ratio table
     table_9b_address='../results/'+str(min_fold_change)+'/step_9_b_generate_bin_spectral_panda/bin_spectral_panda.bin'
-    spectral_bin_panda=pd.read_pickle(table_5_address)
+    spectral_bin_panda=pd.read_pickle(table_9b_address)
     upload_spectral_bin_table(spectral_bin_panda,connection)
     # start_time=time.time()
     # #create our index
-    # connection.execute(
-    #     f'''
-    #     ALTER TABLE non_ratio_table ADD PRIMARY KEY (bin,species,organ,disease);
-    #     '''
-    # )      
+    connection.execute(
+        f'''
+        ALTER TABLE bin_table ADD PRIMARY KEY (compound_identifier);
+        '''
+    )      
     # end_time=time.time()
     # print('time to create non ratio index: '+str(end_time-start_time))
