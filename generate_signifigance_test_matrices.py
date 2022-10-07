@@ -18,7 +18,7 @@ def show_all_organ_species_disease_triplets(temp_panda):
     return set_of_organ_species_disease_tuples
 
 
-def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance_type):
+def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance_type,organ_species_disease_tuple_list):
     '''
     asdf
     '''
@@ -73,7 +73,7 @@ def calculate_one_signifigance_matrix_trip(temp_bin,temp_MultiIndex,signifigance
     return temp_DataFrame
 
 
-def calculate_all_signifigance_matrices_trip(temp_panda,signifigance_type):
+def calculate_all_signifigance_matrices_trip(temp_panda,signifigance_type,organ_species_disease_tuple_list):
     '''
     asdf
     '''
@@ -89,13 +89,13 @@ def calculate_all_signifigance_matrices_trip(temp_panda,signifigance_type):
         #we print merely to see how long this is taking
         print(index)
         print(series['name'])
-        temp_panda.at[index,'signifigance_'+signifigance_type]=calculate_one_signifigance_matrix_trip(series,my_MultiIndex,signifigance_type)    
+        temp_panda.at[index,'signifigance_'+signifigance_type]=calculate_one_signifigance_matrix_trip(series,my_MultiIndex,signifigance_type,organ_species_disease_tuple_list)    
 
     return temp_panda
 
 
 if __name__ == "__main__":
-    
+    multiprocessing.set_start_method("spawn")
     #2-06-2022 plb
     #deleted the "non trip version" of the functions as they only seemed to handle species/organ
 
@@ -109,16 +109,16 @@ if __name__ == "__main__":
 
     input_panda=pandas.read_pickle(input_panda_address)
     print(input_panda)
-    print(input_panda.index)
+    #print(input_panda.index)
     #hold=input('hold')
     #obtain total organ-species list
     #organ_species_tuple_list=list(transform_written_organs.show_all_organ_species_pairs(input_panda))
     organ_species_disease_tuple_list=list(show_all_organ_species_disease_triplets(input_panda))
-    pprint(organ_species_disease_tuple_list)
+    #pprint(organ_species_disease_tuple_list)
     #hold=input('hold')
     #all fold change matrices have the same row/column labels (see single for further logic)
     organ_species_disease_tuple_list.sort(key=lambda temp_tup: (temp_tup[0],temp_tup[1],temp_tup[2]))
-    pprint(organ_species_disease_tuple_list)
+    #pprint(organ_species_disease_tuple_list)
     #hold=input('hold')
     
 
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     print(panda_chunks)
     #hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type)))
+    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type),repeat(organ_species_disease_tuple_list)))
     transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
     #recombine_chunks
     pool.close()
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     print(panda_chunks)
     #hold=input('check chunks')
     pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type)))
+    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type),repeat(organ_species_disease_tuple_list)))
     transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
     #recombine_chunks
     pool.close()
