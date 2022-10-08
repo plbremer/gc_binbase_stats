@@ -6,11 +6,14 @@ if __name__ == "__main__":
 
     
     min_fold_change=sys.argv[1]
-    input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
-    output_panda_address='../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/non_ratio_table.bin'
+
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/dummy.txt')
 
+    #input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/'
+    
+    output_panda_address='../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/non_ratio_table.bin'
     output_dict={
         'bin':[],
         'compound':[],
@@ -22,17 +25,21 @@ if __name__ == "__main__":
         'percent_present':[]
     }
 
-    temp=pd.read_pickle(input_panda_address)
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    for temp_file in file_list:
+        temp=pd.read_pickle(pipeline_input_panda_directory+temp_file)
+ 
 
-    for index,series in temp.iterrows():
-        output_dict['bin']+=[series['id'] for i in range(len(series['species']))]
-        output_dict['compound']+=[series['name'] for i in range(len(series['species']))]
-        output_dict['species']+=series['species']
-        output_dict['organ']+=series['organ']
-        output_dict['disease']+=series['special_property_list']
-        output_dict['intensity_average']+=series['total_intensity']
-        output_dict['intensity_median']+=series['median_intensity']
-        output_dict['percent_present']+=series['percent_present']
+        for index,series in temp.iterrows():
+            output_dict['bin']+=[series['id'] for i in range(len(series['species']))]
+            output_dict['compound']+=[series['name'] for i in range(len(series['species']))]
+            output_dict['species']+=series['species']
+            output_dict['organ']+=series['organ']
+            output_dict['disease']+=series['special_property_list']
+            output_dict['intensity_average']+=series['total_intensity']
+            output_dict['intensity_median']+=series['median_intensity']
+            output_dict['percent_present']+=series['percent_present']
 
 
 

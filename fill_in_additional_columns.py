@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import re
 
 def input_addtional_properties(pipeline_input_panda, additional_property_panda):
 
@@ -80,23 +81,22 @@ if __name__ == "__main__":
     os.system('touch ../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/dummy.txt')
 
     ##addtional_property_csv_address='../resources/bin_to_inchikey_map.csv'
-    addtional_property_csv_address='../resources/pull_from_carrot/intermediates/bins_groups_inchi_from_gert_inchikey_group_harmonized.csv'
     ####temp for getting compound curation
     ####pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
-    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/'
-    concat_many_pipeline_inputs(pipeline_input_panda_directory,named_or_all,addtional_property_csv_address)
-
-    pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/overall_pipeline_input.bin'
-    pipeline_input_panda_output_address='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/pipeline_input_group_properties_added.bin'
-
+    
+    addtional_property_csv_address='../resources/pull_from_carrot/intermediates/bins_groups_inchi_from_gert_inchikey_group_harmonized.csv'
     additional_property_panda=pd.read_csv(addtional_property_csv_address,sep=',')##,index_col=0)
-    pipeline_input_panda=pd.read_pickle(pipeline_input_panda_address)
-    #print(additional_property_panda)
-
-
-
-    input_addtional_properties(pipeline_input_panda,additional_property_panda)
-
-    print(pipeline_input_panda)
-
-    pipeline_input_panda.to_pickle(pipeline_input_panda_output_address,protocol=0)
+ 
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/'
+    
+    
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    
+    for temp_file in file_list:
+        temporary_input_panda=pd.read_pickle(pipeline_input_panda_directory+temp_file)
+        #pandas_list.append(temp_panda)  
+        input_addtional_properties(temporary_input_panda,additional_property_panda)
+        temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+        temporary_input_panda.to_pickle(pipeline_output_directory+'pipeline_input_group_properties_added_'+str(temporary_file_integer)+'.bin',protocol=0)

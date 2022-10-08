@@ -1,6 +1,7 @@
 import sys
 import pandas
 import os
+import re
 
 def remove_rows_with_no_taxonomy(temp_panda):
     '''
@@ -71,23 +72,38 @@ if __name__ == "__main__":
 
     
     min_fold_change=sys.argv[1]
-    input_panda_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
-    output_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
+    # input_panda_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
+    # output_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_5_panda_cleaned/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_5_panda_cleaned/dummy.txt')
+    
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_4_classes_transformed/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/'
+    
+    
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    
+    for temp_file in file_list:
+        
+       
+        
+        input_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
+        
+        #plb edit 2-6-2022
+        #it literally looks like the first function is irrelevant because we get data from carrot
+        #therefore all compounds have all species/organ/special (aka disease). so the first is irrelevant
+        #then, we are keeping those without curated inchikeys to function as unknowns. so the next 
+        #two are irrelevant.
+        #delete rows if the parallel lists organ/species/special property are empty
+        ##remove_rows_with_no_taxonomy(input_panda)
+        #we do this for the moment to streamline the small scale analysis
+        ##remove_rows_without_curated_inchikey(input_panda)
+        ##remove_rows_where_curated_inchikey_is_at(input_panda)
+        
+        #will probably want to convert the standards to taxonomy "unspecified"
 
-    input_panda=pandas.read_pickle(input_panda_address)
-    
-    #plb edit 2-6-2022
-    #it literally looks like the first function is irrelevant because we get data from carrot
-    #therefore all compounds have all species/organ/special (aka disease). so the first is irrelevant
-    #then, we are keeping those without curated inchikeys to function as unknowns. so the next 
-    #two are irrelevant.
-    #delete rows if the parallel lists organ/species/special property are empty
-    ##remove_rows_with_no_taxonomy(input_panda)
-    #we do this for the moment to streamline the small scale analysis
-    ##remove_rows_without_curated_inchikey(input_panda)
-    ##remove_rows_where_curated_inchikey_is_at(input_panda)
-    
-    #will probably want to convert the standards to taxonomy "unspecified"
-    input_panda.to_pickle(output_panda_address)
+        temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+        input_panda.to_pickle(pipeline_output_directory+'binvestigate_ready_for_analysis_'+str(temporary_file_integer)+'.bin',protocol=0)
+
+

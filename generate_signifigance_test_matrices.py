@@ -7,6 +7,7 @@ from pprint import pprint
 import sys
 from itertools import repeat
 import scipy.stats
+import re
 
 
 def show_all_organ_species_disease_triplets(temp_panda):
@@ -102,13 +103,19 @@ if __name__ == "__main__":
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    input_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
-    output_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
-    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/')
-    os.system('touch ../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/dummy.txt')
+
+    input_panda_file=sys.argv[3]
+    #print(input_panda_file)
+    temp_file_numbers=temporary_file_integer=re.findall(r'\d+', input_panda_file)
+    #input_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    input_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/'+input_panda_file
+    #output_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
+    output_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/'+\
+        'binvestigate_with_signifigance_matrices_'+str(temp_file_numbers[0])+'_'+str(temp_file_numbers[1])+'.bin'
+
 
     input_panda=pandas.read_pickle(input_panda_address)
-    print(input_panda)
+    #print(input_panda)
     #print(input_panda.index)
     #hold=input('hold')
     #obtain total organ-species list
