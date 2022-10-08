@@ -37,7 +37,11 @@ if __name__=="__main__":
     min_fold_change=sys.argv[1]
     #min_fold_change=snakemake.params.min_fold_change
     #note that, unusually, we refer to a much earlier panda
-    input_panda_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
+    
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_1_species_transformed/'
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    input_panda_address=pipeline_input_panda_directory+file_list[0]
     output_panda_address='../results/'+str(min_fold_change)+'/step_8_a_create_species_taxid_mapping/species_tax_id_mapping.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_a_create_species_taxid_mapping/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_8_a_create_species_taxid_mapping/dummy.txt')

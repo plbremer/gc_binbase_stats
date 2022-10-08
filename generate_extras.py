@@ -85,7 +85,11 @@ def create_translation_dict_for_triplets(temp_bin_address):
     triplet_translation_panda.set_index('triplet_identifier_string',inplace=True,drop=False)
 
     #add the count column
-    binvestigate_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin')
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/'
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    binvestigate_panda_address=pipeline_input_panda_directory+file_list[0]
+    binvestigate_panda=pd.read_pickle(binvestigate_panda_address)
     organ_list=binvestigate_panda.at[0,'organ']
     species_list=binvestigate_panda.at[0,'species']
     disease_list=binvestigate_panda.at[0,'special_property_list']

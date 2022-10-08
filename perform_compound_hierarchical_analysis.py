@@ -7,7 +7,7 @@ import numpy as np
 import os
 import multiprocessing
 from functools import partial
-
+import re
 #cut network to those nodes related to a fold branch
 def remove_branches_without_fold_matrices(temp_nx):
     '''
@@ -483,6 +483,22 @@ if __name__ == "__main__":
     #update 220926 plb
     #we also want the unknowns for the final database, but not in the compound analysis
     #so we just copy them over from the binvestigate pickle
-    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
-    binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
-    write_each_unknown_to_file(binvestigate_panda,individual_fold_matrix_directory_base)
+    
+
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/'
+    #pipeline_output_directory='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/'    
+    
+    #binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+
+    for temp_file in file_list:
+        temporary_input_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
+        #we actually do this in the method
+        # temporary_input_panda=temporary_input_panda.loc[
+        #     temporary_input_panda['inchikey'] == '@@@@@@@',:
+        # ]
+        #temporary_file_integers=re.findall(r'\d+', temp_file)
+
+        #temp_binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
+        write_each_unknown_to_file(temporary_input_panda,individual_fold_matrix_directory_base)

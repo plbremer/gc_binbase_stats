@@ -246,7 +246,7 @@ if __name__ == "__main__":
     temp_disease_edges=[('disease',temp_node) for temp_node in disease_headnodes_list]
     disease_networkx.add_edges_from(temp_disease_edges)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    #prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
 
     nx.readwrite.gpickle.write_gpickle(organ_networkx,output_organ_networkx_address)
     nx.readwrite.gpickle.write_gpickle(disease_networkx,output_disease_networkx_address)

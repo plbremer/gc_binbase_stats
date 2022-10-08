@@ -153,15 +153,35 @@ if __name__ == "__main__":
     
     #min_fold_change=10
     min_fold_change=sys.argv[1]
-    obo_file_address='../resources/classyfire_files/ChemOnt_2_1.obo'
-    binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
-    output_file_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/dummy.txt')
-
+    obo_file_address='../resources/classyfire_files/ChemOnt_2_1.obo'
     parsed_obo=obonet.read_obo(obo_file_address)
 
-    binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
+
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/'
+
+    #binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
+    #output_file_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
+
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    
+    for file_counter,temp_file in enumerate(file_list):
+        if file_counter==0:
+            master_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)    
+            master_panda=master_panda.loc[master_panda['inchikey'] != '@@@@@@@',:]
+
+        else:
+            temp_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file) 
+            temp_panda=temp_panda.loc[temp_panda['inchikey'] != '@@@@@@@',:]
+            master_panda=pandas.concat(
+                [master_panda,temp_panda],axis='index',ignore_index=True
+            )
+
+
+    #sbinvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
 
     #get dict 
     #for this dict, the keys are the classes and the values are the chemontid
@@ -173,7 +193,7 @@ if __name__ == "__main__":
 
     #make a column with the deepest classyfire class possible - in this way we can 
     #find the class to use on the above dict 
-    obtain_deepest_classyfire_class_per_bin(binvestigate_panda)
+    obtain_deepest_classyfire_class_per_bin(master_panda)
 
     #draw the network before adding the single node
     print(len(parsed_obo.nodes))
@@ -190,16 +210,16 @@ if __name__ == "__main__":
     plt.show()    
     '''
 
-    add_all_bins_to_network(parsed_obo,binvestigate_panda,class_to_node_dict)
+    add_all_bins_to_network(parsed_obo,master_panda,class_to_node_dict)
     #for each bin assign as a child node of the deepest node that is possible
 
 
 
 
 
-
+    print(master_panda)
     #nx.draw(parsed_obo)
     #plt.show()    
     #visualize_added_classes(parsed_obo,original_classyfire_node_count)
     #hold=input('hold again')
-    nx.readwrite.gpickle.write_gpickle(parsed_obo,output_file_address)
+    nx.readwrite.gpickle.write_gpickle(parsed_obo,pipeline_output_directory+'classyfire_ont_with_bins_added.bin')

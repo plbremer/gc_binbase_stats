@@ -103,7 +103,15 @@ if __name__ == "__main__":
     #we do not need to get a taxonomy mapping because metagenompy prepares that automatically
     #from a local database
     input_mapping_panda_address='../results/'+str(min_fold_change)+'/step_8_a_create_species_taxid_mapping/species_tax_id_mapping.bin'
-    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/'
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    input_binvestigate_panda_address=pipeline_input_panda_directory+file_list[0]
+    
+
+    
+    #i#nput_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
     output_networkx_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin'
     output_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/')
@@ -158,7 +166,7 @@ if __name__ == "__main__":
         if temp_taxid not in binvestigate_species_networkx.nodes:
             print(temp_taxid)
     print('------------------------------------------------')
-    hold=input('stop and check to make sure that no taxid from binvestigate were not mapped to a place on the metagonompy networkx')
+    #hold=input('stop and check to make sure that no taxid from binvestigate were not mapped to a place on the metagonompy networkx')
 
     #at this point i realized that the species labels from ete3 were not playing nicely with the species labels from metagenompy
     #however, the taxid were
