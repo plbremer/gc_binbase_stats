@@ -115,7 +115,7 @@ if __name__ == "__main__":
     os.system('touch ../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/dummy.txt')
 
     #make compound translation panda
-    compound_networkx_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    compound_networkx_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     compound_panda_directory_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average'
     compound_translation_panda=create_translation_panda_for_compounds(compound_networkx_address,compound_panda_directory_address)
     compound_translation_panda.to_pickle('../results/'+str(min_fold_change)+'/step_9_generate_extras_for_db_and_api/compound_translation_panda.bin')

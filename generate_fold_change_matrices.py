@@ -121,10 +121,11 @@ if __name__ == "__main__":
     
     #2-06-2022 plb
     #deleted the "non trip version" of the functions as they only seemed to handle species/organ
-    bins_in_file=1
+    
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
+    bins_in_file=int(sys.argv[3])
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/dummy.txt')
 

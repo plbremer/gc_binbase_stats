@@ -96,6 +96,12 @@ if __name__ == "__main__":
     
     for temp_file in file_list:
         temporary_input_panda=pd.read_pickle(pipeline_input_panda_directory+temp_file)
+
+        temporary_input_panda=temporary_input_panda.loc[
+            ~((temporary_input_panda['name'].str.lower[0]=='z') & (temporary_input_panda['name'].str.lower[1]==' ')),
+            :
+        ]
+
         #pandas_list.append(temp_panda)  
         input_addtional_properties(temporary_input_panda,additional_property_panda)
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]

@@ -263,26 +263,26 @@ if __name__ == "__main__":
 
 
 
-    # #for each bin, prepare each then upload each
-    # for i,temp_bin in enumerate(full_list):
-    #     start_time=time.time()
+    #for each bin, prepare each then upload each
+    for i,temp_bin in enumerate(full_list):
+        start_time=time.time()
 
-    #     temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin,triplet_mapping_dict,compound_mapping_dict)
-    #     upload_fold_change_panda(temp_panda_for_upload,i,connection)
+        temp_panda_for_upload=prepare_one_bin_for_upload(temp_bin,triplet_mapping_dict,compound_mapping_dict)
+        upload_fold_change_panda(temp_panda_for_upload,i,connection)
 
-    #     end_time=time.time()
-    #     print(temp_bin+', iteration '+str(i)+': '+str(end_time-start_time))
+        end_time=time.time()
+        print(temp_bin+', iteration '+str(i)+': '+str(end_time-start_time))
 
 
-    # start_time=time.time()
-    # #create our index
-    # connection.execute(
-    #     f'''
-    #     ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
-    #     '''
-    # )      
-    # end_time=time.time()
-    # print('time to create complete differential analysis index: '+str(end_time-start_time))
+    start_time=time.time()
+    #create our index
+    connection.execute(
+        f'''
+        ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
+        '''
+    )      
+    end_time=time.time()
+    print('time to create complete differential analysis index: '+str(end_time-start_time))
 
 
 

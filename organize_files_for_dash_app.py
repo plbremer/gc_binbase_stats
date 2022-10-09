@@ -78,7 +78,7 @@ if __name__ == "__main__":
     os.system(f'cp {non_ratio_dropdown_address} {non_ratio_dropdown_address_output}')
 
     #networkxs
-    compound_networkx_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
+    compound_networkx_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     compound_networkx_address_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/compounds_networkx.bin'
     compound_networkx=nx.readwrite.read_gpickle(compound_networkx_address)
     for temp_node in compound_networkx.nodes:
