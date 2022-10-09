@@ -81,11 +81,11 @@ if __name__ == "__main__":
     compound_networkx_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     compound_networkx_address_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/compounds_networkx.bin'
     compound_networkx=nx.readwrite.read_gpickle(compound_networkx_address)
-    for temp_node in compound_networkx.nodes:
-        compound_networkx.nodes[temp_node].pop('signifigance_matrix_welch')
-        compound_networkx.nodes[temp_node].pop('signifigance_matrix_mannwhitney')
-        compound_networkx.nodes[temp_node].pop('fold_change_matrix_average')
-        compound_networkx.nodes[temp_node].pop('fold_change_matrix_median')
+    # for temp_node in compound_networkx.nodes:
+    #     compound_networkx.nodes[temp_node].pop('signifigance_matrix_welch')
+    #     compound_networkx.nodes[temp_node].pop('signifigance_matrix_mannwhitney')
+    #     compound_networkx.nodes[temp_node].pop('fold_change_matrix_average')
+    #     compound_networkx.nodes[temp_node].pop('fold_change_matrix_median')
     nx.readwrite.write_gpickle(compound_networkx,compound_networkx_address_output)
 
     species_networkx_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin'
