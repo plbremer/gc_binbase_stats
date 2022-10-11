@@ -144,49 +144,52 @@ if __name__ == "__main__":
     ####
     #num_processes = multiprocessing.cpu_count()
     temp_signifigance_type='mannwhitney'
-    num_processes=cores_available
-    chunk_size = len(input_panda_only_identified.index)//num_processes
-    panda_chunks=list()
-    for i in range(0,num_processes):
-        if i<(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
-        elif i==(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
-    print(panda_chunks)
-    #hold=input('check chunks')
-    pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type),repeat(organ_species_disease_tuple_list)))
-    transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
-    #recombine_chunks
-    pool.close()
-    pool.join()
-    # for i in range(len(transformed_chunks)):
-    #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
-    input_panda_only_identified=pandas.concat(transformed_chunks)
+    # num_processes=cores_available
+    # chunk_size = len(input_panda_only_identified.index)//num_processes
+    # panda_chunks=list()
+    # for i in range(0,num_processes):
+    #     if i<(num_processes-1):
+    #         panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
+    #     elif i==(num_processes-1):
+    #         panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
+    # print(panda_chunks)
+    # #hold=input('check chunks')
+    # pool = multiprocessing.Pool(processes=num_processes)
+    # temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type),repeat(organ_species_disease_tuple_list)))
+    # transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
+    # #recombine_chunks
+    # pool.close()
+    # pool.join()
+    # # for i in range(len(transformed_chunks)):
+    # #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+    # input_panda_only_identified=pandas.concat(transformed_chunks)
+    input_panda_only_identified=calculate_all_signifigance_matrices_trip(input_panda_only_identified,temp_signifigance_type,organ_species_disease_tuple_list)
     ####
 
     ####
     #num_processes = multiprocessing.cpu_count()
     temp_signifigance_type='welch'
-    num_processes=cores_available
-    chunk_size = len(input_panda_only_identified.index)//num_processes
-    panda_chunks=list()
-    for i in range(0,num_processes):
-        if i<(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
-        elif i==(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
-    print(panda_chunks)
-    #hold=input('check chunks')
-    pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type),repeat(organ_species_disease_tuple_list)))
-    transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
-    #recombine_chunks
-    pool.close()
-    pool.join()
-    # for i in range(len(transformed_chunks)):
-    #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
-    input_panda_only_identified=pandas.concat(transformed_chunks)
+    # num_processes=cores_available
+    # chunk_size = len(input_panda_only_identified.index)//num_processes
+    # panda_chunks=list()
+    # for i in range(0,num_processes):
+    #     if i<(num_processes-1):
+    #         panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
+    #     elif i==(num_processes-1):
+    #         panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
+    # print(panda_chunks)
+    # #hold=input('check chunks')
+    # pool = multiprocessing.Pool(processes=num_processes)
+    # temp_iterable=list(zip(panda_chunks,repeat(temp_signifigance_type),repeat(organ_species_disease_tuple_list)))
+    # transformed_chunks=pool.starmap(calculate_all_signifigance_matrices_trip,temp_iterable)
+    # #recombine_chunks
+    # pool.close()
+    # pool.join()
+    # # for i in range(len(transformed_chunks)):
+    # #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+    # input_panda_only_identified=pandas.concat(transformed_chunks)
+    input_panda_only_identified=calculate_all_signifigance_matrices_trip(input_panda_only_identified,temp_signifigance_type,organ_species_disease_tuple_list)
+
     ####
 
 

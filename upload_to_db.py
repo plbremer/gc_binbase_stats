@@ -280,6 +280,7 @@ if __name__ == "__main__":
         f'''
         ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
         '''
+        #create index differential_analysis_pairs on differential_analysis (triplet_from,triplet_to)
     )      
     end_time=time.time()
     print('time to create complete differential analysis index: '+str(end_time-start_time))

@@ -49,6 +49,7 @@ if __name__=="__main__":
     #        )
 
     for i in range(len(full_command_list_list)):
+        print('command set: '+str(i))
         temp_Popen_list=[Popen(element,shell=True) for element in full_command_list_list[i]]
         for command in temp_Popen_list:
             command.wait()

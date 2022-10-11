@@ -108,8 +108,8 @@ def calculate_all_fold_change_matrices_trip(temp_panda,fold_change_type):
 
     for index,series in temp_panda.iterrows():
         #we print merely to see how long this is taking
-        print(index)
-        print(series['name'])
+        # print(index)
+        # print(series['name'])
         temp_panda.at[index,'fold_change_'+fold_change_type]=calculate_one_fold_change_matrix_trip(series,my_MultiIndex,fold_change_type)    
 
 
@@ -139,10 +139,12 @@ if __name__ == "__main__":
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
 
-    for temp_file in file_list:
+    for temp_file_counter,temp_file in enumerate(file_list):
+        print(f'we are startin to compute file {temp_file_counter}')
+        print(f'we are starting to compute file {temp_file}')
         input_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
 
-        print(input_panda)
+        #print(input_panda)
         #print(input_panda.index)
         #hold=input('hold')
         #obtain total organ-species list
@@ -172,15 +174,16 @@ if __name__ == "__main__":
         ####
         #num_processes = multiprocessing.cpu_count()
         temp_fold_change_type='total_intensity'
-        num_processes=cores_available
+        num_processes= cores_available-1
         chunk_size = len(input_panda_only_identified.index)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-            if i<(num_processes-1):
-                panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
-            elif i==(num_processes-1):
-                panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
-        print(panda_chunks)
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #print(panda_chunks)
         #hold=input('check chunks')
         pool = multiprocessing.Pool(processes=num_processes)
         temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
@@ -197,15 +200,16 @@ if __name__ == "__main__":
         ####
         #num_processes = multiprocessing.cpu_count()
         temp_fold_change_type='median_intensity'
-        num_processes=cores_available
+        num_processes= cores_available-1
         chunk_size = len(input_panda_only_identified.index)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-            if i<(num_processes-1):
-                panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
-            elif i==(num_processes-1):
-                panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
-        print(panda_chunks)
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #print(panda_chunks)
         #hold=input('check chunks')
         pool = multiprocessing.Pool(processes=num_processes)
         temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
@@ -218,9 +222,6 @@ if __name__ == "__main__":
         input_panda_only_identified=pandas.concat(transformed_chunks)
         ####
 
-        print(input_panda_only_identified)
-        print(input_panda_only_identified.columns)
-        print('---------------------------------------')    
 
 
         #220926 plb
@@ -248,10 +249,11 @@ if __name__ == "__main__":
         # ---------------------------------------------------------------------------------------------  
 
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]
-        print(math.ceil(len(input_panda_only_identified.index)/bins_in_file))
-        print('*'*50)
+        # print(math.ceil(len(input_panda_only_identified.index)/bins_in_file))
+        # print('*'*50)
+        print('printing files')
         for temp_counter in range(math.ceil(len(input_panda_only_identified.index)/bins_in_file)):
-            print(temp_counter)
+            #print(temp_counter)
             mini_input_panda_only_identified=input_panda_only_identified.iloc[
                 bins_in_file*temp_counter:bins_in_file*(temp_counter+1)
             ].reset_index(drop=True)

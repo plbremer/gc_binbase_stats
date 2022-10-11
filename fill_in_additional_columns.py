@@ -94,11 +94,13 @@ if __name__ == "__main__":
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
     
-    for temp_file in file_list:
+    for file_counter,temp_file in enumerate(file_list):
+        print('we are on file number: '+str(file_counter))
+        print(f'we are on file {temp_file}')
         temporary_input_panda=pd.read_pickle(pipeline_input_panda_directory+temp_file)
 
         temporary_input_panda=temporary_input_panda.loc[
-            ~((temporary_input_panda['name'].str.lower[0]=='z') & (temporary_input_panda['name'].str.lower[1]==' ')),
+            ~((temporary_input_panda['name'].str[0].str.lower()=='z') & (temporary_input_panda['name'].str[1]==' ')),
             :
         ]
 

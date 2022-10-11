@@ -98,7 +98,7 @@ def add_special_property_column(temp_panda,temp_mapping_address):
     special_property_mapping_dict=dict(zip(zip(organ_mapping_panda['species'],organ_mapping_panda['organ_initial']),organ_mapping_panda['special_property']))
     #we apply that mapping over each row in the initial panda
     for index, series in temp_panda.iterrows():
-        print(index)
+        #print(index)
         #applying out transform dict as a lambda on the list of organs
         #could have chosen organ, intensity, or species 
         temp_key_list=zip([element.strip().lower() for element in series['species']],[element.strip().lower() for element in series['organ']])
@@ -127,7 +127,7 @@ def transform_organ_column(temp_bin_panda):
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
-        print(mapping_index)
+        #print(mapping_index)
 #        print(mapping_series)
 
         #declare mapping rule
@@ -199,7 +199,7 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
     for temp_node in temp_nx.nodes:
         mesh_organ_name_set.add(temp_nx.nodes[temp_node]['mesh_label'])
 
-    print(mesh_organ_name_set)
+    #print(mesh_organ_name_set)
     #hold=input('mesh organ name set')
     not_in_mesh_set=set()
     in_mesh_set=set()
@@ -209,10 +209,10 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
         elif temp_organ in mesh_organ_name_set:
             in_mesh_set.add(temp_organ)
 
-    print(in_mesh_set)
+    #print(in_mesh_set)
     #hold=input('in mesh_set')
 
-    print(not_in_mesh_set)
+    #print(not_in_mesh_set)
     #hold=input('not_in_mesh_set')
     return in_mesh_set,not_in_mesh_set
 
@@ -233,16 +233,18 @@ if __name__ == "__main__":
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
 
-    for temp_file in file_list:
+    for temp_file_counter,temp_file in enumerate(file_list):
+        print(f'we are startin to compute file {temp_file_counter}')
+        print(f'we are starting to compute file {temp_file}')
         post_species_transform_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
 
         #this is done one time not so that we can make it part of the pipeline
         #but rather so that we can design organ_mapping.txt
         #just like in the species
         organ_specis_pair_list=show_all_organ_species_pairs(post_species_transform_panda)
-        for pair in organ_specis_pair_list:
-            print(pair[0]+'@'+pair[1])
-        print('we have '+str(len(organ_specis_pair_list))+' pairs')
+        # for pair in organ_specis_pair_list:
+        #     print(pair[0]+'@'+pair[1])
+        # print('we have '+str(len(organ_specis_pair_list))+' pairs')
         #hold=input('copy and paste species organ pairs if necessary')
         
         #using the same file, we add an "is cancer" column so that we can do cancer-centered analysis
@@ -252,19 +254,22 @@ if __name__ == "__main__":
         
         #according to the file that we create using the previous output, we transform the panda's organ lists
         #num_processes = multiprocessing.cpu_count()
-        num_processes=cores_available
+        num_processes= cores_available-1
         chunk_size = len(post_species_transform_panda.index)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-        #chunks = [post_species_transform_panda.iloc[post_species_transform_panda[i:i + chunk_size]] for i in range(0, post_species_transform_panda.shape[0], chunk_size)]
-            if i<(num_processes-1):
-                panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:(i+1)*chunk_size])
-            elif i==(num_processes-1):
-                panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:])
-        print(panda_chunks)
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #panda_chunks.append(binvestigate_panda.iloc[num_processes*chunk_size:])
+        #print(panda_chunks)
         #hold=input('check chunks')
-        pool = multiprocessing.Pool(processes=num_processes)
+        pool = multiprocessing.Pool(processes=cores_available)
         transformed_chunks=pool.map(transform_organ_column,panda_chunks)
+        pool.close()
+        pool.join()
         #transform_organ_column(post_species_transform_panda)
         #recombine_chunks
         for i in range(len(transformed_chunks)):

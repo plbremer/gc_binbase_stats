@@ -81,7 +81,7 @@ def transform_species_column(temp_bin_panda):
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
-        print(mapping_index)
+        #print(mapping_index)
 
         #declare mapping rule
         #drop rules work differently. must get all indices and then drop from mapping as well as organs
@@ -150,21 +150,23 @@ if __name__ == "__main__":
     file_list.remove('dummy.txt')
     pandas_list=list()        
     
-    for temp_file in file_list:
-        if start_from_aws=='False':
-            print('hello')
-            binvestigate_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
-        elif start_from_aws=='True':
-            my_server='info-from-binvestigate.czbab8f7pgfj.us-east-2.rds.amazonaws.com'
-            my_database='binvestigate'
-            my_dialect='postgresql'
-            my_driver='psycopg2'
-            my_username='postgres'
-            my_password='elaine123'
-            my_connection=f'{my_dialect}+{my_driver}://{my_username}:{my_password}@{my_server}/{my_database}'
-            engine=create_engine(my_connection)#,echo=True)
-            connection=engine.connect()
-            binvestigate_panda=pandas.read_sql_table(table_name='pseudo_carrot', con=my_connection)
+    for temp_file_counter,temp_file in enumerate(file_list):
+        print(f'we are startin to compute file {temp_file_counter}')
+        print(f'we are starting to compute file {temp_file}')
+        # if start_from_aws=='False':
+        #     print('hello')
+        binvestigate_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
+        # elif start_from_aws=='True':
+        #     my_server='info-from-binvestigate.czbab8f7pgfj.us-east-2.rds.amazonaws.com'
+        #     my_database='binvestigate'
+        #     my_dialect='postgresql'
+        #     my_driver='psycopg2'
+        #     my_username='postgres'
+        #     my_password='elaine123'
+        #     my_connection=f'{my_dialect}+{my_driver}://{my_username}:{my_password}@{my_server}/{my_database}'
+        #     engine=create_engine(my_connection)#,echo=True)
+        #     connection=engine.connect()
+        #     binvestigate_panda=pandas.read_sql_table(table_name='pseudo_carrot', con=my_connection)
 
         #identify species names that do not map to the NCBI database
         #this is done one time not as part of the "informatics pipeline" but rather
@@ -175,11 +177,11 @@ if __name__ == "__main__":
         #the "id" in this case is a number associated with the ncbi taxonomy
         has_0_id_set,has_more_than_1_id_set=identify_elements_not_in_ncbi(all_species_set)
 
-        print_some_set(all_species_set)
+        ##print_some_set(all_species_set)
         #hold=input('copy and paste the all species set if necessary')
-        print_some_set(has_0_id_set)
+        ##print_some_set(has_0_id_set)
         #hold=input('copy and paste the has 0 id if necessary')
-        print_some_set(has_more_than_1_id_set)
+        ##print_some_set(has_more_than_1_id_set)
         #hold=input('copy and paste the has multiple id if necessary')
 
         
@@ -187,19 +189,23 @@ if __name__ == "__main__":
         #'species_mapping_address' location
         #translate species names according to some transform list and drop things that either have no translation or are identified with a translation 'drop'
         #num_processes = multiprocessing.cpu_count()
-        num_processes= cores_available
+        num_processes= cores_available-1
         chunk_size = len(binvestigate_panda.index)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-        #chunks = [post_species_transform_panda.iloc[post_species_transform_panda[i:i + chunk_size]] for i in range(0, post_species_transform_panda.shape[0], chunk_size)]
-            if i<(num_processes-1):
-                panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
-            elif i==(num_processes-1):
-                panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
-        print(panda_chunks)
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(binvestigate_panda.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #panda_chunks.append(binvestigate_panda.iloc[num_processes*chunk_size:])
+        #print(panda_chunks)
         #hold=input('check chunks')
-        pool = multiprocessing.Pool(processes=num_processes)
+        pool = multiprocessing.Pool(processes=cores_available)
         transformed_chunks=pool.map(transform_species_column,panda_chunks)
+        pool.close()
+        pool.join()
+
         #recombine_chunks
         for i in range(len(transformed_chunks)):
             binvestigate_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
@@ -217,4 +223,6 @@ if __name__ == "__main__":
         #binvestigate_species_transformed.bin'
         #output the result
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+
+        print('we are about to write to file')
         binvestigate_panda.to_pickle(pipeline_output_directory+'binvestigate_species_transformed_'+str(temporary_file_integer)+'.bin')
