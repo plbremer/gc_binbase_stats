@@ -102,9 +102,24 @@ def compute_output_matrix_fold(temp_pandas_list):
         level=('organ','species','disease'),axis='index'
     ).max()
 
-    temp_output=my_groupby_min.where(
-        np.sign(my_groupby_min)==np.sign(my_groupby_max),other=0
+    
+    intermediate_min_df=my_groupby_min.where(
+        np.sign(my_groupby_min)>0,
+        other=0
     )
+    intermediate_max_df=my_groupby_max.where(
+        np.sign(my_groupby_max)<0,
+        other=0
+    )
+    
+    temp_output=intermediate_min_df.where(
+        intermediate_min_df !=0,
+        other=intermediate_max_df
+    )
+    
+#     temp_output=my_groupby_min.where(
+#         np.sign(my_groupby_min)==np.sign(my_groupby_max),other=0
+#     )
 
     temp_output.values[np.tril_indices(len(temp_output.index), -1)]=0
 
