@@ -6,6 +6,8 @@ import multiprocessing
 from pprint import pprint
 import sys
 from itertools import repeat
+import re
+import math
 
 
 def show_all_organ_species_disease_triplets(temp_panda):
@@ -106,8 +108,8 @@ def calculate_all_fold_change_matrices_trip(temp_panda,fold_change_type):
 
     for index,series in temp_panda.iterrows():
         #we print merely to see how long this is taking
-        print(index)
-        print(series['name'])
+        # print(index)
+        # print(series['name'])
         temp_panda.at[index,'fold_change_'+fold_change_type]=calculate_one_fold_change_matrix_trip(series,my_MultiIndex,fold_change_type)    
 
 
@@ -119,108 +121,143 @@ if __name__ == "__main__":
     
     #2-06-2022 plb
     #deleted the "non trip version" of the functions as they only seemed to handle species/organ
-
+    
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
-    output_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
+    bins_in_file=int(sys.argv[3])
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/dummy.txt')
 
-    input_panda=pandas.read_pickle(input_panda_address)
-    print(input_panda)
-    print(input_panda.index)
-    hold=input('hold')
-    #obtain total organ-species list
-    #organ_species_tuple_list=list(transform_written_organs.show_all_organ_species_pairs(input_panda))
-    organ_species_disease_tuple_list=list(show_all_organ_species_disease_triplets(input_panda))
-    pprint(organ_species_disease_tuple_list)
-    hold=input('hold')
-    #all fold change matrices have the same row/column labels (see single for further logic)
-    organ_species_disease_tuple_list.sort(key=lambda temp_tup: (temp_tup[0],temp_tup[1],temp_tup[2]))
-    pprint(organ_species_disease_tuple_list)
-    hold=input('hold')
+    # input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
+    # output_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
     
-    #update 7-4-22 plb
-    #basically, we are only going to do the volcano plot stuff for knowns.
-    #so we grab a subset of the entire panda, those with inchikeys, do the comparison for them
-    #and then merge
-    input_panda_only_identified=input_panda.loc[
-        input_panda.inchikey!='@@@@@@@',:
-    ]
-
-
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/'
     
-    ####
-    #num_processes = multiprocessing.cpu_count()
-    temp_fold_change_type='total_intensity'
-    num_processes=cores_available
-    chunk_size = len(input_panda_only_identified.index)//num_processes
-    panda_chunks=list()
-    for i in range(0,num_processes):
-        if i<(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
-        elif i==(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
-    print(panda_chunks)
-    hold=input('check chunks')
-    pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
-    transformed_chunks=pool.starmap(calculate_all_fold_change_matrices_trip,temp_iterable)
-    #recombine_chunks
-    pool.close()
-    pool.join()
-    # for i in range(len(transformed_chunks)):
-    #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
-    input_panda_only_identified=pandas.concat(transformed_chunks)
-    ####
-
-
-    ####
-    #num_processes = multiprocessing.cpu_count()
-    temp_fold_change_type='median_intensity'
-    num_processes=cores_available
-    chunk_size = len(input_panda_only_identified.index)//num_processes
-    panda_chunks=list()
-    for i in range(0,num_processes):
-        if i<(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:(i+1)*chunk_size])
-        elif i==(num_processes-1):
-            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size:])
-    print(panda_chunks)
-    hold=input('check chunks')
-    pool = multiprocessing.Pool(processes=num_processes)
-    temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
-    transformed_chunks=pool.starmap(calculate_all_fold_change_matrices_trip,temp_iterable)
-    #recombine_chunks
-    pool.close()
-    pool.join()
-    # for i in range(len(transformed_chunks)):
-    #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
-    input_panda_only_identified=pandas.concat(transformed_chunks)
-    ####
-
-    print(input_panda_only_identified)
-    print(input_panda_only_identified.columns)
-    print('---------------------------------------')    
-
-    input_panda_only_identified=input_panda_only_identified.loc[
-        :,['inchikey','fold_change_total_intensity','fold_change_median_intensity']
-    ]
-
     
-    print(input_panda_only_identified)
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
 
-    input_panda=input_panda.merge(
-        right=input_panda_only_identified,
-        left_on='inchikey',
-        right_on='inchikey',
-        how='left'
-    )
+    for temp_file_counter,temp_file in enumerate(file_list):
+        print(f'we are startin to compute file {temp_file_counter}')
+        print(f'we are starting to compute file {temp_file}')
+        input_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
+
+        #print(input_panda)
+        #print(input_panda.index)
+        #hold=input('hold')
+        #obtain total organ-species list
+        #organ_species_tuple_list=list(transform_written_organs.show_all_organ_species_pairs(input_panda))
+        organ_species_disease_tuple_list=list(show_all_organ_species_disease_triplets(input_panda))
+        #pprint(organ_species_disease_tuple_list)
+        #hold=input('hold')
+        #all fold change matrices have the same row/column labels (see single for further logic)
+        organ_species_disease_tuple_list.sort(key=lambda temp_tup: (temp_tup[0],temp_tup[1],temp_tup[2]))
+        #pprint(organ_species_disease_tuple_list)
+        #hold=input('hold')
+        
+
+        #update 7-4-22 plb
+        #basically, we are only going to do the volcano plot stuff for knowns.
+        #so we grab a subset of the entire panda, those with inchikeys, do the comparison for them
+        #and then merge
+        #update 220926 we are going to try for all of the bins
+        # input_panda_only_identified=input_panda.loc[
+        #     input_panda.inchikey!='@@@@@@@',:
+        # ]
+        #so now, only_identified is a misnomer. felt easier than rewriting everything
+        input_panda_only_identified=input_panda.copy()
 
 
-    #output as pickle
-    input_panda.loc[
-        input_panda.inchikey!='@@@@@@@',:
-    ].to_pickle(output_panda_address)
+        # ---------------------------------------------------------------------------------------------   
+        ####
+        #num_processes = multiprocessing.cpu_count()
+        temp_fold_change_type='total_intensity'
+        num_processes= cores_available-1
+        chunk_size = len(input_panda_only_identified.index)//num_processes
+        panda_chunks=list()
+        for i in range(0,num_processes):
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #print(panda_chunks)
+        #hold=input('check chunks')
+        pool = multiprocessing.Pool(processes=num_processes)
+        temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
+        transformed_chunks=pool.starmap(calculate_all_fold_change_matrices_trip,temp_iterable)
+        #recombine_chunks
+        pool.close()
+        pool.join()
+        # for i in range(len(transformed_chunks)):
+        #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+        input_panda_only_identified=pandas.concat(transformed_chunks)
+        ####
+
+
+        ####
+        #num_processes = multiprocessing.cpu_count()
+        temp_fold_change_type='median_intensity'
+        num_processes= cores_available-1
+        chunk_size = len(input_panda_only_identified.index)//num_processes
+        panda_chunks=list()
+        for i in range(0,num_processes):
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(input_panda_only_identified.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #print(panda_chunks)
+        #hold=input('check chunks')
+        pool = multiprocessing.Pool(processes=num_processes)
+        temp_iterable=list(zip(panda_chunks,repeat(temp_fold_change_type)))
+        transformed_chunks=pool.starmap(calculate_all_fold_change_matrices_trip,temp_iterable)
+        #recombine_chunks
+        pool.close()
+        pool.join()
+        # for i in range(len(transformed_chunks)):
+        #     input_panda_only_identified.loc[transformed_chunks[i].index]=transformed_chunks[i]
+        input_panda_only_identified=pandas.concat(transformed_chunks)
+        ####
+
+
+
+        #220926 plb
+        # input_panda_only_identified=input_panda_only_identified.loc[
+        #     :,['inchikey','fold_change_total_intensity','fold_change_median_intensity']
+        # ]
+
+        
+        # print(input_panda_only_identified)
+
+
+        # input_panda=input_panda.merge(
+        #     right=input_panda_only_identified,
+        #     left_on='inchikey',
+        #     right_on='inchikey',
+        #     how='left'
+        # )
+
+
+        #output as pickle
+        #220926 we are keepin eerything
+        # input_panda.loc[
+        #     input_panda.inchikey!='@@@@@@@',:
+        # ].to_pickle(output_panda_address)
+        # ---------------------------------------------------------------------------------------------  
+
+        temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+        # print(math.ceil(len(input_panda_only_identified.index)/bins_in_file))
+        # print('*'*50)
+        print('printing files')
+        for temp_counter in range(math.ceil(len(input_panda_only_identified.index)/bins_in_file)):
+            #print(temp_counter)
+            mini_input_panda_only_identified=input_panda_only_identified.iloc[
+                bins_in_file*temp_counter:bins_in_file*(temp_counter+1)
+            ].reset_index(drop=True)
+            mini_input_panda_only_identified.to_pickle(pipeline_output_directory+'binvestigate_with_fold_matrices_'+str(temporary_file_integer)+'_'+str(temp_counter)+'.bin',protocol=0)
+
+
+        #input_panda_only_identified.to_pickle(output_panda_address)

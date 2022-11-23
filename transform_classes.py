@@ -1,6 +1,7 @@
 import sys
 import pandas
 import os
+import re
 
 #a note - the classyfire tool is weird - for certain compounds, in will repeat the lowest class a few times
 #sometimes with blanks between levels. example - http://classyfire.wishartlab.com/entities/WJNGQIYEQLPJMN-IOSLPCCCSA-N
@@ -90,34 +91,46 @@ if __name__ == "__main__":
     #if snakemake in globals():
     #min_fold_change=snakemake.params.min_fold_change
     min_fold_change=sys.argv[1]
-    initial_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
     class_mapping_address='../resources/species_organ_maps/classes_curated_map.txt'
-    output_pickle_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_4_classes_transformed/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_4_classes_transformed/dummy.txt')
-    #else:
+    
+    
+    # initial_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
+    # output_pickle_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
+    # #else:
     #    initial_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_bins_transformed.bin'
     #    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_classes_transformed.bin'
     #    class_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/classes_curated_map.txt'
-
-    initial_panda=pandas.read_pickle(initial_pickle_address)
-
-
-    #the classes are printed
-    #and put in the proper file if necessary
-    #plb 7-4-22 no reason to visit this
-    ##print_bin_information_for_classes_curated(initial_panda)
-    ##hold=input('copy and inchikey_curated if necessary')
-
-    #fill the class column 
-    initial_panda=update_curated_classes_from_mapping(initial_panda, class_mapping_address)
-
-    ###############################################
-    ###############################################
-    #later, we may add a class from a ML algorithm#
-    #in this way, each class could be added to the compound hierarchy#
-    ###############################################
-    ###############################################
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_3_bins_transformed/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_4_classes_transformed/'
+    
+    
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
+    
+    for temp_file in file_list:
 
 
-    initial_panda.to_pickle(output_pickle_address)
+        initial_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
+
+
+        #the classes are printed
+        #and put in the proper file if necessary
+        #plb 7-4-22 no reason to visit this
+        ##print_bin_information_for_classes_curated(initial_panda)
+        ##hold=input('copy and inchikey_curated if necessary')
+
+        #fill the class column 
+        initial_panda=update_curated_classes_from_mapping(initial_panda, class_mapping_address)
+
+        ###############################################
+        ###############################################
+        #later, we may add a class from a ML algorithm#
+        #in this way, each class could be added to the compound hierarchy#
+        #hell no
+        ###############################################
+        ###############################################
+
+        temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+        initial_panda.to_pickle(pipeline_output_directory+'binvestigate_classes_transformed_'+str(temporary_file_integer)+'.bin',protocol=0)

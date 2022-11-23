@@ -146,13 +146,13 @@ if __name__ == "__main__":
     #min_fold_change=10
     #'+str(min_fold_change)+'
     #probably could use the step_5 one if the "with fold matrices" version gets too massive for ram
-    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_11_prepare_species_networkx/binvestigate_species_as_taxid.bin'
+    input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     input_complete_organ_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
     input_complete_disease_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
-    output_organ_networkx_address='../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/organ_networkx.bin'
-    output_disease_networkx_address='../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/disease_networkx.bin'
-    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/')
-    os.system('touch ../results/'+str(min_fold_change)+'/step_12_prepare_organ_and_disease_networkx/dummy.txt')
+    output_organ_networkx_address='../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/organ_networkx.bin'
+    output_disease_networkx_address='../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/disease_networkx.bin'
+    os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/')
+    os.system('touch ../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/dummy.txt')
 
 
 
@@ -172,11 +172,11 @@ if __name__ == "__main__":
     #remove branches that are totally unrelated
     remove_branches_unrelated_to_binvestigate_set(organ_networkx,organ_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     #contract nodes
     contract_irrelevant_nodes(organ_networkx,organ_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     #add custom connection from each head node to a master headnode
     #for custom subset
     ###seems like we use this one in toy datasets atm
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     temp_organ_edges=[('organ',temp_node) for temp_node in organ_headnodes_list]
     organ_networkx.add_edges_from(temp_organ_edges)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
     
 
 
@@ -216,14 +216,14 @@ if __name__ == "__main__":
     #remove branches that are totally unrelated
     remove_branches_unrelated_to_binvestigate_set(disease_networkx,disease_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     #contract nodes
-    contract_irrelevant_nodes(disease_networkx,disease_set)
+    #contract_irrelevant_nodes(disease_networkx,disease_set)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     #add a node for "no" to disease
     disease_networkx.add_node('No', mesh_label='No')
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    # prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
     ###disease_headnodes_list=['C06','C04','C14','C19','C08','C15','C13','C18','C16','C20','C17','C12','C10','No']
     ###seems like we use this one in toy datasets atm
     disease_headnodes_list=['C04','C08','C17','No']
@@ -246,7 +246,7 @@ if __name__ == "__main__":
     temp_disease_edges=[('disease',temp_node) for temp_node in disease_headnodes_list]
     disease_networkx.add_edges_from(temp_disease_edges)
     #visualize
-    prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
+    #prepare_species_networkx.visualize_nodes_on_a_list(disease_networkx,disease_set,'mesh_label')
 
     nx.readwrite.gpickle.write_gpickle(organ_networkx,output_organ_networkx_address)
     nx.readwrite.gpickle.write_gpickle(disease_networkx,output_disease_networkx_address)

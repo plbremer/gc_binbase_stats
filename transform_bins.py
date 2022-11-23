@@ -3,6 +3,7 @@ import pandas
 import os
 import sys
 import itertools
+import re
 #the general thought process for the bin transformation is that we
 #add an inchikey
 #remove species/organ/intensity/count hierarchy based on count (thought about 
@@ -286,90 +287,104 @@ if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
     count_cutoff=int(sys.argv[2])
-    initial_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
     inchikey_mapping_address='../resources/species_organ_maps/inchikey_mapping.txt'
-    output_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_3_bins_transformed/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_3_bins_transformed/dummy.txt')
  
-    #read in the initial panda....
-    initial_panda=pandas.read_pickle(initial_pickle_address)
+    
+    # initial_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
+    # output_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
 
-    #there is a column called 'group' which basically accounts for 
-    #when the same compound is represented by multiple spectra (such as coeluting peaks)
-    #this drops those
-    drop_repeats_in_group(initial_panda)
 
-    #just like the species and organs, we need to create a list of things that we transform
-    #in this case, the transformation is of the inchikeys
-    #update 2-5-2022 plb
-    #we arent going to get the inchikeys from identifiers. we are going to get a custom map from oliver
-    #that goes into the beginning input panda that we build from carrot
-    #we instead update with this single line from that method
-    ##print_all_bin_identifiers(initial_panda)
-    initial_panda.fillna(value='@@@@@@@',inplace=True)
-    #one of the provided inchikeys is a bunch of spaces '                           '
-    initial_panda.replace(
-        to_replace={
-            '                           ':'@@@@@@@',
-            'HUYHGEVLJRTFIB-CRSCSNDXSA-N':'@@@@@@@',
-            'CLDHNWUVRZNQBD-GSVOUGTGSA-N':'@@@@@@@',
-            'ADGFNXYXROZUOG-VKHMYHEASA-N':'@@@@@@@'
-        },
-        inplace=True
-    )
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_3_bins_transformed/'
+    
+    
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')  
 
-    #just like the species and organs, based on some external txt
-    #we update the inchikeys
-    #update 2-5-2022 plb 
-    #we simplified the formatting of the input file to just 3 columns, id, inchikey, and inchikey_curated
-    ##update 7-5-2022 plb
-    ##the inchikey mapping does literally nothing. 
-    ##update_inchikey_from_mapping(initial_panda,inchikey_mapping_address)
-    ##print(initial_panda)
-    ##hold=input('hold')
+    for temp_file in file_list:
 
-    #sometimes the binvestigate rest calls provided species/organs with intensities of zero
-    #this causes nonsense runtime/divide-by-zero errors
-    #update 2-5-2022 plb 
-    #since we get data from carrot, at this point there should be no intensities of zero
-    #so we do not do this as a way to avoid surprising results
-    #transform_intensity_column(initial_panda)
+        #read in the initial panda....
+        initial_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
 
-    #The purpose of this function is to aggregate redundancies after the transforms.
-    #redundancies are "multiple intensity values" that have the "same organ and same species"
-    #this can occur, for example, after rattus+rattisimus,liver and rattus,liver both become rattus,liver
-    #we search all of these and aggregate them
-    #update 2-5-2022 plb 
-    #redid this function
-    aggregate_redundancies(initial_panda)
+        #there is a column called 'group' which basically accounts for 
+        #when the same compound is represented by multiple spectra (such as coeluting peaks)
+        #this drops those
+        drop_repeats_in_group(initial_panda)
 
-    #like the species and the organs, we remove from the quadruplet (species, organ, intensity, count)
-    #if there are fewer samples than the cutoff that we specify (cant trust numbers from 1 sample)
-    #note that there are no transforms in this one, only removals
-    #we assign count_cutoff to be zero to make it so that all triplets are kept
-    #update 2-5-2022 plb 
-    #since we get data from carrot, at this point there should be no counts of zero
-    #so we do not do this as a way to avoid surprising result
-    #update 2-7-2022 plb
-    #we actually readded this because the statistical tests will need to have a minimum amount of samples
-    #to be valid. 
-    #in order to try to preserve what we can, we do the drop after we aggregate, so this was moved to below
-    #aggregate_redundancies
-    transform_count_column(initial_panda,count_cutoff)
+        #just like the species and organs, we need to create a list of things that we transform
+        #in this case, the transformation is of the inchikeys
+        #update 2-5-2022 plb
+        #we arent going to get the inchikeys from identifiers. we are going to get a custom map from oliver
+        #that goes into the beginning input panda that we build from carrot
+        #we instead update with this single line from that method
+        ##print_all_bin_identifiers(initial_panda)
+        initial_panda.fillna(value='@@@@@@@',inplace=True)
+        #one of the provided inchikeys is a bunch of spaces '                           '
+        initial_panda.replace(
+            to_replace={
+                '                           ':'@@@@@@@',
+                'HUYHGEVLJRTFIB-CRSCSNDXSA-N':'@@@@@@@',
+                'CLDHNWUVRZNQBD-GSVOUGTGSA-N':'@@@@@@@',
+                'ADGFNXYXROZUOG-VKHMYHEASA-N':'@@@@@@@'
+            },
+            inplace=True
+        )
 
-    #when calling rest binvestigate, the intensites are aggregates, whereas the GUI renderings are averages
-    #so we must make this conversion manaully
-    #update 2-5-2022 plb 
-    #we only divide the total intensities
-    #leave the median intensity alone
-    divide_total_intensities_by_count(initial_panda)
+        #just like the species and organs, based on some external txt
+        #we update the inchikeys
+        #update 2-5-2022 plb 
+        #we simplified the formatting of the input file to just 3 columns, id, inchikey, and inchikey_curated
+        ##update 7-5-2022 plb
+        ##the inchikey mapping does literally nothing. 
+        ##update_inchikey_from_mapping(initial_panda,inchikey_mapping_address)
+        ##print(initial_panda)
+        ##hold=input('hold')
 
-    #########################
-    #later, we may add a class from a ML algorithm
-    #no. we wont. - plb 2-5-2022
-    #########################
+        #sometimes the binvestigate rest calls provided species/organs with intensities of zero
+        #this causes nonsense runtime/divide-by-zero errors
+        #update 2-5-2022 plb 
+        #since we get data from carrot, at this point there should be no intensities of zero
+        #so we do not do this as a way to avoid surprising results
+        #transform_intensity_column(initial_panda)
 
-    #print to file
-    #print(initial_panda)
-    initial_panda.to_pickle(output_pickle_address)
+        #The purpose of this function is to aggregate redundancies after the transforms.
+        #redundancies are "multiple intensity values" that have the "same organ and same species"
+        #this can occur, for example, after rattus+rattisimus,liver and rattus,liver both become rattus,liver
+        #we search all of these and aggregate them
+        #update 2-5-2022 plb 
+        #redid this function
+        aggregate_redundancies(initial_panda)
+
+        #like the species and the organs, we remove from the quadruplet (species, organ, intensity, count)
+        #if there are fewer samples than the cutoff that we specify (cant trust numbers from 1 sample)
+        #note that there are no transforms in this one, only removals
+        #we assign count_cutoff to be zero to make it so that all triplets are kept
+        #update 2-5-2022 plb 
+        #since we get data from carrot, at this point there should be no counts of zero
+        #so we do not do this as a way to avoid surprising result
+        #update 2-7-2022 plb
+        #we actually readded this because the statistical tests will need to have a minimum amount of samples
+        #to be valid. 
+        #in order to try to preserve what we can, we do the drop after we aggregate, so this was moved to below
+        #aggregate_redundancies
+        transform_count_column(initial_panda,count_cutoff)
+
+        #when calling rest binvestigate, the intensites are aggregates, whereas the GUI renderings are averages
+        #so we must make this conversion manaully
+        #update 2-5-2022 plb 
+        #we only divide the total intensities
+        #leave the median intensity alone
+        divide_total_intensities_by_count(initial_panda)
+
+        #########################
+        #later, we may add a class from a ML algorithm
+        #no. we wont. - plb 2-5-2022
+        #########################
+
+        #print to file
+        #print(initial_panda)
+        temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+
+        initial_panda.to_pickle(pipeline_output_directory+'binvestigate_bins_transformed_'+str(temporary_file_integer)+'.bin',protocol=0)

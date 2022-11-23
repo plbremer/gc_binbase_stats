@@ -11,6 +11,7 @@ import multiprocessing
 from functools import partial
 from pprint import pprint
 import sys
+import re
 
 #thoughts on the way that the organ names work
 #these are more complicated. its possible that he organs were used in ways that are not congruent.
@@ -97,7 +98,7 @@ def add_special_property_column(temp_panda,temp_mapping_address):
     special_property_mapping_dict=dict(zip(zip(organ_mapping_panda['species'],organ_mapping_panda['organ_initial']),organ_mapping_panda['special_property']))
     #we apply that mapping over each row in the initial panda
     for index, series in temp_panda.iterrows():
-        print(index)
+        #print(index)
         #applying out transform dict as a lambda on the list of organs
         #could have chosen organ, intensity, or species 
         temp_key_list=zip([element.strip().lower() for element in series['species']],[element.strip().lower() for element in series['organ']])
@@ -126,7 +127,7 @@ def transform_organ_column(temp_bin_panda):
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
-        print(mapping_index)
+        #print(mapping_index)
 #        print(mapping_series)
 
         #declare mapping rule
@@ -198,8 +199,8 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
     for temp_node in temp_nx.nodes:
         mesh_organ_name_set.add(temp_nx.nodes[temp_node]['mesh_label'])
 
-    print(mesh_organ_name_set)
-    hold=input('mesh organ name set')
+    #print(mesh_organ_name_set)
+    #hold=input('mesh organ name set')
     not_in_mesh_set=set()
     in_mesh_set=set()
     for temp_organ in temp_organ_set:
@@ -208,11 +209,11 @@ def identify_organs_not_mapped_to_anatomy_networkx(temp_nx,temp_organ_set):
         elif temp_organ in mesh_organ_name_set:
             in_mesh_set.add(temp_organ)
 
-    print(in_mesh_set)
-    hold=input('in mesh_set')
+    #print(in_mesh_set)
+    #hold=input('in mesh_set')
 
-    print(not_in_mesh_set)
-    hold=input('not_in_mesh_set')
+    #print(not_in_mesh_set)
+    #hold=input('not_in_mesh_set')
     return in_mesh_set,not_in_mesh_set
 
 if __name__ == "__main__":
@@ -221,71 +222,80 @@ if __name__ == "__main__":
 
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    post_species_transform_input_pickle_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
     organ_networkx_input_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
     disease_networkx_input_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_disease_networkx.bin'
     organ_mapping_address='../resources/species_organ_maps/organ_map.txt'
-    output_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_2b_organ_transformed/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_2b_organ_transformed/dummy.txt')
 
-    post_species_transform_panda=pandas.read_pickle(post_species_transform_input_pickle_address)
-    
-    #this is done one time not so that we can make it part of the pipeline
-    #but rather so that we can design organ_mapping.txt
-    #just like in the species
-    organ_specis_pair_list=show_all_organ_species_pairs(post_species_transform_panda)
-    for pair in organ_specis_pair_list:
-        print(pair[0]+'@'+pair[1])
-    print('we have '+str(len(organ_specis_pair_list))+' pairs')
-    #hold=input('copy and paste species organ pairs if necessary')
-    
-    #using the same file, we add an "is cancer" column so that we can do cancer-centered analysis
-    #because this is dont last we dont need to delete things in parallel like we do with
-    #species, organ, intensity
-    add_special_property_column(post_species_transform_panda,organ_mapping_address)
-    
-    #according to the file that we create using the previous output, we transform the panda's organ lists
-    #num_processes = multiprocessing.cpu_count()
-    num_processes=cores_available
-    chunk_size = len(post_species_transform_panda.index)//num_processes
-    panda_chunks=list()
-    for i in range(0,num_processes):
-    #chunks = [post_species_transform_panda.iloc[post_species_transform_panda[i:i + chunk_size]] for i in range(0, post_species_transform_panda.shape[0], chunk_size)]
-        if i<(num_processes-1):
-            panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:(i+1)*chunk_size])
-        elif i==(num_processes-1):
-            panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size:])
-    print(panda_chunks)
-    hold=input('check chunks')
-    pool = multiprocessing.Pool(processes=num_processes)
-    transformed_chunks=pool.map(transform_organ_column,panda_chunks)
-    #transform_organ_column(post_species_transform_panda)
-    #recombine_chunks
-    for i in range(len(transformed_chunks)):
-        post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
-    post_species_transform_panda=pandas.concat(transformed_chunks)
-    
-    #transform_organ_column(post_species_transform_panda)
+    pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_1_species_transformed/'
+    pipeline_output_directory='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/'
+    file_list=os.listdir(pipeline_input_panda_directory)
+    file_list.remove('dummy.txt')
 
-    #show all organs map to anatomy networkx
-    organ_networkx=nx.readwrite.gpickle.read_gpickle(organ_networkx_input_address)
-    organ_set=set()
-    organ_specis_pair_list=show_all_organ_species_pairs(post_species_transform_panda)
-    for temp_pair in organ_specis_pair_list:
-        organ_set.add(temp_pair[0])
-    mapped_set,not_mapped_set=identify_organs_not_mapped_to_anatomy_networkx(organ_networkx,organ_set)
+    for temp_file_counter,temp_file in enumerate(file_list):
+        print(f'we are startin to compute file {temp_file_counter}')
+        print(f'we are starting to compute file {temp_file}')
+        post_species_transform_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
+
+        #this is done one time not so that we can make it part of the pipeline
+        #but rather so that we can design organ_mapping.txt
+        #just like in the species
+        organ_specis_pair_list=show_all_organ_species_pairs(post_species_transform_panda)
+        # for pair in organ_specis_pair_list:
+        #     print(pair[0]+'@'+pair[1])
+        # print('we have '+str(len(organ_specis_pair_list))+' pairs')
+        #hold=input('copy and paste species organ pairs if necessary')
+        
+        #using the same file, we add an "is cancer" column so that we can do cancer-centered analysis
+        #because this is dont last we dont need to delete things in parallel like we do with
+        #species, organ, intensity
+        add_special_property_column(post_species_transform_panda,organ_mapping_address)
+        
+        #according to the file that we create using the previous output, we transform the panda's organ lists
+        #num_processes = multiprocessing.cpu_count()
+        num_processes= cores_available-1
+        chunk_size = len(post_species_transform_panda.index)//num_processes
+        panda_chunks=list()
+        for i in range(0,num_processes):
+            #if i<(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
+            #elif i==(num_processes-1):
+            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
+            panda_chunks.append(post_species_transform_panda.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
+        #panda_chunks.append(binvestigate_panda.iloc[num_processes*chunk_size:])
+        #print(panda_chunks)
+        #hold=input('check chunks')
+        pool = multiprocessing.Pool(processes=cores_available)
+        transformed_chunks=pool.map(transform_organ_column,panda_chunks)
+        pool.close()
+        pool.join()
+        #transform_organ_column(post_species_transform_panda)
+        #recombine_chunks
+        for i in range(len(transformed_chunks)):
+            post_species_transform_panda.iloc[transformed_chunks[i].index]=transformed_chunks[i]
+        post_species_transform_panda=pandas.concat(transformed_chunks)
+        
+        #transform_organ_column(post_species_transform_panda)
+
+        #show all organs map to anatomy networkx
+        organ_networkx=nx.readwrite.gpickle.read_gpickle(organ_networkx_input_address)
+        organ_set=set()
+        organ_specis_pair_list=show_all_organ_species_pairs(post_species_transform_panda)
+        for temp_pair in organ_specis_pair_list:
+            organ_set.add(temp_pair[0])
+        mapped_set,not_mapped_set=identify_organs_not_mapped_to_anatomy_networkx(organ_networkx,organ_set)
 
 
-    #show all special property map to disease networkx
-    disease_networkx=nx.readwrite.gpickle.read_gpickle(disease_networkx_input_address)
-    disease_set=set()
-    disease_species_pair_list=show_all_disease_species_pairs(post_species_transform_panda)
-    for temp_pair in disease_species_pair_list:
-        disease_set.add(temp_pair[0])
-    mapped_set,not_mapped_set=identify_organs_not_mapped_to_anatomy_networkx(disease_networkx,disease_set)
+        #show all special property map to disease networkx
+        disease_networkx=nx.readwrite.gpickle.read_gpickle(disease_networkx_input_address)
+        disease_set=set()
+        disease_species_pair_list=show_all_disease_species_pairs(post_species_transform_panda)
+        for temp_pair in disease_species_pair_list:
+            disease_set.add(temp_pair[0])
+        mapped_set,not_mapped_set=identify_organs_not_mapped_to_anatomy_networkx(disease_networkx,disease_set)
 
 
-    #output the result
-    post_species_transform_panda.to_pickle(output_pickle_address)
-    
+        #output the result
+        temporary_file_integer=re.findall(r'\d+', temp_file)[0]
+        post_species_transform_panda.to_pickle(pipeline_output_directory+'binvestigate_organ_transformed_'+str(temporary_file_integer)+'.bin',protocol=0)
