@@ -63,7 +63,56 @@ def make_index_panda_for_dash_app():
     starting_point.to_pickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/index_panda.bin')
 
 
+def get_unique_sod_combinations():
+    unique_sod_combinations_address = "../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/unique_sod_combinations.bin"
+    unique_sod_combinations_panda = pd.read_pickle(unique_sod_combinations_address)
+    unique_sod_combinations_dict = {
+        temp:temp for temp in unique_sod_combinations_panda.keys().to_list()
+    }
+    return unique_sod_combinations_dict
 
+def extract_networkx_selections_species():
+    species_networkx=nx.read_gpickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/species_networkx.bin')
+    species_node_dict=dict()
+    #when we make the options dict, the strategy depends on what common nodes are available
+    #note that some have more than one name, so we just choose the first listed
+    #so we check if its a string. if its not, then it is a list
+    for temp_node in species_networkx.nodes:
+        #print(temp_node)
+        # if 'common_name' in species_networkx.nodes[temp_node].keys():
+        #     if isinstance(species_networkx.nodes[temp_node]['common_name'],str):
+        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['common_name']
+        #     else:
+        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['common_name'][0]
+        # elif 'genbank_common_name' in species_networkx.nodes[temp_node].keys():
+        #     if isinstance(species_networkx.nodes[temp_node]['genbank_common_name'],str):
+        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['genbank_common_name']
+        #     else:
+        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['genbank_common_name'][0]
+        # else:
+        #     species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: None Available'
+        if temp_node=='1':
+            species_node_dict[temp_node]='All Species'
+        elif 'common_name' in species_networkx.nodes[temp_node].keys():
+            if isinstance(species_networkx.nodes[temp_node]['common_name'],str):
+                species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']+' AKA '+species_networkx.nodes[temp_node]['common_name']
+            else:
+                species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']+' AKA '+species_networkx.nodes[temp_node]['common_name'][0]
+        elif 'genbank_common_name' in species_networkx.nodes[temp_node].keys():
+            if isinstance(species_networkx.nodes[temp_node]['genbank_common_name'],str):
+                species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']+' AKA '+species_networkx.nodes[temp_node]['genbank_common_name']
+            else:
+                species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']+' AKA '+species_networkx.nodes[temp_node]['genbank_common_name'][0]
+        else:
+            species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']
+    #print(species_node_dict)
+        species_node_dict['9606']='Homo sapiens AKA human'
+
+    return species_networkx,species_node_dict
+
+def get_index_panda():
+    temp=pd.read_pickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/index_panda.bin')
+    return temp
 
 if __name__ == "__main__":
 
@@ -123,3 +172,24 @@ if __name__ == "__main__":
     species_translation_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/for_index_panda_for_dash_species_translation.bin'
     species_translation_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/for_index_panda_for_dash_species_translation.bin'
     os.system(f'cp {species_translation_address} {species_translation_output}')
+
+
+
+    #after transferring, we glue on this step in order to make the clickable labels for differential + upset
+    unique_sod_combinations_address = "../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/unique_sod_combinations.bin"
+    _,species_code_to_english_dict_map=extract_networkx_selections_species()
+    unique_sod_combinations_panda = pd.DataFrame(
+        pd.read_pickle(unique_sod_combinations_address)
+    )
+    unique_sod_combinations_panda.reset_index(inplace=True)
+    output_panda=unique_sod_combinations_panda['index'].str.split(' - ',expand=True)
+    species_english_to_code_map=dict(zip(
+        index_panda['species_english'],index_panda['species']
+    ))
+    output_panda[0]=output_panda[0].map(species_english_to_code_map.get)
+    output_panda[0]=output_panda[0].astype(str).map(species_code_to_english_dict_map.get)
+
+    output_panda['triplet_with_common_name']=output_panda[[0,1,2]].agg(' - '.join,axis=1)
+    output_panda['triplet']=unique_sod_combinations_panda['index']
+    output_panda.drop([0,1,2],axis='columns',inplace=True)
+    output_panda.to_pickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/unique_sod_combinations_common_and_database_names.bin')
