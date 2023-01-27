@@ -3,6 +3,7 @@
 #work (ete3, metagenompy, our curation)
 #this swap occurs in the binvestigate panda
 
+from cProfile import label
 import os
 import pandas
 import metagenompy
@@ -75,9 +76,10 @@ def visualize_nodes_on_a_list(temp_nx,temp_list,temp_attribute_name):
             if temp_nx.nodes[temp_node][temp_attribute_name] in temp_list:
                 color_list.append('#ffa500')
             else:
-                color_list.append('#0000ff')
+                color_list.append('#00ff00')
         pos = graphviz_layout(temp_nx, prog="dot")
-        nx.draw(temp_nx, pos,with_labels=True,node_color=color_list)
+        labels = nx.get_node_attributes(temp_nx, 'scientific_name') 
+        nx.draw(temp_nx, pos,with_labels=labels,node_color=color_list)
         plt.show()    
 
     elif temp_attribute_name == None:
@@ -86,11 +88,12 @@ def visualize_nodes_on_a_list(temp_nx,temp_list,temp_attribute_name):
             if temp_node in temp_list:
                 color_list.append('#ffa500')
             else:
-                color_list.append('#0000ff')
-
-        
+                color_list.append('#00ff00')
         pos = nx.nx_agraph.pygraphviz_layout(temp_nx, prog='dot')
-        nx.draw(temp_nx, pos,with_labels=True,node_color=color_list)
+
+        labels = nx.get_node_attributes(temp_nx, 'scientific_name') 
+        print(labels)
+        nx.draw(temp_nx, pos,labels=labels)#,node_color=color_list)
         plt.show()  
 
 
@@ -109,9 +112,6 @@ if __name__ == "__main__":
     file_list.remove('dummy.txt')
     input_binvestigate_panda_address=pipeline_input_panda_directory+file_list[0]
     
-
-    
-    #i#nput_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_generate_fold_matrices/binvestigate_with_fold_matrices.bin'
     output_networkx_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin'
     output_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/')
@@ -126,7 +126,6 @@ if __name__ == "__main__":
 
     #get a list of taxids for each species foudn in this binvestigate panda
     #all species in the google sheets transform
-    ##total_transform_taxid_list=species_taxid_panda['tax_id'].astype('str').to_list()
     #shrinkt the total possibel list to those that appear in this particular binvestigate panda
     species_in_this_binvestigate_panda_set=get_all_strings_in_list_across_panda_column(binvestigate_panda,'species')
     taxid_for_this_binvestigate_panda_list=list()
@@ -148,9 +147,6 @@ if __name__ == "__main__":
     binvestigate_species_networkx_view=metagenompy.highlight_nodes(total_ncbi_networkx,taxid_for_this_binvestigate_panda_list)
     binvestigate_species_networkx=binvestigate_species_networkx_view.copy()
 
-
-
-
     #back when we thought that the classic King Philliip Went To Greece etc set would work
     #now we must include instraclasses and chordates and blah blah
     #metagenompy.condense_taxonomy(binvestigate_species_networkx)
@@ -166,8 +162,7 @@ if __name__ == "__main__":
         if temp_taxid not in binvestigate_species_networkx.nodes:
             print(temp_taxid)
     print('------------------------------------------------')
-    #hold=input('stop and check to make sure that no taxid from binvestigate were not mapped to a place on the metagonompy networkx')
-
+    
     #at this point i realized that the species labels from ete3 were not playing nicely with the species labels from metagenompy
     #however, the taxid were
     #i also realized that even when using the taxid, stupid things like "selachii" aka sharks being technically an "intraclass"
@@ -184,30 +179,16 @@ if __name__ == "__main__":
         if temp_species not in binvestigate_species_networkx.nodes:
             print(type(temp_species))
             print(temp_species)
-    #hold=input('confirm that those mapped were swapped')
 
-    #cut the networkx to branches and meaningful inputs
-    #contract_irrelevant_nodes(binvestigate_species_networkx,taxid_for_this_binvestigate_panda_list)
-
-    #print('check that the ncbi number was added')
     for temp_node in binvestigate_species_networkx.nodes:
-        #print(binvestigate_species_networkx.nodes[temp_node])
-        #print(temp_node)
-        #hold=input('hold')
         binvestigate_species_networkx.nodes[temp_node]['ncbi_number']=temp_node
-        #print(binvestigate_species_networkx.nodes[temp_node])
-        #print(temp_node)
-        #hold=input('hold')
+
 
     #render the network after node contraction
     node_labels = {
         n: data.get('scientific_name', '') for n, data in binvestigate_species_networkx.nodes(data=True)
     }
-    # fig, ax = plt.subplots(figsize=(10, 10))
-    # metagenompy.plot_network(binvestigate_species_networkx, ax=ax, labels_kws=dict(font_size=10))
-    # fig.tight_layout()
-    # plt.show()
-    
+
     #render the network with the "binvestigate nodes" being a special color
     species_id_set=get_all_strings_in_list_across_panda_column(binvestigate_panda,'species')
     # visualize_nodes_on_a_list(binvestigate_species_networkx,species_id_set,None)

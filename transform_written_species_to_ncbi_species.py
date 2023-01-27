@@ -33,8 +33,6 @@ def identify_elements_not_in_ncbi(temp_set):
 
     #creat an ncbi taxonomy object. theres a sql database hidden in the home directory that this references
     ncbi=NCBITaxa()
-    #ncbi.update_taxonomy_database()
-
     has_0_id_set=set()
     has_more_than_1_id_set=set()
 
@@ -81,7 +79,6 @@ def transform_species_column(temp_bin_panda):
 
     #apply each transformation to each row
     for mapping_index, mapping_series in mapping_panda.iterrows():
-        #print(mapping_index)
 
         #declare mapping rule
         #drop rules work differently. must get all indices and then drop from mapping as well as organs
@@ -112,37 +109,25 @@ def transform_species_column(temp_bin_panda):
             for bin_index, bin_series in temp_bin_panda.iterrows():
 
                 for i in range(0,len(bin_series['species'])):
-                    #print(bin_series['species'][i].lower()+' and '+mapping_series['list_of_species_that_had_zero_ncbi_id'].lower())
                     if (bin_series['species'][i].lower()) == (mapping_series['list_of_species_that_had_zero_ncbi_id'].lower()):
                         bin_series['species'][i] = mapping_series['most_specific'].lower()
-                    #print(mapping_series['most_specific'].lower())
-
+                    
                 temp_bin_panda.at[bin_index,'species']=bin_series['species']
                 
-                #temp_bin_panda.at[bin_index,'species']=[element.lower() for element in temp_bin_panda.at[bin_index,'species']]
-
     #quick fix to make everythin the same case
     for index,series in temp_bin_panda.iterrows():
         temp_bin_panda.at[index,'species']=[element.lower() for element in temp_bin_panda.at[index,'species']]
 
     return temp_bin_panda
 
-
-
-
-
 if __name__ == "__main__":
-
-
     min_fold_change=sys.argv[1]
     cores_available=int(sys.argv[2])
-    #start_from_aws=(sys.argv[3])
     start_from_aws='False'
     species_mapping_address='../resources/species_organ_maps/species_map.txt'
 
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/'
     pipeline_output_directory='../results/'+str(min_fold_change)+'/step_1_species_transformed/'
-    #output_pickle_address='../results/'+str(min_fold_change)+'/step_1_species_transformed/binvestigate_species_transformed.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_1_species_transformed/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_1_species_transformed/dummy.txt')
     
@@ -153,20 +138,8 @@ if __name__ == "__main__":
     for temp_file_counter,temp_file in enumerate(file_list):
         print(f'we are startin to compute file {temp_file_counter}')
         print(f'we are starting to compute file {temp_file}')
-        # if start_from_aws=='False':
-        #     print('hello')
+
         binvestigate_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
-        # elif start_from_aws=='True':
-        #     my_server='info-from-binvestigate.czbab8f7pgfj.us-east-2.rds.amazonaws.com'
-        #     my_database='binvestigate'
-        #     my_dialect='postgresql'
-        #     my_driver='psycopg2'
-        #     my_username='postgres'
-        #     my_password='elaine123'
-        #     my_connection=f'{my_dialect}+{my_driver}://{my_username}:{my_password}@{my_server}/{my_database}'
-        #     engine=create_engine(my_connection)#,echo=True)
-        #     connection=engine.connect()
-        #     binvestigate_panda=pandas.read_sql_table(table_name='pseudo_carrot', con=my_connection)
 
         #identify species names that do not map to the NCBI database
         #this is done one time not as part of the "informatics pipeline" but rather
@@ -176,31 +149,15 @@ if __name__ == "__main__":
         #species map to 0 and sometimes they map to >1
         #the "id" in this case is a number associated with the ncbi taxonomy
         has_0_id_set,has_more_than_1_id_set=identify_elements_not_in_ncbi(all_species_set)
-
-        ##print_some_set(all_species_set)
-        #hold=input('copy and paste the all species set if necessary')
-        ##print_some_set(has_0_id_set)
-        #hold=input('copy and paste the has 0 id if necessary')
-        ##print_some_set(has_more_than_1_id_set)
-        #hold=input('copy and paste the has multiple id if necessary')
-
         
         #later, after doing a curatin of this list, we put the transform file in the 
         #'species_mapping_address' location
         #translate species names according to some transform list and drop things that either have no translation or are identified with a translation 'drop'
-        #num_processes = multiprocessing.cpu_count()
         num_processes= cores_available-1
         chunk_size = len(binvestigate_panda.index)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-            #if i<(num_processes-1):
-            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:(i+1)*chunk_size])
-            #elif i==(num_processes-1):
-            #    panda_chunks.append(binvestigate_panda.iloc[i*chunk_size:])
             panda_chunks.append(binvestigate_panda.iloc[i*chunk_size+i:(i+1)*chunk_size+i+1])
-        #panda_chunks.append(binvestigate_panda.iloc[num_processes*chunk_size:])
-        #print(panda_chunks)
-        #hold=input('check chunks')
         pool = multiprocessing.Pool(processes=cores_available)
         transformed_chunks=pool.map(transform_species_column,panda_chunks)
         pool.close()
@@ -216,11 +173,8 @@ if __name__ == "__main__":
         all_species_set=get_all_strings_in_list_across_panda_column(binvestigate_panda,'species')
         has_0_id_set,has_more_than_1_id_set=identify_elements_not_in_ncbi(all_species_set)
         print_some_set(has_0_id_set)
-        #hold=input('confirm 0 set empty')
         print_some_set(has_more_than_1_id_set)
-        #hold=input('confirm multiple set empty')
 
-        #binvestigate_species_transformed.bin'
         #output the result
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]
 

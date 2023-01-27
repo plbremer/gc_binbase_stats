@@ -39,13 +39,11 @@ def drop_repeats_in_group(temp_panda):
         if pandas.isnull(index):
             continue
 
-        
         #in this block we confirm that for each group, all [organ, species, intensity are the same]
         #which we expect because the sunburst diagrams are all the same
         zeroth_index=temp_panda.loc[temp_panda['group'] == index].index[0]
         non_zeroth_indices=temp_panda.loc[temp_panda['group'] == index].index[1:]
         for subset_index, subset_series in temp_panda.loc[temp_panda['group'] == index].iterrows():
-
 
             if subset_series['organ'] != temp_panda.loc[temp_panda['group']==index].loc[zeroth_index,'organ']:
                 hold=input('there is a difference amongst the organs')
@@ -118,12 +116,8 @@ def divide_total_intensities_by_count(temp_panda):
     so we must make this conversion manaully
     '''
     for index,series in temp_panda.iterrows():
-        #print(index)
-        #print(np.array(series['intensity']))
-        #print(np.array(series['count']))
         new_intensities=list(np.divide(np.array(series['total_intensity']),np.array(series['count'])))
         temp_panda.at[index,'total_intensity']=new_intensities
-        #hold=input('one iteration')
 
 def transform_count_column(temp_bin_panda,temp_count_cutoff):
     '''
@@ -157,8 +151,6 @@ def transform_count_column(temp_bin_panda,temp_count_cutoff):
         temp_bin_panda.at[bin_index,'annotation_distribution']=annotation_distribution_list_with_indices_removed
         temp_bin_panda.at[bin_index,'percent_present']=percent_present_list_with_indices_removed
 
-    #hold=input('hold')
-
 def transform_intensity_column(temp_bin_panda):
     '''
     sometimes the binvestigate rest calls provided species/organs with intensities of zero
@@ -166,7 +158,6 @@ def transform_intensity_column(temp_bin_panda):
     '''
     
     for bin_index, bin_series in temp_bin_panda.iterrows():
-        #print(bin_index)
         indices_to_drop=[i for i in range(0,len(bin_series['intensity'])) if bin_series['intensity'][i] == 0.0]
         species_list_with_indices_removed=list(np.delete(bin_series['species'],indices_to_drop))
         organ_list_with_indices_removed=list(np.delete(bin_series['organ'],indices_to_drop))
@@ -191,15 +182,11 @@ def get_list_of_redundancies(temp_organ_list,temp_species_list,temp_properties_l
 
     
     key_set=set(zip(temp_organ_list,temp_species_list,temp_properties_list))
-    #print(key_set)
     redundancy_dict={i:[] for i in key_set}
-    #print(redundancy_dict)
 
     for i,temp_triplet in enumerate(zip(temp_organ_list,temp_species_list,temp_properties_list)):
         redundancy_dict[temp_triplet].append(i)
 
-    #print(redundancy_dict)
-    #hold=input('hold')
     return redundancy_dict
 
 def aggregate_redundancies(temp_panda):
@@ -212,9 +199,7 @@ def aggregate_redundancies(temp_panda):
 
     for index, series in temp_panda.iterrows():
         print(index)
-        #print(series)
         redundancy_dict=get_list_of_redundancies(series['organ'],series['species'],series['special_property_list'])
-        #print(redundancy_dict)
 
         temp_species_list=list()
         temp_organ_list=list()
@@ -228,7 +213,6 @@ def aggregate_redundancies(temp_panda):
 
         for temp_triplet in redundancy_dict.keys():
             #if there is only one occurence of a species,organ,property triplet
-            #print(temp_triplet)
             if len(redundancy_dict[temp_triplet])==1:
                 temp_species_list.append(series['species'][redundancy_dict[temp_triplet][0]])
                 temp_organ_list.append(series['organ'][redundancy_dict[temp_triplet][0]])
@@ -290,11 +274,6 @@ if __name__ == "__main__":
     inchikey_mapping_address='../resources/species_organ_maps/inchikey_mapping.txt'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_3_bins_transformed/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_3_bins_transformed/dummy.txt')
- 
-    
-    # initial_pickle_address='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/binvestigate_organ_transformed.bin'
-    # output_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
-
 
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_2b_organ_transformed/'
     pipeline_output_directory='../results/'+str(min_fold_change)+'/step_3_bins_transformed/'
@@ -383,8 +362,6 @@ if __name__ == "__main__":
         #no. we wont. - plb 2-5-2022
         #########################
 
-        #print to file
-        #print(initial_panda)
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]
 
         initial_panda.to_pickle(pipeline_output_directory+'binvestigate_bins_transformed_'+str(temporary_file_integer)+'.bin',protocol=0)

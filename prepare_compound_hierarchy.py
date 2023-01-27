@@ -6,54 +6,6 @@ import pandas
 import numpy as np
 import os
 from pprint import pprint
-'''
-def poke_around_networkx(temp_nx):
-    #parsed_obo.add_node() to add  new nodes to graph
-    #DiGraph is a special class for directed graphs (which we have)
-    #networkx.drawing
-
-    #i think that you have to add a node then add an edge
-
-    #show that its DAG
-    print(nx.is_directed_acyclic_graph(temp_nx))
-
-    #things i want to do
-    ##visualize the current network
-    ###subgraph
-    ###nbunch
-    nx.draw(temp_nx)
-    plt.show()
-
-    #we have chosen 162 as a simple point
-
-    #get descendants (things downstream of the graph)
-    print(nx.descendants(parsed_obo,'CHEMONTID:0000162'))
-
-    #get ancestors (things upstream, but lower in the ontology)
-    print(nx.ancestors(parsed_obo,'CHEMONTID:0000162'))
-
-    #try drawing ancestors
-    ##get the set
-    ##create an nbunchiterator over the set
-    ##send that to the drawer
-    ancestor_set=nx.ancestors(parsed_obo,'CHEMONTID:0000162')
-    subgraph_parsed_obo=parsed_obo.subgraph(ancestor_set)
-    nx.draw(subgraph_parsed_obo,with_labels=True)
-    #this doesnt include 162 itself, so might want to get the direct parent of 162 then get th3
-    #ancestors of 162's parent
-    plt.show()
-
-    #show node attributes
-    print(temp_nx.nodes['CHEMONTID:0000162'])
-
-    ##see what attributes each node has
-    ##add one node (and edge?) to the graph
-    ##add one more
-    ##add the proper fold matrices to each node
-    ##adjust parent nodes to have the proper correspodning fold matrix and any other proper indicators
-    ##i think that the best way to get around the infinity thing is to choose the lowest fold to be
-    #the entry in the next parent matrix
-'''
 
 def obtain_deepest_classyfire_class_per_bin(temp_panda):
     '''
@@ -114,21 +66,14 @@ def add_one_node_to_classyfire_network(temp_nx,temp_bin,temp_class_to_node_dict)
         node_to_connect_to=temp_class_to_node_dict[current_bin_name]
     except KeyError:
         return
-    ##    node_to_connect_to='CHEMONTID:9999999'
 
-
-    #hold=input('first prints')
     #add this bin as a node in the network
     #the id number is the name of the node
     temp_nx.add_node(
         int(temp_bin['id']),
         inchikey=temp_bin['inchikey'],
         type_of_node='from_binvestigate',
-        common_name=temp_bin['name'],
-        # fold_change_matrix_average=temp_bin['fold_change_total_intensity'],
-        # fold_change_matrix_median=temp_bin['fold_change_median_intensity'],
-        # signifigance_matrix_mannwhitney=temp_bin['signifigance_mannwhitney'],
-        # signifigance_matrix_welch=temp_bin['signifigance_welch']
+        common_name=temp_bin['name']
     )
 
     #add a connection between the added node and the class that it is most specifically
@@ -141,7 +86,6 @@ def add_all_bins_to_network(temp_nx,temp_panda,temp_class_to_node_dict):
         add_one_node_to_classyfire_network(temp_nx,series,temp_class_to_node_dict)
 
 def visualize_added_classes(temp_nx,temp_original_classyfire_nodecount):
-    #add_one_node_to_classyfire_network(parsed_obo,binvestigate_panda.loc[0],class_to_node_dict)
     color_list_original=['#1f78b4' for i in range(0,temp_original_classyfire_nodecount)]
     color_list_new=['#32cd32' for i in range(0,len(temp_nx.nodes)-temp_original_classyfire_nodecount)]
     total_color_list=color_list_original+color_list_new
@@ -264,15 +208,11 @@ def draw_nx_for_analysis(temp_nx,temp_hierarchy_type,set_of_binvestigate_nodes=N
             else:
                 total_color_list.append('#ff0000')
 
-
-
-
     pos = nx.nx_agraph.pygraphviz_layout(temp_nx, prog='dot')
     nx.draw(temp_nx, pos,labels=label_dict,node_color=total_color_list)
     plt.show()
 
 def get_labels_for_drawing(temp_nx,temp_hierarchy_type):
-
     label_dict=dict()
     if temp_hierarchy_type=='compound':
         for temp_node in temp_nx.nodes:
@@ -309,7 +249,6 @@ def get_labels_for_drawing(temp_nx,temp_hierarchy_type):
 
 if __name__ == "__main__":
     
-    #min_fold_change=10
     min_fold_change=sys.argv[1]
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/dummy.txt')
@@ -321,9 +260,6 @@ if __name__ == "__main__":
 
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/'
     pipeline_output_directory='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/'
-
-    #binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
-    #output_file_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
 
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
@@ -339,9 +275,6 @@ if __name__ == "__main__":
             master_panda=pandas.concat(
                 [master_panda,temp_panda],axis='index',ignore_index=True
             )
-
-
-    #sbinvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
 
     #get dict 
     #for this dict, the keys are the classes and the values are the chemontid
@@ -362,18 +295,8 @@ if __name__ == "__main__":
     #nx.draw(parsed_obo,node_color=['#1f78b4' for i in range(0,len(parsed_obo.nodes))],node_size=50)
     #plt.show()
 
-    '''
-    add_one_node_to_classyfire_network(parsed_obo,binvestigate_panda.loc[0],class_to_node_dict)
-    color_list=['#1f78b4' for i in range(0,len(parsed_obo.nodes)-1)]
-    color_list.append('#32cd32')
-    nx.draw(parsed_obo,with_labels=True,node_color=color_list)
-    plt.show()    
-    '''
-
     add_all_bins_to_network(parsed_obo,master_panda,class_to_node_dict)
     #for each bin assign as a child node of the deepest node that is possible
-
-
 
     remove_branches_without_fold_matrices(parsed_obo)
 
@@ -381,20 +304,13 @@ if __name__ == "__main__":
     #originally from "reduce hierarchy complexity post dash"
     #compound_nx_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
     compound_node_keep_address='../resources/species_organ_maps/networkx_shrink_compound.txt'
-    #compound_nx_output_address='../results/'+str(min_fold_change)+'/step_14_reduce_hierarchy_complexity_post_dash/compounds_networkx.bin'
     parsed_obo=do_everything(parsed_obo,compound_node_keep_address,'compound')
     
 
-    #nx.draw(parsed_obo)
-    #plt.show()
 
     print(master_panda)
     print('*'*50)
     for temp_node in parsed_obo.nodes:
         print(parsed_obo.nodes[temp_node])
-    #nx.draw(parsed_obo)
-    #plt.show()    
-    #visualize_added_classes(parsed_obo,original_classyfire_node_count)
-    #draw_nx_for_analysis(parsed_obo,'compound')
-    #hold=input('hold again')
+    
     nx.readwrite.gpickle.write_gpickle(parsed_obo,pipeline_output_directory+'classyfire_ont_with_bins_added.bin')

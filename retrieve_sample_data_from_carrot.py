@@ -25,7 +25,6 @@ my_engine=create_engine(my_connection)#,echo=True)
 
 
 def obtain_all_species_organs_compounds():
-    #connection=my_engine.connect()
     all_species_organs_compounds_cursor=connection.execute('''
         select
             psdsvasl.species,
@@ -53,14 +52,10 @@ def obtain_all_species_organs_compounds():
         orient='records'
     )
 
-    #connection.close()
-    #my_engine.dispose()
-
     return all_species_organs_compounds_panda
 
 
 def obtain_all_species_organ_sample_count_and_average_fames():
-    #connection=my_engine.connect()
     species_organ_sample_count_and_average_fame_cursor=connection.execute('''
         select
             *
@@ -73,12 +68,9 @@ def obtain_all_species_organ_sample_count_and_average_fames():
         species_organ_sample_count_and_average_fame_result,
         orient='records'
     )
-    #connection.close()
-    #my_engine.dispose()
     return species_organ_sample_count_and_average_fame_panda
 
 def aquire_normalized_intensities_for_species_organ_compound(temp_species,temp_organ,temp_compound):
-    #connection=my_engine.connect()
     all_samples_for_soc_cursor=connection.execute(
         f'''
         select
@@ -92,36 +84,23 @@ def aquire_normalized_intensities_for_species_organ_compound(temp_species,temp_o
         '''
     )
 
-
     all_samples_for_soc_result=json.dumps([dict(r) for r in all_samples_for_soc_cursor])
     all_samples_for_soc_panda=pd.read_json(
         all_samples_for_soc_result,
         orient='records'
     )
-    #connection.close()
-    #my_engine.dispose()
+
     return all_samples_for_soc_panda
 
 def aquire_normalized_intensities_for_species_organ_compound_wrapper(temp_panda):
-
-    # ##################################################################################
-    # #temporarily here for testing - leaves us with only 1 compound
-    # temp_panda=temp_panda.loc[temp_panda.name=='alanine']
-    # temp_panda.reset_index(inplace=True,drop=True)
-    # ##################################################################################
-    print(temp_panda)
-
     for index,series in temp_panda.iterrows():
         if index%10==0:
             print(index)
-        #print(series)
-        #hold=input('hold')
         temp_results=aquire_normalized_intensities_for_species_organ_compound(
             series['species'],
             series['organ'],
             series['target_id']
         )
-        #print(temp_results)
 
         temp_file_address='../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/soc_data/'+series['species']+'¬'+series['organ']+'¬'+str(series['target_id'])+'.bin'
 
@@ -149,10 +128,7 @@ if __name__=="__main__":
     species_organ_sample_count_and_average_fame_panda.to_pickle('../results/'+str(min_fold_change)+'/step_0_a_pull_distributions_from_aws/so_count_data/species_organ_sample_count_and_average_fame.bin')
     print(species_organ_sample_count_and_average_fame_panda)
 
-
-    #hold=input('hold')
     aquire_normalized_intensities_for_species_organ_compound_wrapper(all_species_organs_compounds_panda)
-
 
     connection.close()
     my_engine.dispose()

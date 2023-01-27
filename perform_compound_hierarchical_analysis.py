@@ -36,11 +36,7 @@ def write_each_bin_to_file(binvestigate_panda,temp_address_base):
         'signifigance_welch'
     ]
 
-    #print('now outputting unknown bins')
     for index,series in binvestigate_panda.iterrows():
-        # if series['inchikey']!='@@@@@@@':
-        #     continue
-        # else:
         print('printing bin '+str(series['id'])+' iteration number '+str(index))
         for i in range(len(matrices_to_compute)):
             total_address=temp_address_base+matrices_to_compute[i]+'/'
@@ -70,7 +66,7 @@ def bfs_layers(G, sources):
     >>> dict(enumerate(nx.bfs_layers(H, [1, 6])))
     {0: [1, 6], 1: [0, 3, 4, 2], 2: [5]}
     """
-    #this is in here like this because its in a newer version of nx and i was not about to fuck with tht
+    #this is in here like this because its in a newer version of nx 
     if sources in G:
         sources = [sources]
     current_layer = list(sources)
@@ -116,10 +112,6 @@ def compute_output_matrix_fold(temp_pandas_list):
         intermediate_min_df !=0,
         other=intermediate_max_df
     )
-    
-#     temp_output=my_groupby_min.where(
-#         np.sign(my_groupby_min)==np.sign(my_groupby_max),other=0
-#     )
 
     temp_output.values[np.tril_indices(len(temp_output.index), -1)]=0
 
@@ -165,26 +157,16 @@ if __name__ == "__main__":
 
     #make the compounds individual files
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/'
-    #pipeline_output_directory='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/'    
-    
-    #binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
+
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
     for temp_file in file_list:
         temporary_input_panda=pd.read_pickle(pipeline_input_panda_directory+temp_file)
-        #we actually do this in the method
-        # temporary_input_panda=temporary_input_panda.loc[
-        #     temporary_input_panda['inchikey'] == '@@@@@@@',:
-        # ]
-        #temporary_file_integers=re.findall(r'\d+', temp_file)
-
-        #temp_binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
         write_each_bin_to_file(temporary_input_panda,individual_fold_matrix_directory_base)
 
 
 
     input_graph_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
-    #output_graph_address='../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/classyfire_analysis_results.bin'
     #read in network
     compound_network=nx.readwrite.gpickle.read_gpickle(input_graph_address)
 
@@ -224,46 +206,3 @@ if __name__ == "__main__":
                     output_panda.to_pickle(
                         individual_fold_matrix_directory_base+temp_matrix+'/'+str(node)+'.bin'
                     )
-
-
-
-    # #print(compound_network.nodes)
-    # #hold=input('node list')
-
-    # #visualize_added_classes(compound_network)
-
-    
-    # nx.draw(compound_network)
-    # plt.show()
-
-    # #visualize_added_classes(compound_network)
-
-    # for temp_matrix in matrices_to_compute:
-    #     recursively_calculate_fold_matrices(compound_network,'CHEMONTID:9999999',temp_matrix)
-
-    # #write each compound fold matrix panda to file
-    # for temp_matrix in matrices_to_compute:
-    #     write_each_compound_fold_change_matrix_to_file(compound_network,individual_fold_matrix_directory_base,temp_matrix)
-
-
-    # #visualize_added_classes(compound_network)
-    # '''
-    # print(compound_network.nodes[4]['fold_change_matrix'])
-    # #print(compound_network.nodes[4]['name'])
-    # hold=input('4')
-    # print(compound_network.nodes['CHEMONTID:0001073']['fold_change_matrix'])
-    # print(compound_network.nodes['CHEMONTID:0001073']['name'])
-    # hold=input('0001073')
-    # print(compound_network.nodes[1682]['fold_change_matrix'])
-    # #print(compound_network.nodes[1682]['name'])
-    # hold=input('1682')
-    # print(compound_network.nodes['CHEMONTID:0001074']['fold_change_matrix'])
-    # print(compound_network.nodes['CHEMONTID:0001074']['name'])
-    # hold=input('0001074')
-    # print(compound_network.nodes['CHEMONTID:0000435']['fold_change_matrix'])
-    # print(compound_network.nodes['CHEMONTID:0000435']['name'])
-    # hold=input('0000435')
-    # print(compound_network.nodes[2]['fold_change_matrix'])
-    # #print(compound_network.nodes[2]['name'])
-    # hold=input('2')
-    # '''

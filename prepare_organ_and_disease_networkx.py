@@ -24,61 +24,19 @@ def remove_branches_unrelated_to_binvestigate_set(temp_nx,temp_organ_set):
     nodes_to_remove=list()
 
     for i, temp_node in enumerate(temp_nx.nodes):
-        
-        #print(type(temp_node))
-        #hold=input('check type')
-        #if type(temp_node) != str:
-            #print('found float')
-            #hold=input('pre continue')
-        #    continue
-            #hold=input('post continue')
-        #print(temp_node)
         temp_descendent_list=nx.algorithms.dag.descendants(temp_nx,temp_node)
-        #print(temp_descendent_list)
-        ###hold=input('hold')
-        #descendent_mesh_label_list=[i['mesh_label'] for ]
-        
-        #go through all descendents. if we fail to find a mesh label in the organ set
-        #then move on, implicitly not adding the temp_node to nodes_to_remove
-        ##for temp_descendent in temp_descendent_list:
-            #print(temp_nx.nodes[temp_descendent]['mesh_label'])
-        ##    if temp_nx.nodes[temp_descendent]['mesh_label'] in temp_organ_set:
-        ##        continue
+
         #add descendents as well as original label
         temp_mesh_label_list=[temp_nx.nodes[x]['mesh_label'] for x in temp_descendent_list]+[temp_nx.nodes[temp_node]['mesh_label']]
-        ###print(temp_mesh_label_list)
+
         found_organ=any([element in temp_organ_set for element in temp_mesh_label_list])
-        ###print(found_organ)
         if found_organ:
             continue
         #finally we check the node itself. if we still dont find anything, remove this node from the graph
         #ultimately we will find the descedents, so we let that minor inefficiency go
-        ##if (temp_nx.nodes[temp_node]['mesh_label'] not in temp_organ_set):
         else:
             nodes_to_remove.append(temp_node)
-        ###hold=input('hold')
-        #print(temp_node)
-        #hold=input('hold')
-        #temp_ancestor_list=nx.algorithms.dag.ancestors(temp_nx,temp_node)
         
-        #has_numerical_value_in_ancestors=False
-
-        #for temp_ancestor in temp_ancestor_list:
-        #    if type(temp_ancestor) != str:
-                #print('found float')
-                #hold=input('found float')
-        #        has_numerical_value_in_ancestors=True
-        #        break
-        
-        #if has_numerical_value_in_ancestors==False:
-        #    nodes_to_remove.append(temp_node)
-
-        #print(temp_ancestor_list)
-        #print(nodes_to_remove)
-        #print(has_numerical_value_in_ancestors)
-        #print(temp_node)
-        #hold=input('one iteration')
-
     temp_nx.remove_nodes_from(nodes_to_remove)
 
 def remove_branches_unrelated_to_a_given_heading(temp_nx,temp_heading):
@@ -86,9 +44,6 @@ def remove_branches_unrelated_to_a_given_heading(temp_nx,temp_heading):
     this function was strictly for debugging
     '''
     nodes_to_remove=list()
-
-    #print(len(temp_nx.nodes))
-    #hold=input('hold')
     for i, temp_node in enumerate(temp_nx.nodes):
 
         temp_ancestor_list=nx.algorithms.dag.ancestors(temp_nx,temp_node)
@@ -98,9 +53,6 @@ def remove_branches_unrelated_to_a_given_heading(temp_nx,temp_heading):
 
     temp_nx.remove_nodes_from(nodes_to_remove)
 
-    #n#x.draw(temp_nx,with_labels=True)
-    #plt.show()
-
     pos = graphviz_layout(temp_nx, prog="dot")
     nx.draw(temp_nx, pos,with_labels=True)
     plt.show()
@@ -109,16 +61,6 @@ def contract_irrelevant_nodes(temp_nx,temp_binvestigate_entries_set):
     #add node to list if (its name is NOT in the species taxid panda) AND (it has <2 children)
     #when those two conditions are met, then the node's species results can be inferred as being exactly that of the child
 
-    #the contract function takes pairs of nodes
-    #we find the predeccessor dynamically because the graph changes with evey contraction 
-    #binvestigate_taxid_list=temp_panda['tax_id'].astype(str).to_list()
-    #print(temp_nx.nodes)
-    #print(len(temp_nx.nodes))
-    #hold=input('hold')
-    #print(temp_binvestigate_entries_set)
-    #hold=input('hold')
-    #print([temp_nx.nodes[element]['mesh_label'] for element in temp_nx.nodes])
-    #hold=input('hold')
     nodes_to_contract=list()
 
     for temp_node in temp_nx.nodes:
@@ -131,20 +73,10 @@ def contract_irrelevant_nodes(temp_nx,temp_binvestigate_entries_set):
         temp_edge=temp_nx.add_edge(list(temp_nx.predecessors(temp_node))[0],list(temp_nx.successors(temp_node))[0])
         temp_nx.remove_node(temp_node)
 
-    #remove all self loops. artifact that has no meaning
-    #for temp_node in temp_nx.nodes:
-    #    try:
-    #        temp_nx.remove_edge(temp_node,temp_node)
-    #    except nx.exception.NetworkXError:
-    #        continue
-
-
 if __name__ == "__main__":
     
     
     min_fold_change=sys.argv[1]
-    #min_fold_change=10
-    #'+str(min_fold_change)+'
     #probably could use the step_5 one if the "with fold matrices" version gets too massive for ram
     input_binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/binvestigate_species_as_taxid.bin'
     input_complete_organ_networkx_address='../results/'+str(min_fold_change)+'/step_2a_create_organ_and_disease_networkx/mesh_organ_networkx.bin'
@@ -154,17 +86,13 @@ if __name__ == "__main__":
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/dummy.txt')
 
-
-
     #overall workflow
     #read in the binvestigate panda and organ/disease networkx
     #remove branches unrelated to anything
     #contract nodes that are neither explicitly listed or a branch
-    
     binvestigate_panda=pandas.read_pickle(input_binvestigate_panda_address)
     organ_networkx=nx.readwrite.gpickle.read_gpickle(input_complete_organ_networkx_address)
     disease_networkx=nx.readwrite.gpickle.read_gpickle(input_complete_disease_networkx_address)
-
 
     #get the set of organs in this networkx
     organ_species_disease_triplet_list=generate_fold_change_matrices.show_all_organ_species_disease_triplets(binvestigate_panda)
@@ -203,12 +131,6 @@ if __name__ == "__main__":
     organ_networkx.add_edges_from(temp_organ_edges)
     #visualize
     # prepare_species_networkx.visualize_nodes_on_a_list(organ_networkx,organ_set,'mesh_label')
-    
-
-
-
-
-
 
     #get the set of diseases in this networkx
     disease_species_disease_triplet_list=generate_fold_change_matrices.show_all_organ_species_disease_triplets(binvestigate_panda)
@@ -250,8 +172,6 @@ if __name__ == "__main__":
 
     nx.readwrite.gpickle.write_gpickle(organ_networkx,output_organ_networkx_address)
     nx.readwrite.gpickle.write_gpickle(disease_networkx,output_disease_networkx_address)
-
-
 
     print(organ_networkx.nodes)
     print(disease_networkx.nodes)

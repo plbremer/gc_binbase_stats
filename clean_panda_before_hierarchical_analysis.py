@@ -72,8 +72,6 @@ if __name__ == "__main__":
 
     
     min_fold_change=sys.argv[1]
-    # input_panda_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
-    # output_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_5_panda_cleaned/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_5_panda_cleaned/dummy.txt')
     
@@ -98,9 +96,6 @@ if __name__ == "__main__":
         #delete rows if the parallel lists organ/species/special property are empty
         ##remove_rows_with_no_taxonomy(input_panda)
         #we do this for the moment to streamline the small scale analysis
-        ##remove_rows_without_curated_inchikey(input_panda)
-        ##remove_rows_where_curated_inchikey_is_at(input_panda)
-        
         #will probably want to convert the standards to taxonomy "unspecified"
 
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]

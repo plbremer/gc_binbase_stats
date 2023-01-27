@@ -10,7 +10,6 @@ if __name__ == "__main__":
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/dummy.txt')
 
-    #input_panda_address='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/binvestigate_ready_for_analysis.bin'
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_5_panda_cleaned/'
     
     output_panda_address='../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/non_ratio_table.bin'
@@ -40,9 +39,6 @@ if __name__ == "__main__":
             output_dict['intensity_average']+=series['total_intensity']
             output_dict['intensity_median']+=series['median_intensity']
             output_dict['percent_present']+=series['percent_present']
-
-
-
 
     temp_2=pd.DataFrame.from_dict(output_dict)
     

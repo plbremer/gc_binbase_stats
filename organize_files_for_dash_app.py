@@ -9,19 +9,13 @@ def make_index_panda_for_dash_app():
     starting_point['species_english']=starting_point['species']
     starting_point['organ_english']=starting_point['organ']
     starting_point['disease_english']=starting_point['disease']
-    #species_networkx=nx.read_gpickle('../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin')
     species_mapping_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/for_index_panda_for_dash_species_translation.bin')
 
     disease_networkx=nx.read_gpickle('../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/disease_networkx.bin')
-
-    #species_mapping_dict={species_networkx.nodes[temp_node]['scientific_name'].lower():temp_node for temp_node in species_networkx}
     species_mapping_dict=dict(zip(species_mapping_panda.english,species_mapping_panda.ncbi_id))
-    print('-'*50)
-    print(species_mapping_dict)
     starting_point['species']=starting_point['species'].map(species_mapping_dict.get)
 
     organ_networkx=nx.read_gpickle('../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/organ_networkx.bin')
-    # organ_map_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_organ_dash.bin')
     keys=set()
     for temp_node in organ_networkx.nodes:
         keys.add(organ_networkx.nodes[temp_node]['mesh_label'])
@@ -30,14 +24,7 @@ def make_index_panda_for_dash_app():
         organ_mapping_dict[organ_networkx.nodes[temp_node]['mesh_label']].append(temp_node)
     starting_point['organ']=starting_point['organ'].map(organ_mapping_dict.get)
     starting_point=starting_point.explode('organ')
-    #keys=set(organ_map_panda.english_name.to_list())
-    # organ_mapping_dict={temp_key:list() for temp_key in keys}
-    # zipped_list_for_values=list(zip(organ_map_panda.english_name.to_list(),organ_map_panda.node_id.to_list()))
-    # [organ_mapping_dict[temp_tup[0]].append(temp_tup[1]) for temp_tup in zipped_list_for_values]
-    # index_panda=index_panda.assign(organ=index_panda['organ'].map(organ_mapping_dict))
-    # index_panda=index_panda=index_panda.explode('organ')
     disease_networkx=nx.read_gpickle('../results/'+str(min_fold_change)+'/step_8_c_prepare_organ_and_disease_networkx/disease_networkx.bin')
-    # disease_map_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease_dash.bin')
     keys=set()
     for temp_node in disease_networkx.nodes:
         keys.add(disease_networkx.nodes[temp_node]['mesh_label'])
@@ -46,20 +33,7 @@ def make_index_panda_for_dash_app():
         disease_mapping_dict[disease_networkx.nodes[temp_node]['mesh_label']].append(temp_node)
     starting_point['disease']=starting_point['disease'].map(disease_mapping_dict.get)
     starting_point=starting_point.explode('disease')
-    # disease_map_panda=pd.read_pickle('../results/'+str(min_fold_change)+'/step_20_build_hierarchy_filter_tables/table_disease_dash.bin')
-    # keys=set(disease_map_panda.english_name.to_list())
-    # disease_mapping_dict={temp_key:list() for temp_key in keys}
-    # zipped_list_for_values=list(zip(disease_map_panda.english_name.to_list(),disease_map_panda.node_id.to_list()))
-    # [disease_mapping_dict[temp_tup[0]].append(temp_tup[1]) for temp_tup in zipped_list_for_values]
-    # index_panda=index_panda.assign(disease=index_panda['disease'].map(disease_mapping_dict))
-    # index_panda=index_panda=index_panda.explode('disease')
-    print(starting_point)
-    print(starting_point.loc[starting_point.species.isnull()==True])
     starting_point.set_index(keys=['organ','species','disease'],drop=False,inplace=True)
-    
-    print(starting_point)
-    
-    #index_panda.set_index()
     starting_point.to_pickle('../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/index_panda.bin')
 
 
@@ -78,19 +52,6 @@ def extract_networkx_selections_species():
     #note that some have more than one name, so we just choose the first listed
     #so we check if its a string. if its not, then it is a list
     for temp_node in species_networkx.nodes:
-        #print(temp_node)
-        # if 'common_name' in species_networkx.nodes[temp_node].keys():
-        #     if isinstance(species_networkx.nodes[temp_node]['common_name'],str):
-        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['common_name']
-        #     else:
-        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['common_name'][0]
-        # elif 'genbank_common_name' in species_networkx.nodes[temp_node].keys():
-        #     if isinstance(species_networkx.nodes[temp_node]['genbank_common_name'],str):
-        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['genbank_common_name']
-        #     else:
-        #         species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: '+species_networkx.nodes[temp_node]['genbank_common_name'][0]
-        # else:
-        #     species_node_dict[temp_node]='Formal: '+species_networkx.nodes[temp_node]['scientific_name']+' Common: None Available'
         if temp_node=='1':
             species_node_dict[temp_node]='All Species'
         elif 'common_name' in species_networkx.nodes[temp_node].keys():
@@ -105,7 +66,6 @@ def extract_networkx_selections_species():
                 species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']+' AKA '+species_networkx.nodes[temp_node]['genbank_common_name'][0]
         else:
             species_node_dict[temp_node]=species_networkx.nodes[temp_node]['scientific_name']
-    #print(species_node_dict)
         species_node_dict['9606']='Homo sapiens AKA human'
 
     return species_networkx,species_node_dict
@@ -120,7 +80,6 @@ if __name__ == "__main__":
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/dummy.txt')
 
-
     #add non ratio stuff
     non_ratio_dropdown_address='../results/'+str(min_fold_change)+'/step_5_b_make_non_ratio_table/unique_sod_combinations.bin'
     non_ratio_dropdown_address_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/unique_sod_combinations.bin'    
@@ -130,11 +89,6 @@ if __name__ == "__main__":
     compound_networkx_address='../results/'+str(min_fold_change)+'/step_7_prepare_compound_hierarchy/classyfire_ont_with_bins_added.bin'
     compound_networkx_address_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/compounds_networkx.bin'
     compound_networkx=nx.readwrite.read_gpickle(compound_networkx_address)
-    # for temp_node in compound_networkx.nodes:
-    #     compound_networkx.nodes[temp_node].pop('signifigance_matrix_welch')
-    #     compound_networkx.nodes[temp_node].pop('signifigance_matrix_mannwhitney')
-    #     compound_networkx.nodes[temp_node].pop('fold_change_matrix_average')
-    #     compound_networkx.nodes[temp_node].pop('fold_change_matrix_median')
     nx.readwrite.write_gpickle(compound_networkx,compound_networkx_address_output)
 
     species_networkx_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/species_networkx.bin'
@@ -172,8 +126,6 @@ if __name__ == "__main__":
     species_translation_address='../results/'+str(min_fold_change)+'/step_8_b_prepare_species_networkx/for_index_panda_for_dash_species_translation.bin'
     species_translation_output='../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/for_index_panda_for_dash_species_translation.bin'
     os.system(f'cp {species_translation_address} {species_translation_output}')
-
-
 
     #after transferring, we glue on this step in order to make the clickable labels for differential + upset
     unique_sod_combinations_address = "../results/'+str(min_fold_change)+'/step_11_organize_files_for_dash_app/unique_sod_combinations.bin"

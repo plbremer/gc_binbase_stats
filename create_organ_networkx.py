@@ -23,8 +23,6 @@ import sys
 #__copyright__ = "Copyright 2015, Uli Kö221hler"
 #__license__ = "CC0 1.0 Universal"
 #__version__ = "1.0"
-
-
 def readMeSH(fin):
     """
     Given a file-like object, generates MeSH objects, i.e.
@@ -50,55 +48,6 @@ def readMeSH(fin):
     # If there is a non-empty entry left, yield it
     if currentEntry:
         yield currentEntry
-'''
-def add_nodepath_and_label_to_endnode_to_networkx(temp_nx,temp_mesh_entry):
-
-    #MN and MH are 'attributes' in the ascii text file
-    nodepath_string_path_list=temp_mesh_entry['MN']
-    print(nodepath_string_path_list)
-    end_node_label=temp_mesh_entry['MH'][0]
-    print(end_node_label)
-
-    for temp_string_path in nodepath_string_path_list:
-        node_path_elements=temp_string_path.split('.')
-        #print(node_path_elements)
-        node_paths=list()
-        #for temp_element in node_path_elements:
-        # #   node_paths.append
-        #    for 
-        #for i in range(0,len(node_path_elements)):
-            #temp_path=''
-            #for j in range(0,i):
-            #    temp_path+=node_path_elements[j]+'.'
-        #    node_paths.append('.'.join(node_paths[0:i]))
-        #if len(node_path_elements)>1:
-        for i in range(0,len(node_path_elements)):
-            node_paths.append('.'.join(node_path_elements[0:i+1]))
-        print(node_paths)
-        #elif len(node_path_elements)==1:
-        #    node_paths.append(node_path_elements[0])
-        #print(node_paths)
-        #hold=input('hold')
-        #print(end_node_label)
-        #print(node_path)
-        #if 'A' in node_paths[0]:
-        nx.add_path(temp_nx,node_paths)
-
-            
-            #temp_nx.nodes[temp_nx.nodes[node_path[-1]]]['mesh_label']=end_node_label[0]
-        temp_nx.nodes[node_paths[-1]]['mesh_label']=end_node_label
-            #if(len(node_paths)==1):
-                #print(node_path_elements)
-                #print(node_paths)
-                #print(temp_nx.nodes[node_paths[-1]])
-                #print(end_node_label)
-        nx.draw(temp_nx,with_labels=True)
-        plt.show()
-                #hold=input('hold')
-
-    hold=input('one path')
-'''
-
 
 def add_nodepath_and_label_to_endnode_to_networkx(temp_nx,temp_mesh_entry):
     '''
@@ -127,16 +76,9 @@ def add_nodepath_and_label_to_endnode_to_networkx(temp_nx,temp_mesh_entry):
         for i in range(0,len(node_path_elements)):
             node_paths.append('.'.join(node_path_elements[0:i+1]))
 
-        #print(node_paths)
-        #hold=input('node_paths')
-
         #if 'A11' in node_paths:
             nx.add_path(temp_nx,node_paths)
         temp_nx.nodes[node_paths[-1]]['mesh_label']=end_node_label
-
-            #nx.draw(temp_nx,with_labels=True)
-            #plt.show()
-
 
 
 if __name__ == "__main__":
@@ -178,7 +120,6 @@ if __name__ == "__main__":
     for temp in organ_networkx.nodes:
         if 'C' in temp:
             print('theres still a disease ehre')
-    #hold=input('check diseases gone')
     print(disease_networkx.nodes)
     #prove that the disease hierarchy is filled with nodes (albeit not showing edges)
     #hold=input('check diesases')

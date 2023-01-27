@@ -37,25 +37,9 @@ def update_curated_classes_from_mapping(temp_panda, temp_class_mapping_address):
 
     we do the same matching style based on 'id' that we do for the inchikeys
     '''
-
-    # temp_panda['kingdom']='pre_curation_file'
-    # temp_panda['superclass']='pre_curation_file'
-    # temp_panda['class']='pre_curation_file'
-    # temp_panda['subclass']='pre_curation_file'
-    # temp_panda['direct_parent_1']='pre_curation_file'
-    # temp_panda['direct_parent_2']='pre_curation_file'
-    # temp_panda['direct_parent_3']='pre_curation_file'
-    # temp_panda['direct_parent_4']='pre_curation_file'
-    # temp_panda['direct_parent_5']='pre_curation_file'
-
     temp_panda['class_from_curation_not_ML']=True
 
     class_mapping_panda=pandas.read_csv(temp_class_mapping_address,sep='\t')
-
-
-    # print(class_mapping_panda.loc[
-    #     class_mappping_panda.InChIKey== )
-    # print(temp_panda.at[])
 
     temp_panda=temp_panda.merge(
         right=class_mapping_panda,
@@ -69,20 +53,7 @@ def update_curated_classes_from_mapping(temp_panda, temp_class_mapping_address):
         axis='columns',
         inplace=True
     )
-    #for index, series in class_mapping_panda.iterrows():
-    #for index, series in temp_panda.iterrows():
-    # temp_main_panda_index=temp_panda.index[temp_panda['id']==series['id']]
-    # temp_panda.at[temp_main_panda_index,'kingdom']=series['kingdom']
-    # temp_panda.at[temp_main_panda_index,'superclass']=series['superclass']
-    # temp_panda.at[temp_main_panda_index,'class']=series['class']
-    # temp_panda.at[temp_main_panda_index,'subclass']=series['subclass']
-    # temp_panda.at[temp_main_panda_index,'direct_parent_1']=series['direct_parent_1']
-    # temp_panda.at[temp_main_panda_index,'direct_parent_2']=series['direct_parent_2']
-    # temp_panda.at[temp_main_panda_index,'direct_parent_3']=series['direct_parent_3']
-    # temp_panda.at[temp_main_panda_index,'direct_parent_4']=series['direct_parent_4']
-    # temp_panda.at[temp_main_panda_index,'direct_parent_5']=series['direct_parent_5']
 
-    #temp_panda.at[temp_main_panda_index,'class_from_curation_not_ML']=True
     return temp_panda
 
 
@@ -95,13 +66,6 @@ if __name__ == "__main__":
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_4_classes_transformed/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_4_classes_transformed/dummy.txt')
     
-    
-    # initial_pickle_address='../results/'+str(min_fold_change)+'/step_3_bins_transformed/binvestigate_bins_transformed.bin'
-    # output_pickle_address='../results/'+str(min_fold_change)+'/step_4_classes_transformed/binvestigate_classes_transformed.bin'
-    # #else:
-    #    initial_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_bins_transformed.bin'
-    #    output_pickle_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/intermediate_step_transforms/binvestigate_classes_transformed.bin'
-    #    class_mapping_address='/home/rictuar/coding_projects/fiehn_work/gc_bin_base/text_files/species_organ_maps/classes_curated_map.txt'
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_3_bins_transformed/'
     pipeline_output_directory='../results/'+str(min_fold_change)+'/step_4_classes_transformed/'
     
@@ -113,13 +77,9 @@ if __name__ == "__main__":
 
 
         initial_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
-
-
         #the classes are printed
         #and put in the proper file if necessary
         #plb 7-4-22 no reason to visit this
-        ##print_bin_information_for_classes_curated(initial_panda)
-        ##hold=input('copy and inchikey_curated if necessary')
 
         #fill the class column 
         initial_panda=update_curated_classes_from_mapping(initial_panda, class_mapping_address)
@@ -128,9 +88,8 @@ if __name__ == "__main__":
         ###############################################
         #later, we may add a class from a ML algorithm#
         #in this way, each class could be added to the compound hierarchy#
-        #hell no
+        #this was the original intent. not any more.
         ###############################################
         ###############################################
-
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]
         initial_panda.to_pickle(pipeline_output_directory+'binvestigate_classes_transformed_'+str(temporary_file_integer)+'.bin',protocol=0)

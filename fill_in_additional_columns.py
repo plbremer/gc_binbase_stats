@@ -80,16 +80,11 @@ if __name__ == "__main__":
     os.system('mkdir -p ../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/')
     os.system('touch ../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/dummy.txt')
 
-    ##addtional_property_csv_address='../resources/bin_to_inchikey_map.csv'
-    ####temp for getting compound curation
-    ####pipeline_input_panda_address='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/pipeline_input_version_0.bin'
-    
     addtional_property_csv_address='../resources/pull_from_carrot/intermediates/bins_groups_inchi_from_gert_inchikey_group_harmonized.csv'
     additional_property_panda=pd.read_csv(addtional_property_csv_address,sep=',')##,index_col=0)
  
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_0_b_shape_aws_pull_to_pipeline_input/'
     pipeline_output_directory='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/'
-    
     
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
@@ -103,8 +98,7 @@ if __name__ == "__main__":
             ~((temporary_input_panda['name'].str[0].str.lower()=='z') & (temporary_input_panda['name'].str[1]==' ')),
             :
         ]
-
-        #pandas_list.append(temp_panda)  
+ 
         input_addtional_properties(temporary_input_panda,additional_property_panda)
         temporary_file_integer=re.findall(r'\d+', temp_file)[0]
         temporary_input_panda.to_pickle(pipeline_output_directory+'pipeline_input_group_properties_added_'+str(temporary_file_integer)+'.bin',protocol=0)

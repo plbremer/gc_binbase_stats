@@ -20,7 +20,6 @@ if __name__ == "__main__":
     binvestigate_spectral_panda_output_address='../results/'+str(min_fold_change)+'/step_9_b_generate_bin_spectral_panda/bin_spectral_panda.bin'
 
     #remove rows not in translation panda (compound identifier
-    #
     binvestigate_spectral_panda=binvestigate_spectral_panda.loc[binvestigate_spectral_panda.id.isin(compound_translation_panda.compound_identifier)]
     
     #reshape spectra_mz and spectra_intensity into array (string)
@@ -36,8 +35,7 @@ if __name__ == "__main__":
         spectrum_list.append(uploaded_string)
     ##normalize spectrum intensity
     binvestigate_spectral_panda['spectrum']=spectrum_list
-    
-    #print(binvestigate_spectral_panda) 
+
     #keep only a handful of columns
     binvestigate_spectral_panda.drop(['spectra_mz','spectra_intensity','name','sample','_id','species','organ','count','intensity','group','inchikey'],axis='columns',inplace=True)
     #get enlgish name from compound translation panda
@@ -52,7 +50,5 @@ if __name__ == "__main__":
     
     binvestigate_spectral_panda.drop('id',axis='columns',inplace=True)
     binvestigate_spectral_panda.compound_identifier=binvestigate_spectral_panda.compound_identifier.astype(int)
-    print(binvestigate_spectral_panda)
     
     binvestigate_spectral_panda.to_pickle(binvestigate_spectral_panda_output_address)
-

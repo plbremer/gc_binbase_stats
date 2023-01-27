@@ -24,7 +24,6 @@ def create_translation_panda_for_compounds(networkx_address,directory_address):
 
     bin_type=list()
     for temp_identifier in compound_translation_panda.compound_identifier.to_list():
-        #print(temp_identifier)
         if temp_identifier not in compound_networkx_nodes_as_str:
             bin_type.append('unknown')
         else:
@@ -68,12 +67,9 @@ def create_translation_panda_for_compounds(networkx_address,directory_address):
     compound_translation_panda['identifier']=identifier
     print(compound_translation_panda)
     return compound_translation_panda
-    #return {element[:-4]:i for i,element in enumerate(full_list)}
 
 def create_translation_dict_for_triplets(temp_bin_address):
     temp=pd.read_pickle(temp_bin_address)
-    #print(temp.index)
-    #print(temp.index[0])
     triplet_translation_panda=pd.DataFrame.from_dict(
         {
             'triplet_identifier_tuple':[temp.index[i] for i in range(len(temp.index))],
@@ -97,7 +93,6 @@ def create_translation_dict_for_triplets(temp_bin_address):
     count_list_dict=dict()
     for i in range(len(count_list)):
         count_list_dict[species_list[i]+' - '+organ_list[i]+' - '+disease_list[i]]=count_list[i]
-    #count_list_dict=dict(zip())
 
     print(count_list_dict)
     triplet_translation_panda['count']=triplet_translation_panda['triplet_identifier_string']

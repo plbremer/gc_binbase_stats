@@ -10,7 +10,6 @@ from functools import partial
 import re
 #cut network to those nodes related to a fold branch
 
-
 #recursively control the assignment of fold change matrices
 def recursively_calculate_fold_matrices(temp_nx,bottom_node,temp_matrix):
     '''
@@ -22,11 +21,7 @@ def recursively_calculate_fold_matrices(temp_nx,bottom_node,temp_matrix):
     predecessors_without_fold_matrices=list()
     for predecessor in current_predecessor_list:
         print(predecessor)
-        #print('0-00')
         try:
-            #print(temp_nx.nodes[predecessor])
-            #print('-----------------------------------------------------------------------------')
-            #print(temp_nx.nodes[predecessor][temp_matrix])
             if temp_nx.nodes[predecessor][temp_matrix] is not None:
                 predecessors_with_fold_matrices.append(predecessor)
         except KeyError:
@@ -49,10 +44,6 @@ def recursively_calculate_fold_matrices(temp_nx,bottom_node,temp_matrix):
 def visualize_added_classes(temp_nx):
     '''
     '''
-    #add_one_node_to_classyfire_network(parsed_obo,binvestigate_panda.loc[0],class_to_node_dict)
-    #color_list_original=['#1f78b4' for i in range(0,temp_original_classyfire_nodecount)]
-    #color_list_new=['#32cd32' for i in range(0,len(temp_nx.nodes)-temp_original_classyfire_nodecount)]
-    #total_color_list=color_list_original+color_list_new
     total_color_list=list()
     for temp_node in temp_nx.nodes:
         try:
@@ -83,21 +74,13 @@ def write_each_compound_fold_change_matrix_to_file(temp_nx,temp_address_base, te
 
 def one_cell_transform_fold(temp_cell):
     conditions=[
-        #np.isnan(temp_cell.values).any(),
-        #all(temp_cell==np.inf),
-        #all(temp_cell==-np.inf),
         any(temp_cell<0) and any(temp_cell>0),
-        #any(temp_cell==0),
         all(temp_cell>0),
         all(temp_cell<0)
     ]
 
     choices=[
-        #np.nan,
-        #np.inf,
-        #-np.inf,
         0,
-        #0,
         min(temp_cell),
         max(temp_cell)
     ]
@@ -106,22 +89,10 @@ def one_cell_transform_fold(temp_cell):
 
 def one_cell_transform_sig(temp_cell):
     conditions=[
-        #np.isnan(temp_cell.values).any(),
-        #all(temp_cell==np.inf),
-        #all(temp_cell==-np.inf),
-        #any(temp_cell<0) and any(temp_cell>0),
-        #any(temp_cell==0),
         all(temp_cell>0)
-        #all(temp_cell<0)
     ]
 
     choices=[
-        #np.nan,
-        #np.inf,
-        #-np.inf,
-        #0,
-        #0,
-        #min(temp_cell),
         max(temp_cell)
     ]
 
@@ -138,17 +109,9 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
     #hyperparameters that we currently have as (implicitly by the way this is coded)
     ##average or lowest -> lowest
     ##how many exceptions -> no exceptions
-    # print('hi')
-    # print(temp_predecessor_list)
-    # print(temp_bottom_node)
-    # print(temp_matrix)
-    # for i in temp_predecessor_list:
-    #     print(temp_nx.nodes[i])
-    #print(temp_nx.nodes[tuple(temp_predecessor_list)])
     temp_MultiIndex=temp_nx.nodes[temp_predecessor_list[0]][temp_matrix].columns
     
     temp_DataFrame=pandas.DataFrame(data=np.nan,index=temp_MultiIndex,columns=temp_MultiIndex)
-    # print(temp_bottom_node)
 
     #if there is only one predecessor, then we dont need to calculate anything, just copy and return
     if len(temp_predecessor_list)==1:
@@ -167,7 +130,6 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
     #makethe next one entirely np.nan and return
     
     if all([True if temp in [np.nan, 0] else False for temp in all_predecessors_concatenated_DataFrame.apply(pandas.Series.value_counts).index.to_list()]):
-        #hold=input('here')
         print('found a dead node')
         temp_nx.nodes[temp_bottom_node][temp_matrix]=temp_DataFrame
         temp_nx.nodes[temp_bottom_node]['type_of_node']='combination'
@@ -176,17 +138,13 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
 
     if 'fold' in temp_matrix:
         num_processes=cores_available
-        #num_processes = multiprocessing.cpu_count()
         chunk_size = len(all_predecessors_concatenated_DataFrame.columns)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-        #chunks = [post_species_transform_panda.iloc[post_species_transform_panda[i:i + chunk_size]] for i in range(0, post_species_transform_panda.shape[0], chunk_size)]
             if i<(num_processes-1):
                 panda_chunks.append(all_predecessors_concatenated_DataFrame.iloc[:,i*chunk_size:(i+1)*chunk_size])
             elif i==(num_processes-1):
                 panda_chunks.append(all_predecessors_concatenated_DataFrame.iloc[:,i*chunk_size:])
-        #print(panda_chunks)
-        #hold=input('check chunks')
         pool = multiprocessing.Pool(processes=num_processes)
         transformed_chunks=pool.map(partial(pandas.DataFrame.agg,func=one_column_custom_aggregation_fold),panda_chunks)
         #recombine_chunks
@@ -201,20 +159,15 @@ def calculate_combined_fold_change_matrix_vectorized(temp_nx,temp_predecessor_li
 
     elif 'signifigance' in temp_matrix:
         num_processes=cores_available
-        #num_processes = multiprocessing.cpu_count()
         chunk_size = len(all_predecessors_concatenated_DataFrame.columns)//num_processes
         panda_chunks=list()
         for i in range(0,num_processes):
-        #chunks = [post_species_transform_panda.iloc[post_species_transform_panda[i:i + chunk_size]] for i in range(0, post_species_transform_panda.shape[0], chunk_size)]
             if i<(num_processes-1):
                 panda_chunks.append(all_predecessors_concatenated_DataFrame.iloc[:,i*chunk_size:(i+1)*chunk_size])
             elif i==(num_processes-1):
                 panda_chunks.append(all_predecessors_concatenated_DataFrame.iloc[:,i*chunk_size:])
-        #print(panda_chunks)
-        #hold=input('check chunks')
         pool = multiprocessing.Pool(processes=num_processes)
         transformed_chunks=pool.map(partial(pandas.DataFrame.agg,func=one_column_custom_aggregation_sig),panda_chunks)
-        #recombine_chunks
         for i in range(len(transformed_chunks)):
             if i<(num_processes-1):
                 temp_DataFrame.iloc[:,i*chunk_size:(i+1)*chunk_size]=transformed_chunks[i]
@@ -250,12 +203,6 @@ def write_each_unknown_to_file(binvestigate_panda,temp_address_base):
                 total_address=temp_address_base+matrices_to_compute[i]+'/'
                 series[binvestigate_panda_column_names[i]].to_pickle(total_address+str(series['id'])+'.bin')
 
-
-
-
-
-
-
 if __name__ == "__main__":
     
     
@@ -275,16 +222,9 @@ if __name__ == "__main__":
 
     #read in network
     compound_network=nx.readwrite.gpickle.read_gpickle(input_graph_address)
-    #print(compound_network.nodes)
-    #hold=input('node list')
 
-    #visualize_added_classes(compound_network)
-
-    
     nx.draw(compound_network)
     plt.show()
-
-    #visualize_added_classes(compound_network)
 
     for temp_matrix in matrices_to_compute:
         recursively_calculate_fold_matrices(compound_network,'CHEMONTID:9999999',temp_matrix)
@@ -293,54 +233,16 @@ if __name__ == "__main__":
     for temp_matrix in matrices_to_compute:
         write_each_compound_fold_change_matrix_to_file(compound_network,individual_fold_matrix_directory_base,temp_matrix)
 
-
-    #visualize_added_classes(compound_network)
-    '''
-    print(compound_network.nodes[4]['fold_change_matrix'])
-    #print(compound_network.nodes[4]['name'])
-    hold=input('4')
-    print(compound_network.nodes['CHEMONTID:0001073']['fold_change_matrix'])
-    print(compound_network.nodes['CHEMONTID:0001073']['name'])
-    hold=input('0001073')
-    print(compound_network.nodes[1682]['fold_change_matrix'])
-    #print(compound_network.nodes[1682]['name'])
-    hold=input('1682')
-    print(compound_network.nodes['CHEMONTID:0001074']['fold_change_matrix'])
-    print(compound_network.nodes['CHEMONTID:0001074']['name'])
-    hold=input('0001074')
-    print(compound_network.nodes['CHEMONTID:0000435']['fold_change_matrix'])
-    print(compound_network.nodes['CHEMONTID:0000435']['name'])
-    hold=input('0000435')
-    print(compound_network.nodes[2]['fold_change_matrix'])
-    #print(compound_network.nodes[2]['name'])
-    hold=input('2')
-    '''
-
-
-
-
-
     nx.readwrite.gpickle.write_gpickle(compound_network,output_graph_address,protocol=0)
 
     #update 220926 plb
     #we also want the unknowns for the final database, but not in the compound analysis
     #so we just copy them over from the binvestigate pickle
-    
-
     pipeline_input_panda_directory='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/'
     #pipeline_output_directory='../results/'+str(min_fold_change)+'/step_0_c_complete_pipeline_input/'    
-    
-    #binvestigate_panda_address='../results/'+str(min_fold_change)+'/step_6_b_generate_signifigance_test_matrices/binvestigate_with_signifigance_matrices.bin'
     file_list=os.listdir(pipeline_input_panda_directory)
     file_list.remove('dummy.txt')
 
     for temp_file in file_list:
         temporary_input_panda=pandas.read_pickle(pipeline_input_panda_directory+temp_file)
-        #we actually do this in the method
-        # temporary_input_panda=temporary_input_panda.loc[
-        #     temporary_input_panda['inchikey'] == '@@@@@@@',:
-        # ]
-        #temporary_file_integers=re.findall(r'\d+', temp_file)
-
-        #temp_binvestigate_panda=pandas.read_pickle(binvestigate_panda_address)
         write_each_unknown_to_file(temporary_input_panda,individual_fold_matrix_directory_base)

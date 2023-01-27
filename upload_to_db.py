@@ -40,31 +40,21 @@ def prepare_one_bin_for_upload(temp_bin,mapping_dict,compound_mapping_dict):
         pandas_list[i].index=pandas_list[i].index.to_flat_index()
         pandas_list[i].rename(columns=mapping_dict,inplace=True,errors='raise')
         pandas_list[i].rename(index=mapping_dict,inplace=True)
-        #print(pandas_list[i])
-        #hold=input('hold')
-        #pandas_list[i]=pd.DataFrame(panda.stack().stack().stack())
         
         pandas_list[i].values[np.tril_indices_from(pandas_list[i], 0)] = np.nan
         
         pandas_list[i]=pd.DataFrame(panda.stack())
-        #print(pandas_list[i])
-        #hold=input('hold2')
-        #pandas_list[i].index.set_names(['organ_from','species_from','disease_from','disease_to','species_to','organ_to'],inplace=True)
         pandas_list[i].index.set_names(['triplet_from','triplet_to'],inplace=True)
-        #print(pandas_list[i])
-        #print(pandas_list[i].index)
         
     pandas_list[0].rename({0:'fold_change_average'},inplace=True,axis='columns')
     pandas_list[1].rename({0:'fold_change_median'},inplace=True,axis='columns')
     pandas_list[2].rename({0:'significance_mwu'},inplace=True,axis='columns')
     pandas_list[3].rename({0:'significance_welch'},inplace=True,axis='columns')
-    #print(pandas_list[0])
     total_panda=pd.concat(pandas_list,axis='columns')
     
     total_panda.reset_index(inplace=True)
     
     total_panda.insert(loc=0,column='compound_id',value=compound_mapping_dict[temp_bin[:-4]])
-    #print(total_panda)
     total_panda=total_panda[[
         'compound_id','triplet_from', 
         'triplet_to','fold_change_average', 'fold_change_median',
@@ -167,7 +157,6 @@ def upload_spectral_bin_table(spectral_bin_panda,connection):
         'bin_table',
         connection,
         index=False,
-        #index_label='compound_identifier',
         dtype={
             'retentionIndex':postgresql.FLOAT, 
             'kovats':postgresql.FLOAT, 
@@ -228,13 +217,6 @@ if __name__ == "__main__":
     end_time=time.time()
     print('time to create non ratio index: '+str(end_time-start_time))
 
-
-
-
-
-
-
-
     #upload the fold change matrices
     #get list of compounds and classes (listdir on one) (basically just bins)
     full_list=choose_all_bins('../results/'+str(min_fold_change)+'/step_8_perform_compound_hierarchical_analysis/all_matrices/fold_change_matrix_average')
@@ -247,21 +229,10 @@ if __name__ == "__main__":
         compound_mapping_panda.at[i,'compound_identifier']:compound_mapping_panda.at[i,'integer_representation'] for i in compound_mapping_panda.index
     }  
 
-
-
-
-
-
     #220926 plb dont upload these, do the "math" in the api
     # #upload mapping pandas
     # upload_compound_translation_table(compound_mapping_panda,connection)
     # upload_triplet_translation_table(triplet_mapping_panda,connection)
-
-
-
-
-
-
 
     #for each bin, prepare each then upload each
     for i,temp_bin in enumerate(full_list):
@@ -280,23 +251,9 @@ if __name__ == "__main__":
         f'''
         ALTER TABLE differential_analysis ADD PRIMARY KEY (compound_id, triplet_from, triplet_to);
         '''
-        #create index differential_analysis_pairs on differential_analysis (triplet_from,triplet_to)
     )      
     end_time=time.time()
     print('time to create complete differential analysis index: '+str(end_time-start_time))
-
-
-
-
-
-
-
-    # #upload mapping pandas
-    # upload_compound_translation_table(compound_mapping_panda,connection)
- 
-
-    # upload_triplet_translation_table(triplet_mapping_panda,connection)
-
 
     #upload non-ratio table
     table_9b_address='../results/'+str(min_fold_change)+'/step_9_b_generate_bin_spectral_panda/bin_spectral_panda.bin'
@@ -309,5 +266,3 @@ if __name__ == "__main__":
         ALTER TABLE bin_table ADD PRIMARY KEY (compound_identifier);
         '''
     )      
-    # end_time=time.time()
-    # print('time to create non ratio index: '+str(end_time-start_time))
